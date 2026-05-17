@@ -14,6 +14,7 @@ class SakuwiseApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        System.loadLibrary("sqlcipher")
         keyManager.setupKeyOnFirstLaunch()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
