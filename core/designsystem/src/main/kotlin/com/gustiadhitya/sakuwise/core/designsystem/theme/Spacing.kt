@@ -19,4 +19,5 @@ object SakuwiseSpacing {
     val tabBarClearance = 100.dp
     val borderThin = 1.5.dp   // standard UI border (field, card, outline button)
     val borderFocus = 2.dp    // focused/active border (pin input focus ring)
+    val barHeight = 6.dp      // SwBar progress bar height
 }
