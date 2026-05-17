@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gustiadhitya.sakuwise.core.designsystem.brand.DaunMark
 import com.gustiadhitya.sakuwise.core.designsystem.brand.Wordmark
 import com.gustiadhitya.sakuwise.core.designsystem.theme.FigtreeFontFamily
@@ -40,13 +42,17 @@ private val SplashSlideOffset = 20f  // dp, starting Y offset for fade-up animat
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
-    onSplashComplete: () -> Unit = {},
+    onNavigateToOnboarding: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    viewModel: SplashViewModel = hiltViewModel(),
 ) {
+    val destination by viewModel.destination.collectAsStateWithLifecycle()
     val reduceMotion = LocalReduceMotion.current
 
     var showMark by remember { mutableStateOf(reduceMotion) }
     var showWordmark by remember { mutableStateOf(reduceMotion) }
     var showTagline by remember { mutableStateOf(reduceMotion) }
+    var animationDone by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (reduceMotion) {
@@ -59,7 +65,16 @@ fun SplashScreen(
             showTagline = true
             delay(1160)  // total: 0 + 220 + 220 + 1160 = 1600ms
         }
-        onSplashComplete()
+        animationDone = true
+    }
+
+    LaunchedEffect(animationDone, destination) {
+        if (!animationDone) return@LaunchedEffect
+        when (destination) {
+            SplashDestination.Onboarding -> onNavigateToOnboarding()
+            SplashDestination.Home -> onNavigateToHome()
+            SplashDestination.None -> Unit
+        }
     }
 
     val markAlpha by animateFloatAsState(

@@ -7,8 +7,32 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object SplashRoute
 
-fun NavGraphBuilder.splashScreen(onSplashComplete: () -> Unit) {
+@Serializable
+data object LanguageRoute
+
+@Serializable
+data object PrivacyRoute
+
+fun NavGraphBuilder.splashScreen(
+    onNavigateToOnboarding: () -> Unit,
+    onNavigateToHome: () -> Unit,
+) {
     composable<SplashRoute> {
-        SplashScreen(onSplashComplete = onSplashComplete)
+        SplashScreen(
+            onNavigateToOnboarding = onNavigateToOnboarding,
+            onNavigateToHome = onNavigateToHome,
+        )
+    }
+}
+
+fun NavGraphBuilder.languageScreen(onNext: () -> Unit) {
+    composable<LanguageRoute> {
+        Onb_Language(onNext = onNext)
+    }
+}
+
+fun NavGraphBuilder.privacyScreen(onDone: () -> Unit) {
+    composable<PrivacyRoute> {
+        Onb_Privacy(onDone = onDone)
     }
 }

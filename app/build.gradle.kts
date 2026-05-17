@@ -43,6 +43,7 @@ dependencies {
     implementation(projects.feature.plan)
     implementation(projects.feature.asset)
     implementation(projects.feature.settings)
+    implementation(projects.core.data)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
