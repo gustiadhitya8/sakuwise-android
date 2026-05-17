@@ -104,6 +104,9 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 # Timber
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
+# Inject (for JVM modules using @Inject without Android Hilt)
+javax-inject = { module = "javax.inject:javax.inject", version = "1" }
+
 # Testing
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }

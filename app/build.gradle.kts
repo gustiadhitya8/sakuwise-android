@@ -37,10 +37,16 @@ android {
 dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.common)
+    implementation(projects.core.model)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
+    implementation(projects.core.crypto)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.timber)
+    implementation(libs.hilt.nav.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 }

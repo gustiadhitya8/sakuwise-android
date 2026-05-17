@@ -19,6 +19,7 @@ import com.gustiadhitya.sakuwise.core.database.dao.PlanDao
 import com.gustiadhitya.sakuwise.core.database.dao.PlanItemDao
 import com.gustiadhitya.sakuwise.core.database.dao.TransactionDao
 import com.gustiadhitya.sakuwise.core.database.dao.UserProfileDao
+import com.gustiadhitya.sakuwise.core.crypto.KeyManager
 import com.gustiadhitya.sakuwise.core.database.migration.MIGRATIONS
 import dagger.Module
 import dagger.Provides
@@ -34,9 +35,11 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideSakuwiseDatabase(@ApplicationContext context: Context): SakuwiseDatabase {
-        // TODO(M4c): replace stub passphrase with KeyManager.getDek()
-        val passphrase = "sakuwise_dev_stub_replace_in_M4c".toByteArray(Charsets.UTF_8)
+    fun provideSakuwiseDatabase(
+        @ApplicationContext context: Context,
+        keyManager: KeyManager,
+    ): SakuwiseDatabase {
+        val passphrase = keyManager.getDek()
         val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(
             context,
