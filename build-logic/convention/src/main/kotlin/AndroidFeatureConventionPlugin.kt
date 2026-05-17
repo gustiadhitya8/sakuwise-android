@@ -15,6 +15,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             "implementation"(platform(libs.findLibrary("androidx-compose-bom").get()))
             "implementation"(libs.findBundle("compose").get())
             "implementation"(libs.findLibrary("androidx-nav-compose").get())
+            "implementation"(libs.findLibrary("hilt-nav-compose").get())
+            "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-compose").get())
+            "implementation"(libs.findLibrary("androidx-lifecycle-runtime-compose").get())
         }
     }
 }

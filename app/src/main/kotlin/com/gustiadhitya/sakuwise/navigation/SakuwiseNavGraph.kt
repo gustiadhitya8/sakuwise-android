@@ -12,7 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gustiadhitya.sakuwise.core.designsystem.theme.LocalReduceMotion
+import com.gustiadhitya.sakuwise.feature.onboarding.LanguageRoute
+import com.gustiadhitya.sakuwise.feature.onboarding.PrivacyRoute
 import com.gustiadhitya.sakuwise.feature.onboarding.SplashRoute
+import com.gustiadhitya.sakuwise.feature.onboarding.languageScreen
+import com.gustiadhitya.sakuwise.feature.onboarding.privacyScreen
 import com.gustiadhitya.sakuwise.feature.onboarding.splashScreen
 
 private val NavEasing = CubicBezierEasing(0.2f, 0.7f, 0.3f, 1f)
@@ -53,7 +57,26 @@ fun SakuwiseNavGraph(modifier: Modifier = Modifier) {
         },
     ) {
         splashScreen(
-            onSplashComplete = {
+            onNavigateToOnboarding = {
+                navController.navigate(LanguageRoute) {
+                    popUpTo<SplashRoute> { inclusive = true }
+                }
+            },
+            onNavigateToHome = {
+                navController.navigate(HomeRoute) {
+                    popUpTo<SplashRoute> { inclusive = true }
+                }
+            },
+        )
+
+        languageScreen(
+            onNext = {
+                navController.navigate(PrivacyRoute)
+            },
+        )
+
+        privacyScreen(
+            onDone = {
                 navController.navigate(HomeRoute) {
                     popUpTo<SplashRoute> { inclusive = true }
                 }
