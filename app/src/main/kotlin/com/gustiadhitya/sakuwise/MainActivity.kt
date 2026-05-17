@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
                 if (!splashDone) {
                     SplashScreen(onSplashComplete = { splashDone = true })
                 } else {
-                    M5cGalleryScreen()
+                    ComponentGalleryScreen()
                 }
             }
         }

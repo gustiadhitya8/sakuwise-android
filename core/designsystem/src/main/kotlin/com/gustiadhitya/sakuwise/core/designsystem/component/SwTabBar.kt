@@ -15,15 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.outlined.AccountBalance
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.List
+import com.gustiadhitya.sakuwise.core.designsystem.icon.SakuwiseIcons
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -189,12 +182,11 @@ private fun TabNavItem(
     }
 }
 
-// Default tabs for previews and gallery (icons will be replaced with custom ones in M5d)
 val DefaultSakuwiseTabs = listOf(
-    SwTabItem("Beranda", Icons.Filled.Home, Icons.Outlined.Home),
-    SwTabItem("Plan", Icons.Filled.List, Icons.Outlined.List),
-    SwTabItem("Aset", Icons.Filled.AccountBalance, Icons.Outlined.AccountBalance),
-    SwTabItem("Saya", Icons.Filled.Person, Icons.Outlined.Person),
+    SwTabItem("Beranda", SakuwiseIcons.HomeFilled, SakuwiseIcons.Home),
+    SwTabItem("Plan", SakuwiseIcons.PlanFilled, SakuwiseIcons.Plan),
+    SwTabItem("Aset", SakuwiseIcons.AssetsFilled, SakuwiseIcons.Assets),
+    SwTabItem("Saya", SakuwiseIcons.MeFilled, SakuwiseIcons.Me),
 )
 
 @Preview(showBackground = true)
