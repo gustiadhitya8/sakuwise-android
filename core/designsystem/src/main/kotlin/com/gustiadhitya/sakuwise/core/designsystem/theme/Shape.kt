@@ -12,6 +12,8 @@ object SakuwiseShapes {
     val xl = RoundedCornerShape(20.dp)
     val xl2 = RoundedCornerShape(24.dp)
     val full = RoundedCornerShape(9999.dp)
+    val button = RoundedCornerShape(14.dp)  // SW_Button.borderRadius=14 from prototype
+    val card = RoundedCornerShape(18.dp)    // SW_Card.borderRadius=18 from prototype
 }
 
 val SakuwiseMaterialShapes = Shapes(

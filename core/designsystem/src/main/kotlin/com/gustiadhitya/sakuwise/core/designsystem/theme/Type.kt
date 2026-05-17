@@ -83,6 +83,26 @@ val CaptionStyle = TextStyle(
     letterSpacing = 0.12.sp,
 )
 
+// Button text styles — SemiBold weight, tight tracking per SW_Button prototype
+val ButtonTextSmStyle = TextStyle(
+    fontFamily = FigtreeFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 13.sp,
+    letterSpacing = (-0.065).sp,
+)
+val ButtonTextMdStyle = TextStyle(
+    fontFamily = FigtreeFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 15.sp,
+    letterSpacing = (-0.075).sp,
+)
+val ButtonTextLgStyle = TextStyle(
+    fontFamily = FigtreeFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 16.sp,
+    letterSpacing = (-0.08).sp,
+)
+
 // Amount styles — tabular nums enforced via fontFeatureSettings at call site
 val AmountXLStyle = TextStyle(
     fontFamily = FigtreeFontFamily,
