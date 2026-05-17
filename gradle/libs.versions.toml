@@ -19,6 +19,7 @@ datastore = "1.1.1"
 timber = "5.0.1"
 serialization = "1.7.3"
 junit5 = "5.11.0"
+junit-platform = "1.11.0"
 mockk = "1.13.13"
 kotest = "5.9.1"
 turbine = "1.2.0"
@@ -105,6 +106,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Testing
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }

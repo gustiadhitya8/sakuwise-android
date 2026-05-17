@@ -2,7 +2,10 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
@@ -20,12 +23,20 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
             }
+            testOptions {
+                unitTests.all { it.useJUnitPlatform() }
+            }
         }
 
         extensions.configure<KotlinAndroidProjectExtension> {
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
             }
+        }
+
+        val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+        dependencies {
+            "testRuntimeOnly"(libs.findLibrary("junit-platform-launcher").get())
         }
     }
 }

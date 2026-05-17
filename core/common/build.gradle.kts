@@ -8,4 +8,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotest.assertions)
 }
