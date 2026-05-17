@@ -8,6 +8,10 @@ android {
     namespace = "com.gustiadhitya.sakuwise.core.database"
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(projects.core.model)
     implementation(projects.core.crypto)
@@ -15,4 +19,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.sqlcipher.android)
     implementation(libs.androidx.security.crypto)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.junit.jupiter)
 }

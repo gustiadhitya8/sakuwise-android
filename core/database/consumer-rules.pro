@@ -1,0 +1,3 @@
+-keep class net.zetetic.database.** { *; }
+-keepclassmembers class net.zetetic.database.** { *; }
+-dontwarn net.zetetic.database.**
