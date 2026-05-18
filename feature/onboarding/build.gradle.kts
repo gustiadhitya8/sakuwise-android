@@ -18,9 +18,11 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.biometric)
+    implementation(libs.androidx.appcompat)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.ext.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

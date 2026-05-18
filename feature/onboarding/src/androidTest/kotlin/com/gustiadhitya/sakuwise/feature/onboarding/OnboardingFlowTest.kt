@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.ext.junit4.runners.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTheme
 import com.gustiadhitya.sakuwise.core.model.AccountType
 import org.junit.Rule

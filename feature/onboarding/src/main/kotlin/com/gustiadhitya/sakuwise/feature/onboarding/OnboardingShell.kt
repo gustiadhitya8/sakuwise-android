@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,22 +24,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.gustiadhitya.sakuwise.core.designsystem.component.SwButton
+import com.gustiadhitya.sakuwise.core.designsystem.theme.OnboardingTitleStyle
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseShapes
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseSpacing
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTokens
 
-private val HeroCircleSize: Dp = 200.dp
-private val HeroBadgeSize: Dp = 64.dp
-private val ProgressDotWidth: Dp = 24.dp
-private val ProgressDotHeight: Dp = 8.dp
-private val ProgressDotInactiveWidth: Dp = 8.dp
+internal val OnboardingHeroSize: Dp = 180.dp
+
+private val ProgressDotActiveWidth: Dp = 22.dp
+private val ProgressDotInactiveWidth: Dp = 6.dp
+private val ProgressDotHeight: Dp = 6.dp
 
 @Composable
 fun OnboardingShell(
@@ -69,18 +70,16 @@ fun OnboardingShell(
 
         Spacer(Modifier.height(SakuwiseSpacing.xxl))
 
-        HeroCircle(content = heroContent)
+        heroContent()
 
         Spacer(Modifier.height(SakuwiseSpacing.xxl))
 
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
+            style = OnboardingTitleStyle.copy(
                 color = MaterialTheme.colorScheme.onBackground,
             ),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
 
         Spacer(Modifier.height(SakuwiseSpacing.s))
@@ -90,7 +89,7 @@ fun OnboardingShell(
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = SakuwiseTokens.current.inkSubtle,
             ),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
 
         Spacer(Modifier.height(SakuwiseSpacing.xxl))
@@ -129,7 +128,7 @@ private fun StepProgressDots(current: Int, total: Int) {
     ) {
         repeat(total) { index ->
             val isActive = index == current
-            val width = if (isActive) ProgressDotWidth else ProgressDotInactiveWidth
+            val width = if (isActive) ProgressDotActiveWidth else ProgressDotInactiveWidth
             Box(
                 modifier = Modifier
                     .width(width)
@@ -145,27 +144,18 @@ private fun StepProgressDots(current: Int, total: Int) {
 }
 
 @Composable
-fun HeroCircle(
+internal fun OnbHeroSquircle(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = {},
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     Box(
         modifier = modifier
-            .size(HeroCircleSize)
-            .clip(CircleShape)
+            .size(OnboardingHeroSize)
+            .clip(SakuwiseShapes.hero)
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(HeroBadgeSize)
-                .clip(SakuwiseShapes.md)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
-        ) {
-            content()
-        }
-    }
+        content = content,
+    )
 }
 
 @Preview(showBackground = true)
@@ -177,8 +167,8 @@ private fun OnboardingShellPreviewLight() {
             totalSteps = 4,
             title = "Halo, kenalan dulu yuk",
             subtitle = "Pilih bahasa yang ingin kamu gunakan.",
-            heroContent = {},
-            actionLabel = "Lanjut",
+            heroContent = { OnbHeroSquircle() },
+            actionLabel = "Mulai",
             onAction = {},
         ) {}
     }
@@ -193,8 +183,8 @@ private fun OnboardingShellPreviewDark() {
             totalSteps = 4,
             title = "Halo, kenalan dulu yuk",
             subtitle = "Pilih bahasa yang ingin kamu gunakan.",
-            heroContent = {},
-            actionLabel = "Lanjut",
+            heroContent = { OnbHeroSquircle() },
+            actionLabel = "Mulai",
             onAction = {},
         ) {}
     }
