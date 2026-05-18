@@ -14,6 +14,9 @@ class UserPreferencesDataSource @Inject constructor(
 ) {
     private val onboardingCompletedKey = booleanPreferencesKey("onboarding_completed")
     private val languageCodeKey = stringPreferencesKey("language_code")
+    private val nicknameKey = stringPreferencesKey("nickname")
+    private val biometricEnabledKey = booleanPreferencesKey("biometric_enabled")
+    private val devicePinKey = stringPreferencesKey("device_pin")
 
     fun observeOnboardingCompleted(): Flow<Boolean> =
         dataStore.data.map { it[onboardingCompletedKey] ?: false }
@@ -27,5 +30,17 @@ class UserPreferencesDataSource @Inject constructor(
 
     suspend fun setLanguageCode(code: String) {
         dataStore.edit { it[languageCodeKey] = code }
+    }
+
+    suspend fun setNickname(nickname: String) {
+        dataStore.edit { it[nicknameKey] = nickname }
+    }
+
+    suspend fun setBiometricEnabled(enabled: Boolean) {
+        dataStore.edit { it[biometricEnabledKey] = enabled }
+    }
+
+    suspend fun setDevicePin(pin: String) {
+        dataStore.edit { it[devicePinKey] = pin }
     }
 }

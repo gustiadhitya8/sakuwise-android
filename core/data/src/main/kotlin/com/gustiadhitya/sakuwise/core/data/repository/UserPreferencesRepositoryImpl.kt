@@ -20,4 +20,13 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun setLanguageCode(code: String) =
         dataSource.setLanguageCode(code)
+
+    override suspend fun setNickname(nickname: String) =
+        dataSource.setNickname(nickname)
+
+    override suspend fun setBiometricEnabled(enabled: Boolean) =
+        dataSource.setBiometricEnabled(enabled)
+
+    override suspend fun setDevicePin(pin: String) =
+        dataSource.setDevicePin(pin)
 }

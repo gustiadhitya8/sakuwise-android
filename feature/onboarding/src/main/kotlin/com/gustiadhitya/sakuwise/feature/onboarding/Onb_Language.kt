@@ -31,16 +31,17 @@ import com.gustiadhitya.sakuwise.core.designsystem.icon.SakuwiseIcons
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseShapes
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseSpacing
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTheme
+import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTokens
 
 private data class LanguageOption(
     val code: String,
     val label: String,
-    val nativeLabel: String,
+    val sublabel: String,
 )
 
 private val LanguageOptions = listOf(
-    LanguageOption(code = "id", label = "Bahasa Indonesia", nativeLabel = ""),
-    LanguageOption(code = "en", label = "English", nativeLabel = ""),
+    LanguageOption(code = "id", label = "Bahasa Indonesia", sublabel = "Default"),
+    LanguageOption(code = "en", label = "English", sublabel = "Available too"),
 )
 
 @Composable
@@ -70,7 +71,7 @@ internal fun Onb_LanguageContent(
         stepIndex = 0,
         totalSteps = 4,
         title = "Halo, kenalan dulu yuk",
-        subtitle = "Pilih bahasa yang ingin kamu gunakan.",
+        subtitle = "Sakuwise adalah aplikasi anggaran lokal — semua data tinggal di HP kamu, tanpa cloud, tanpa pelacakan.",
         heroContent = {
             Icon(
                 imageVector = SakuwiseIcons.Leaf,
@@ -79,17 +80,25 @@ internal fun Onb_LanguageContent(
                 modifier = Modifier.size(SakuwiseSpacing.xxxl),
             )
         },
-        actionLabel = "Lanjut",
+        actionLabel = "Mulai",
         onAction = onNext,
         modifier = modifier,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(SakuwiseSpacing.m),
+            verticalArrangement = Arrangement.spacedBy(SakuwiseSpacing.s),
             modifier = Modifier.fillMaxWidth(),
         ) {
+            Text(
+                text = "PILIH BAHASA",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = SakuwiseTokens.current.inkSubtle,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+            )
             LanguageOptions.forEach { option ->
                 LanguageOptionCard(
                     label = option.label,
+                    sublabel = option.sublabel,
                     isSelected = selectedCode == option.code,
                     onClick = { onSelectLanguage(option.code) },
                 )
@@ -101,12 +110,12 @@ internal fun Onb_LanguageContent(
 @Composable
 private fun LanguageOptionCard(
     label: String,
+    sublabel: String,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.outline
-
     val borderWidth = if (isSelected) SakuwiseSpacing.xs / 2 else SakuwiseSpacing.xs / 4
 
     Card(
@@ -130,15 +139,22 @@ private fun LanguageOptionCard(
                 .padding(SakuwiseSpacing.l),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurface,
-                ),
-                modifier = Modifier.weight(1f),
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+                Text(
+                    text = sublabel,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = SakuwiseTokens.current.inkSubtle,
+                    ),
+                )
+            }
             if (isSelected) {
                 Spacer(Modifier.width(SakuwiseSpacing.m))
                 Icon(

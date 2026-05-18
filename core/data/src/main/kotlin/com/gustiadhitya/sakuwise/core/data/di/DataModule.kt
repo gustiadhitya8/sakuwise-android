@@ -1,6 +1,8 @@
 package com.gustiadhitya.sakuwise.core.data.di
 
+import com.gustiadhitya.sakuwise.core.data.repository.AccountRepositoryImpl
 import com.gustiadhitya.sakuwise.core.data.repository.UserPreferencesRepositoryImpl
+import com.gustiadhitya.sakuwise.core.domain.repository.AccountRepository
 import com.gustiadhitya.sakuwise.core.domain.repository.UserPreferencesRepository
 import dagger.Binds
 import dagger.Module
@@ -17,4 +19,10 @@ abstract class DataModule {
     abstract fun bindUserPreferencesRepository(
         impl: UserPreferencesRepositoryImpl,
     ): UserPreferencesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAccountRepository(
+        impl: AccountRepositoryImpl,
+    ): AccountRepository
 }

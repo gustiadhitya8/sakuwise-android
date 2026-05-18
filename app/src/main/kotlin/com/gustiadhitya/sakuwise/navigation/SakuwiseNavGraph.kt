@@ -12,9 +12,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gustiadhitya.sakuwise.core.designsystem.theme.LocalReduceMotion
+import com.gustiadhitya.sakuwise.feature.onboarding.FirstAccountRoute
+import com.gustiadhitya.sakuwise.feature.onboarding.IdentityRoute
 import com.gustiadhitya.sakuwise.feature.onboarding.LanguageRoute
 import com.gustiadhitya.sakuwise.feature.onboarding.PrivacyRoute
 import com.gustiadhitya.sakuwise.feature.onboarding.SplashRoute
+import com.gustiadhitya.sakuwise.feature.onboarding.firstAccountScreen
+import com.gustiadhitya.sakuwise.feature.onboarding.identityScreen
 import com.gustiadhitya.sakuwise.feature.onboarding.languageScreen
 import com.gustiadhitya.sakuwise.feature.onboarding.privacyScreen
 import com.gustiadhitya.sakuwise.feature.onboarding.splashScreen
@@ -70,13 +74,24 @@ fun SakuwiseNavGraph(modifier: Modifier = Modifier) {
         )
 
         languageScreen(
-            onNext = {
-                navController.navigate(PrivacyRoute)
-            },
+            onNext = { navController.navigate(IdentityRoute) },
+        )
+
+        identityScreen(
+            onNext = { navController.navigate(PrivacyRoute) },
         )
 
         privacyScreen(
+            onDone = { navController.navigate(FirstAccountRoute) },
+        )
+
+        firstAccountScreen(
             onDone = {
+                navController.navigate(HomeRoute) {
+                    popUpTo<SplashRoute> { inclusive = true }
+                }
+            },
+            onSkip = {
                 navController.navigate(HomeRoute) {
                     popUpTo<SplashRoute> { inclusive = true }
                 }
