@@ -4,11 +4,15 @@ import android.content.res.Configuration
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +46,10 @@ import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseShapes
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseSpacing
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTokens
+
+private val IdentityShieldSize: Dp = 90.dp
+private val IdentityBadgeSize: Dp = 56.dp
+private val IdentityBadgeIconSize: Dp = 28.dp
 
 @Composable
 fun Onb_Identity(
@@ -57,6 +67,10 @@ fun Onb_Identity(
         viewModel.setBiometricAvailable(available)
         onDispose {}
     }
+
+    val promptTitle = stringResource(R.string.onb_identity_biometric_prompt_title)
+    val promptSubtitle = stringResource(R.string.onb_identity_biometric_prompt_subtitle)
+    val promptCancel = stringResource(R.string.onb_identity_biometric_prompt_cancel)
 
     Onb_IdentityContent(
         nickname = uiState.nickname,
@@ -79,9 +93,9 @@ fun Onb_Identity(
                     }
                     BiometricPrompt(activity, executor, callback).authenticate(
                         BiometricPrompt.PromptInfo.Builder()
-                            .setTitle("Aktifkan biometrik")
-                            .setSubtitle("Konfirmasi untuk menggunakan sidik jari / wajah")
-                            .setNegativeButtonText("Batal")
+                            .setTitle(promptTitle)
+                            .setSubtitle(promptSubtitle)
+                            .setNegativeButtonText(promptCancel)
                             .build()
                     )
                 }
@@ -109,17 +123,10 @@ internal fun Onb_IdentityContent(
     OnboardingShell(
         stepIndex = 1,
         totalSteps = 4,
-        title = "Atur identitas singkat",
-        subtitle = "Cuma untuk sapaan dan keamanan. Tidak ada data ke server, ini semua tetap di HP kamu.",
-        heroContent = {
-            Icon(
-                imageVector = SakuwiseIcons.Me,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(SakuwiseSpacing.xxxl),
-            )
-        },
-        actionLabel = "Lanjut",
+        title = stringResource(R.string.onb_identity_title),
+        subtitle = stringResource(R.string.onb_identity_subtitle),
+        heroContent = { IdentityHero() },
+        actionLabel = stringResource(R.string.onb_identity_cta),
         onAction = onNext,
         actionEnabled = nickname.isNotBlank() && pin.length == 6,
         modifier = modifier,
@@ -128,16 +135,16 @@ internal fun Onb_IdentityContent(
             SwField(
                 value = nickname,
                 onValueChange = onNicknameChange,
-                label = "Nama panggilan",
-                placeholder = "Contoh: Gusti",
-                hint = "Dipakai untuk sapaan di Beranda.",
+                label = stringResource(R.string.onb_identity_name_label),
+                placeholder = stringResource(R.string.onb_identity_name_placeholder),
+                hint = stringResource(R.string.onb_identity_name_hint),
                 modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(Modifier.height(SakuwiseSpacing.l))
 
             Text(
-                text = "PIN 6 digit (cadangan biometrik)",
+                text = stringResource(R.string.onb_identity_pin_label),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
@@ -150,7 +157,7 @@ internal fun Onb_IdentityContent(
             )
             Spacer(Modifier.height(SakuwiseSpacing.xs))
             Text(
-                text = "Dipakai kalau biometrik gagal. Bisa diganti kapan saja di Pengaturan.",
+                text = stringResource(R.string.onb_identity_pin_hint),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = SakuwiseTokens.current.inkSubtle,
                 ),
@@ -168,11 +175,45 @@ internal fun Onb_IdentityContent(
 }
 
 @Composable
+private fun IdentityHero() {
+    OnbHeroSquircle {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = SakuwiseIcons.Shield,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(IdentityShieldSize),
+            )
+            Box(
+                modifier = Modifier
+                    .size(IdentityBadgeSize)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = -SakuwiseSpacing.m, y = -SakuwiseSpacing.m)
+                    .clip(SakuwiseShapes.card)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = SakuwiseIcons.Me,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(IdentityBadgeIconSize),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun BiometricToggleCard(
     enabled: Boolean,
     available: Boolean,
     onToggle: (Boolean) -> Unit,
 ) {
+    val toggleDesc = stringResource(R.string.onb_identity_biometric_toggle_desc)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,15 +231,15 @@ private fun BiometricToggleCard(
         Spacer(Modifier.width(SakuwiseSpacing.m))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Buka pakai biometrik",
+                text = stringResource(R.string.onb_identity_biometric_title),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
             )
             Text(
-                text = if (available) "Sidik jari / wajah — lebih cepat dari ketik PIN."
-                else "Biometrik tidak tersedia di device ini.",
+                text = if (available) stringResource(R.string.onb_identity_biometric_available)
+                else stringResource(R.string.onb_identity_biometric_unavailable),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = SakuwiseTokens.current.inkSubtle,
                 ),
@@ -209,7 +250,7 @@ private fun BiometricToggleCard(
             onCheckedChange = onToggle,
             enabled = available,
             modifier = Modifier.semantics {
-                contentDescription = "Toggle biometrik"
+                contentDescription = toggleDesc
             },
         )
     }

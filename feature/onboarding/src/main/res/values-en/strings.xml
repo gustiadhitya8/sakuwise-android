@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Language screen -->
+    <string name="onb_language_title">Let\'s get acquainted</string>
+    <string name="onb_language_subtitle">Sakuwise is a local budget app — all data stays on your phone, no cloud, no tracking.</string>
+    <string name="onb_language_cta">Start</string>
+    <string name="onb_language_section_header">CHOOSE LANGUAGE</string>
+    <string name="onb_lang_id">Bahasa Indonesia</string>
+    <string name="onb_lang_id_sublabel">Default</string>
+    <string name="onb_lang_en">English</string>
+    <string name="onb_lang_en_sublabel">Available too</string>
+
+    <!-- Privacy screen -->
+    <string name="onb_privacy_title">Your data stays here.</string>
+    <string name="onb_privacy_subtitle">No server. No telemetry. No internet access requests.</string>
+    <string name="onb_privacy_cta">I understand</string>
+    <string name="onb_privacy_feat1_title">Encrypted on disk</string>
+    <string name="onb_privacy_feat1_desc">Database &amp; receipt photos are all encrypted with AES-256.</string>
+    <string name="onb_privacy_feat2_title">No account, no email</string>
+    <string name="onb_privacy_feat2_desc">No login. Sakuwise doesn\'t know who you are.</string>
+    <string name="onb_privacy_feat3_title">Backup is in your hands</string>
+    <string name="onb_privacy_feat3_desc">Backup file is encrypted — you save it, you hold the PIN.</string>
+
+    <!-- Identity screen -->
+    <string name="onb_identity_title">Set up a brief identity</string>
+    <string name="onb_identity_subtitle">Just for greetings and security. No data to server — it all stays on your phone.</string>
+    <string name="onb_identity_cta">Continue</string>
+    <string name="onb_identity_name_label">Nickname</string>
+    <string name="onb_identity_name_placeholder">E.g. John</string>
+    <string name="onb_identity_name_hint">Used for greetings on the Home screen.</string>
+    <string name="onb_identity_pin_label">6-digit PIN (biometric backup)</string>
+    <string name="onb_identity_pin_hint">Used if biometrics fail. Can be changed anytime in Settings.</string>
+    <string name="onb_identity_biometric_title">Open with biometrics</string>
+    <string name="onb_identity_biometric_available">Fingerprint / face — faster than typing a PIN.</string>
+    <string name="onb_identity_biometric_unavailable">Biometrics not available on this device.</string>
+    <string name="onb_identity_biometric_prompt_title">Enable biometrics</string>
+    <string name="onb_identity_biometric_prompt_subtitle">Confirm to use fingerprint / face</string>
+    <string name="onb_identity_biometric_prompt_cancel">Cancel</string>
+    <string name="onb_identity_biometric_toggle_desc">Toggle biometrics</string>
+
+    <!-- First account screen -->
+    <string name="onb_first_account_title">Your first account</string>
+    <string name="onb_first_account_subtitle">Let\'s set up a Cash account first. You can rename it, update the balance, or proceed directly.</string>
+    <string name="onb_first_account_cta">Done · Go to Home</string>
+    <string name="onb_first_account_skip">Add another account later</string>
+    <string name="onb_first_account_name_label">Account name</string>
+    <string name="onb_first_account_name_placeholder">E.g. Cash, Mandiri, GoPay</string>
+    <string name="onb_first_account_type_label">Type</string>
+    <string name="onb_account_type_cash">Cash</string>
+    <string name="onb_account_type_bank">Bank</string>
+    <string name="onb_account_type_ewallet">Wallet</string>
+    <string name="onb_first_account_balance_label">Initial balance</string>
+    <string name="onb_first_account_balance_hint">Can be 0 — you can update it later.</string>
+    <string name="onb_account_card_label">ACCOUNT · %s</string>
+</resources>

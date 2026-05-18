@@ -35,6 +35,14 @@ val DisplayMStyle = TextStyle(
     letterSpacing = (-0.64).sp,
 )
 
+val OnboardingTitleStyle = TextStyle(
+    fontFamily = FigtreeFontFamily,
+    fontWeight = FontWeight.ExtraBold,
+    fontSize = 28.sp,
+    lineHeight = 34.sp,
+    letterSpacing = (-0.28).sp,
+)
+
 val H1Style = TextStyle(
     fontFamily = FigtreeFontFamily,
     fontWeight = FontWeight.Bold,

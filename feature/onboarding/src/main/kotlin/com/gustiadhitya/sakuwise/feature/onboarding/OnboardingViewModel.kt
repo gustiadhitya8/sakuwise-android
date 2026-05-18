@@ -1,5 +1,7 @@
 package com.gustiadhitya.sakuwise.feature.onboarding
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.core.domain.usecase.preferences.CompleteOnboardingUseCase
@@ -37,8 +39,10 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun confirmLanguage(onNext: () -> Unit) {
+        val code = _uiState.value.selectedLanguage
         viewModelScope.launch {
-            setLanguage(_uiState.value.selectedLanguage)
+            setLanguage(code)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
             onNext()
         }
     }

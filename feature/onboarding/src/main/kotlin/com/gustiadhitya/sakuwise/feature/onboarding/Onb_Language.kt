@@ -19,30 +19,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gustiadhitya.sakuwise.core.designsystem.brand.DaunMark
 import com.gustiadhitya.sakuwise.core.designsystem.icon.SakuwiseIcons
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseShapes
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseSpacing
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseTokens
 
-private data class LanguageOption(
-    val code: String,
-    val label: String,
-    val sublabel: String,
-)
-
-private val LanguageOptions = listOf(
-    LanguageOption(code = "id", label = "Bahasa Indonesia", sublabel = "Default"),
-    LanguageOption(code = "en", label = "English", sublabel = "Available too"),
-)
+private val LanguageHeroDaunSize: Dp = 108.dp
 
 @Composable
 fun Onb_Language(
@@ -70,17 +65,14 @@ internal fun Onb_LanguageContent(
     OnboardingShell(
         stepIndex = 0,
         totalSteps = 4,
-        title = "Halo, kenalan dulu yuk",
-        subtitle = "Sakuwise adalah aplikasi anggaran lokal — semua data tinggal di HP kamu, tanpa cloud, tanpa pelacakan.",
+        title = stringResource(R.string.onb_language_title),
+        subtitle = stringResource(R.string.onb_language_subtitle),
         heroContent = {
-            Icon(
-                imageVector = SakuwiseIcons.Leaf,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(SakuwiseSpacing.xxxl),
-            )
+            OnbHeroSquircle {
+                DaunMark(size = LanguageHeroDaunSize)
+            }
         },
-        actionLabel = "Mulai",
+        actionLabel = stringResource(R.string.onb_language_cta),
         onAction = onNext,
         modifier = modifier,
     ) {
@@ -89,26 +81,33 @@ internal fun Onb_LanguageContent(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = "PILIH BAHASA",
+                text = stringResource(R.string.onb_language_section_header),
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = SakuwiseTokens.current.inkSubtle,
                     fontWeight = FontWeight.SemiBold,
                 ),
             )
-            LanguageOptions.forEach { option ->
-                LanguageOptionCard(
-                    label = option.label,
-                    sublabel = option.sublabel,
-                    isSelected = selectedCode == option.code,
-                    onClick = { onSelectLanguage(option.code) },
-                )
-            }
+            LanguageOptionCard(
+                code = "id",
+                label = stringResource(R.string.onb_lang_id),
+                sublabel = stringResource(R.string.onb_lang_id_sublabel),
+                isSelected = selectedCode == "id",
+                onClick = { onSelectLanguage("id") },
+            )
+            LanguageOptionCard(
+                code = "en",
+                label = stringResource(R.string.onb_lang_en),
+                sublabel = stringResource(R.string.onb_lang_en_sublabel),
+                isSelected = selectedCode == "en",
+                onClick = { onSelectLanguage("en") },
+            )
         }
     }
 }
 
 @Composable
 private fun LanguageOptionCard(
+    code: String,
     label: String,
     sublabel: String,
     isSelected: Boolean,

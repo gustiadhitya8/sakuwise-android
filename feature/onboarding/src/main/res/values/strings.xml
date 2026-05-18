@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Language screen -->
+    <string name="onb_language_title">Halo, kenalan dulu yuk</string>
+    <string name="onb_language_subtitle">Sakuwise adalah aplikasi anggaran lokal — semua data tinggal di HP kamu, tanpa cloud, tanpa pelacakan.</string>
+    <string name="onb_language_cta">Mulai</string>
+    <string name="onb_language_section_header">PILIH BAHASA</string>
+    <string name="onb_lang_id">Bahasa Indonesia</string>
+    <string name="onb_lang_id_sublabel">Default</string>
+    <string name="onb_lang_en">English</string>
+    <string name="onb_lang_en_sublabel">Available too</string>
+
+    <!-- Privacy screen -->
+    <string name="onb_privacy_title">Data kamu tinggal di sini.</string>
+    <string name="onb_privacy_subtitle">Tidak ada server. Tidak ada telemetry. Tidak ada permintaan akses internet.</string>
+    <string name="onb_privacy_cta">Saya mengerti</string>
+    <string name="onb_privacy_feat1_title">Terenkripsi di disk</string>
+    <string name="onb_privacy_feat1_desc">Database &amp; foto struk semua dienkripsi pakai AES-256.</string>
+    <string name="onb_privacy_feat2_title">Bukan akun, bukan email</string>
+    <string name="onb_privacy_feat2_desc">Tidak ada login. Sakuwise tidak tahu siapa kamu.</string>
+    <string name="onb_privacy_feat3_title">Backup dipegang kamu</string>
+    <string name="onb_privacy_feat3_desc">File backup terenkripsi — kamu yang simpan, kamu yang pegang PIN-nya.</string>
+
+    <!-- Identity screen -->
+    <string name="onb_identity_title">Atur identitas singkat</string>
+    <string name="onb_identity_subtitle">Cuma untuk sapaan dan keamanan. Tidak ada data ke server, ini semua tetap di HP kamu.</string>
+    <string name="onb_identity_cta">Lanjut</string>
+    <string name="onb_identity_name_label">Nama panggilan</string>
+    <string name="onb_identity_name_placeholder">Mis. Gusti</string>
+    <string name="onb_identity_name_hint">Dipakai untuk sapaan di Beranda.</string>
+    <string name="onb_identity_pin_label">PIN 6 digit (cadangan biometrik)</string>
+    <string name="onb_identity_pin_hint">Dipakai kalau biometrik gagal. Bisa diganti kapan saja di Pengaturan.</string>
+    <string name="onb_identity_biometric_title">Buka pakai biometrik</string>
+    <string name="onb_identity_biometric_available">Sidik jari / wajah — lebih cepat dari ketik PIN.</string>
+    <string name="onb_identity_biometric_unavailable">Biometrik tidak tersedia di device ini.</string>
+    <string name="onb_identity_biometric_prompt_title">Aktifkan biometrik</string>
+    <string name="onb_identity_biometric_prompt_subtitle">Konfirmasi untuk menggunakan sidik jari / wajah</string>
+    <string name="onb_identity_biometric_prompt_cancel">Batal</string>
+    <string name="onb_identity_biometric_toggle_desc">Toggle biometrik</string>
+
+    <!-- First account screen -->
+    <string name="onb_first_account_title">Akun pertamamu</string>
+    <string name="onb_first_account_subtitle">Kita siapkan akun Tunai dulu. Bisa di-rename, ubah saldonya, atau langsung lanjut.</string>
+    <string name="onb_first_account_cta">Selesai · Masuk Beranda</string>
+    <string name="onb_first_account_skip">Tambah akun lain nanti</string>
+    <string name="onb_first_account_name_label">Nama akun</string>
+    <string name="onb_first_account_name_placeholder">Mis. Tunai, Mandiri, GoPay</string>
+    <string name="onb_first_account_type_label">Tipe</string>
+    <string name="onb_account_type_cash">Tunai</string>
+    <string name="onb_account_type_bank">Bank</string>
+    <string name="onb_account_type_ewallet">Dompet</string>
+    <string name="onb_first_account_balance_label">Saldo awal</string>
+    <string name="onb_first_account_balance_hint">Boleh 0 — kamu bisa update nanti.</string>
+    <string name="onb_account_card_label">AKUN · %s</string>
+</resources>
