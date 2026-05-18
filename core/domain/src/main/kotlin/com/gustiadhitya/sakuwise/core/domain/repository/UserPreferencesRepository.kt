@@ -7,4 +7,7 @@ interface UserPreferencesRepository {
     suspend fun setOnboardingCompleted(completed: Boolean)
     fun observeLanguageCode(): Flow<String>
     suspend fun setLanguageCode(code: String)
+    suspend fun setNickname(nickname: String)
+    suspend fun setBiometricEnabled(enabled: Boolean)
+    suspend fun setDevicePin(pin: String)
 }

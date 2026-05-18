@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.gustiadhitya.sakuwise.core.designsystem.icon.SakuwiseIcons
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseShapes
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SakuwiseSpacing
@@ -55,10 +54,9 @@ private val PrivacyFeatures = listOf(
 fun Onb_Privacy(
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     Onb_PrivacyContent(
-        onDone = { viewModel.completeOnboarding(onDone) },
+        onDone = onDone,
         modifier = modifier,
     )
 }

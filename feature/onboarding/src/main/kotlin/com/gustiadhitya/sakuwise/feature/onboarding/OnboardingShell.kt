@@ -50,6 +50,9 @@ fun OnboardingShell(
     actionLabel: String,
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
+    actionEnabled: Boolean = true,
+    secondaryActionLabel: String? = null,
+    onSecondaryAction: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -99,8 +102,19 @@ fun OnboardingShell(
         SwButton(
             text = actionLabel,
             onClick = onAction,
+            enabled = actionEnabled,
             modifier = Modifier.fillMaxWidth(),
         )
+
+        if (secondaryActionLabel != null && onSecondaryAction != null) {
+            Spacer(Modifier.height(SakuwiseSpacing.m))
+            SwButton(
+                text = secondaryActionLabel,
+                onClick = onSecondaryAction,
+                variant = com.gustiadhitya.sakuwise.core.designsystem.component.SwButtonVariant.Ghost,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         Spacer(Modifier.height(SakuwiseSpacing.xxxl))
     }
