@@ -26,7 +26,7 @@
     <string name="dashboard_greeting_afternoon">Selamat sore</string>
     <string name="dashboard_greeting_evening">Selamat malam</string>
     <string name="dashboard_default_name">Teman</string>
-    <string name="dashboard_top_expenses">Top Pengeluaran</string>
+    <string name="dashboard_top_expenses">Pengeluaran Teratas</string>
     <string name="dashboard_active_period">periode aktif</string>
     <string name="dashboard_no_plan">Belum ada plan bulan ini</string>
     <string name="dashboard_period_format">%1$s · sisa %2$d hari</string>
@@ -132,6 +132,7 @@
     <!-- Transaction forms -->
     <string name="txn_expense_title">Pengeluaran</string>
     <string name="txn_expense_amount_label">Jumlah Pengeluaran</string>
+    <string name="txn_expense_alloc_subtitle_format">Alokasi %1$s</string>
     <string name="txn_income_title">Pemasukan</string>
     <string name="txn_income_amount_label">Jumlah Pemasukan</string>
     <string name="txn_transfer_title">Transfer</string>
@@ -243,7 +244,7 @@
     <string name="privacy_section_backup">Backup &amp; Kontrol Kamu</string>
     <string name="privacy_backup_body">Kamu yang memutuskan kapan, ke mana, dan bagaimana data di-backup. File .sakuwise dienkripsi ulang dengan PIN backup yang kamu tetapkan (Argon2id KDF + AES-256-GCM). Sakuwise tidak menyimpan PIN backup ini — kalau hilang, file backup tidak bisa dipulihkan oleh kami.</string>
     <string name="privacy_section_reset">Hak Hapus</string>
-    <string name="privacy_reset_body">Buka Saya → Export &amp; Reset → ketik frasa konfirmasi untuk hapus semua data secara permanen. Setelah dihapus, tidak ada yang bisa memulihkannya kecuali kamu punya file backup yang valid.</string>
+    <string name="privacy_reset_body">Buka Saya → Reset Aplikasi → ketik frasa konfirmasi untuk hapus semua data secara permanen. Setelah dihapus, tidak ada yang bisa memulihkannya kecuali kamu punya file backup yang valid.</string>
     <string name="privacy_section_camera">Kamera (Opsional)</string>
     <string name="privacy_camera_body">Fitur Scan Struk (OCR) meminta izin kamera saat kamu memakainya. Foto struk diproses 100%% di HP via ML Kit on-device — gambar tidak dikirim ke mana pun dan tidak disimpan setelah ekstraksi selesai.</string>
     <string name="privacy_section_contact_q">Pertanyaan?</string>
@@ -385,6 +386,9 @@
     <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>
     <string name="plan_action_regen_incomes_sub">Cek transaksi income bertanda [BERULANG] dan tulis untuk bulan ini</string>
     <string name="plan_recurring_result_format">%1$d pemasukan berulang ditambahkan</string>
+    <string name="plan_created_toast_format">Plan %1$s berhasil dibuat</string>
+    <string name="plan_month_picker_create_next">+ Buat Plan Bulan Berikutnya</string>
+    <string name="plan_month_picker_empty">Belum ada riwayat plan.</string>
     <string name="plan_recurring_result_none">Tidak ada pemasukan berulang yang perlu ditambahkan.</string>
 
     <!-- Account edit -->
@@ -687,4 +691,13 @@
     <string name="restore_success_body">Data dari file backup sudah diganti ke aplikasi ini. Aplikasi harus dibuka ulang supaya semua tampilan refresh dengan data baru.</string>
     <string name="restore_relaunch">Buka Ulang Aplikasi</string>
     <string name="restore_footer">Catatan: PIN aplikasi &amp; nama kamu tidak ikut di-restore — itu cuma ada di install saat ini. Data keuangan (akun, plan, transaksi, aset) sudah balik.</string>
+
+    <!-- AUDIT-CC2: externalized sheet/dialog titles (PLAN-7 EN walkthrough prep) -->
+    <string name="sheet_plan_month_picker_title">Pilih Periode</string>
+    <string name="sheet_plan_add_category_title">Tambah Kategori</string>
+    <string name="sheet_plan_delete_category_title">Hapus Kategori?</string>
+    <string name="sheet_plan_expected_income_title">Pemasukan Diharapkan</string>
+    <string name="sheet_plan_reset_title">Reset Plan?</string>
+    <string name="sheet_picker_debt_title">Pilih hutang</string>
+    <string name="sheet_picker_income_category_title">Kategori Sumber</string>
 </resources>

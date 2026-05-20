@@ -191,7 +191,7 @@ fun DebtPickerSheet(
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Pilih hutang", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_picker_debt_title), onDismiss = onDismiss) {
         if (debts.isEmpty()) {
             Text(
                 "Belum ada hutang terbuka. Tambah dulu di tab Aset → Hutang.",
@@ -418,7 +418,7 @@ fun IncomeCategoryPickerSheet(
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Kategori Sumber", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_picker_income_category_title), onDismiss = onDismiss) {
         if (categories.isEmpty()) {
             Text("Belum ada kategori sumber.", color = sw.inkMuted, style = SwType.Body)
             return@SwPickerSheet

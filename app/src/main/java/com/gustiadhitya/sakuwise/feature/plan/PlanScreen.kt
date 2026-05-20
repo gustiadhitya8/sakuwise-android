@@ -348,8 +348,53 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         MonthPickerSheet(
             plans = allPlans,
             activeId = state.plan?.id,
+            onPick = { id ->
+                viewModel.setViewedPlan(id)
+                monthPickerOpen = false
+            },
+            onCreateNext = {
+                viewModel.regenerateNextPeriodPlan()
+                monthPickerOpen = false
+            },
             onDismiss = { monthPickerOpen = false },
         )
+    }
+    // Toast-style feedback for actions that previously appeared dead
+    val planCreated by viewModel.planCreatedResult.collectAsState()
+    val recurringRes by viewModel.recurringResult.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(planCreated) {
+        if (planCreated != null) {
+            kotlinx.coroutines.delay(2500)
+            viewModel.clearPlanCreatedResult()
+        }
+    }
+    androidx.compose.runtime.LaunchedEffect(recurringRes) {
+        if (recurringRes != null) {
+            kotlinx.coroutines.delay(2500)
+            viewModel.clearRecurringResult()
+        }
+    }
+    if (planCreated != null || recurringRes != null) {
+        Box(
+            modifier = Modifier.fillMaxSize().padding(20.dp),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(sw.ink)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            ) {
+                val msg = when {
+                    planCreated != null -> stringResource(R.string.plan_created_toast_format, planCreated!!)
+                    recurringRes != null && recurringRes!! > 0 ->
+                        stringResource(R.string.plan_recurring_result_format, recurringRes!!)
+                    recurringRes != null -> stringResource(R.string.plan_recurring_result_none)
+                    else -> ""
+                }
+                Text(msg, color = sw.bg, style = SwType.LabelStrong.copy(fontSize = 13.sp))
+            }
+        }
     }
 }
 
@@ -391,12 +436,39 @@ private fun FilterChip(label: String, selected: Boolean, accent: Color, onClick:
 private fun MonthPickerSheet(
     plans: List<com.gustiadhitya.sakuwise.core.domain.model.Plan>,
     activeId: String?,
+    onPick: (String) -> Unit,
+    onCreateNext: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Periode Plan", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_month_picker_title), onDismiss = onDismiss) {
+        // "Create next month" CTA pinned at top so users can build out future
+        // periods without leaving the picker. Each click chains forward
+        // (Jun → Jul → Aug …) per the regenerateNextPeriodPlan fix.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(sw.primary)
+                .clickable(onClick = onCreateNext)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.CalendarToday, null,
+                    tint = sw.onPrimary, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+                Text(
+                    stringResource(R.string.plan_month_picker_create_next),
+                    color = sw.onPrimary,
+                    style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                )
+            }
+        }
+        Spacer(Modifier.height(12.dp))
         if (plans.isEmpty()) {
-            Text("Belum ada riwayat plan.", color = sw.inkMuted, style = SwType.Body)
+            Text(stringResource(R.string.plan_month_picker_empty),
+                color = sw.inkMuted, style = SwType.Body)
             return@SwPickerSheet
         }
         Column {
@@ -408,6 +480,7 @@ private fun MonthPickerSheet(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(if (active) sw.primaryContainer else Color.Transparent)
+                        .clickable { onPick(plan.id) }
                         .padding(vertical = 10.dp, horizontal = 12.dp),
                 ) {
                     Icon(Icons.Outlined.CalendarToday, null,
@@ -511,7 +584,7 @@ private fun DashedAddCategoryButton(text: String, accentColor: Color, onClick: (
 @Composable
 private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
     var name by remember { mutableStateOf("") }
-    SwPickerSheet(title = "Tambah Kategori", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_add_category_title), onDismiss = onDismiss) {
         SwField(value = name, onValueChange = { name = it },
             label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
         Spacer(Modifier.height(16.dp))
@@ -528,7 +601,7 @@ private fun ConfirmDeleteCategorySheet(
     categoryName: String, onConfirm: () -> Unit, onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Hapus Kategori?", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_delete_category_title), onDismiss = onDismiss) {
         Text(
             "Hapus kategori \"$categoryName\" dan semua plan item di dalamnya. " +
                 "Tindakan ini tidak bisa dibatalkan.",
@@ -808,7 +881,7 @@ private fun EditExpectedIncomeSheet(
 ) {
     val sw = SwTheme.colors
     var amount by remember { mutableStateOf(if (current == 0L) "" else current.toString()) }
-    SwPickerSheet(title = "Pemasukan Diharapkan", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_expected_income_title), onDismiss = onDismiss) {
         Text(
             "Total pemasukan yang kamu ekspektasikan di periode ini. " +
                 "Dipakai sebagai baseline progress bar plan.",
@@ -836,7 +909,7 @@ private fun EditExpectedIncomeSheet(
 @Composable
 private fun ConfirmResetSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Reset Plan?", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_reset_title), onDismiss = onDismiss) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

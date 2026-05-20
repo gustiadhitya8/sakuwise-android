@@ -8,11 +8,15 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import android.app.Activity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gustiadhitya.sakuwise.feature.onboarding.viewmodel.OnboardingViewModel
 
@@ -32,7 +36,9 @@ fun OnboardingFlow(
         accountType = state.accountType,
         accountBalance = state.accountBalance,
     )
+    val ctx = LocalContext.current
     val onChange: (OnboardingUi) -> Unit = { next ->
+        val langChanged = next.lang != state.lang
         viewModel.update {
             it.copy(
                 lang = next.lang,
@@ -43,6 +49,14 @@ fun OnboardingFlow(
                 accountType = next.accountType,
                 accountBalance = next.accountBalance,
             )
+        }
+        if (langChanged) {
+            // Apply the locale immediately so the rest of onboarding renders
+            // in the user's chosen language. Without this, the user picks
+            // English on step 1 but steps 2-4 + lock + dashboard stay in ID
+            // until the saved pref is read on next cold-start.
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(next.lang))
+            (ctx as? Activity)?.recreate()
         }
     }
     val finish = { viewModel.finish() }

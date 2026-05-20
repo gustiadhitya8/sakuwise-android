@@ -63,14 +63,40 @@ fun ExpenseFormScreen(
 
     val account = accounts.firstOrNull { it.id == state.accountId }
 
+    // Hero tint follows the picked plan item's allocation bucket (PRD §7.4 +
+    // screens-addtxn.jsx:62). Needs=primary, Wants=accent, Invest=info. When
+    // no plan item is picked yet, fall back to inkMuted-on-surface so the
+    // hero isn't "loud" before the user has selected anything (proto: same).
+    val alloc = state.planItemAllocation
+    val heroBg = when (alloc) {
+        com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Needs -> sw.primary
+        com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> sw.accent
+        com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Invest -> sw.info
+        null -> sw.surface
+    }
+    val heroFg = when (alloc) {
+        // Mint (accent) needs the fixed-dark token for contrast per proto.
+        com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> sw.fixedDarkOnMint
+        null -> sw.ink
+        else -> sw.onPrimary
+    }
+    val allocLabel: String? = alloc?.let { a ->
+        val name = when (a) {
+            com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Needs -> stringResource(R.string.alloc_needs)
+            com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> stringResource(R.string.alloc_wants)
+            com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Invest -> stringResource(R.string.alloc_invest)
+        }
+        stringResource(R.string.txn_expense_alloc_subtitle_format, name)
+    }
+
     TxnFormShell(
         title = stringResource(R.string.txn_expense_title),
-        heroBg = sw.danger,
-        heroFg = sw.onPrimary,
+        heroBg = heroBg,
+        heroFg = heroFg,
         heroLabel = stringResource(R.string.txn_expense_amount_label),
         amount = state.amount,
         onAmountChange = viewModel::setAmount,
-        heroSubtitle = state.planItemName?.let { "Plan item · $it" },
+        heroSubtitle = allocLabel,
         onCancel = onClose,
         saveLabel = "Simpan",
         saveEnabled = state.amount > 0 && state.accountId != null && state.planItemId != null && !state.saving,
@@ -158,7 +184,8 @@ fun ExpenseFormScreen(
         ExpensePicker.PlanItem -> PlanItemPickerSheet(
             grouped = planItems,
             selectedId = state.planItemId,
-            onPick = { viewModel.setPlanItem(it.id, it.name) },
+            onPick = { viewModel.setPlanItem(it.id, it.name,
+                com.gustiadhitya.sakuwise.core.domain.model.AllocationId.fromName(it.allocationName)) },
             onDismiss = { picker = null },
         )
         ExpensePicker.Date -> DatePickerSheet(

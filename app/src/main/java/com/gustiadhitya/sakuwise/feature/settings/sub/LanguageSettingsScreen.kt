@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import android.app.Activity
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,7 @@ fun LanguageSettingsScreen(
 ) {
     val sw = SwTheme.colors
     val prefs by main.prefs.collectAsState()
+    val ctx = LocalContext.current
 
     SimpleSettingsScreen(title = stringResource(R.string.language_title), onBack = onBack) {
         Text(
@@ -57,7 +60,14 @@ fun LanguageSettingsScreen(
                 active = prefs.language == code,
                 label = pair.first,
                 sub = pair.second,
-                onClick = { mutator.setLanguage(code) },
+                onClick = {
+                    mutator.setLanguage(code)
+                    // AppCompatDelegate.setApplicationLocales fires a config change,
+                    // but the Activity's attachBaseContext doesn't re-run unless we
+                    // explicitly recreate. Without this, the new locale is saved
+                    // but the visible UI stays in the old language until cold-restart.
+                    (ctx as? Activity)?.recreate()
+                },
             )
             Spacer(Modifier.height(8.dp))
         }

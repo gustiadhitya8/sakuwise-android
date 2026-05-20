@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +20,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.PieChart
+import androidx.compose.material.icons.outlined.Replay
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -135,40 +147,51 @@ fun SettingsScreen(
         SettingsGroup(label = stringResource(R.string.settings_group_plan)) {
             SettingsRow(stringResource(R.string.settings_default_alloc),
                 "${prefs.needsPct} · ${prefs.wantsPct} · ${prefs.investPct}",
+                icon = Icons.Outlined.PieChart,
                 onClick = onNavigateToAllocation)
             SettingsRow(stringResource(R.string.settings_period_start),
                 "Tanggal ${prefs.planPeriodStartDay}",
+                icon = Icons.Outlined.CalendarToday,
                 onClick = onNavigateToPeriodStart)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_security)) {
             SettingsRow(stringResource(R.string.settings_pin_bio),
                 if (prefs.biometricEnabled) activeStr else inactiveStr,
+                icon = Icons.Outlined.Shield,
                 onClick = onNavigateToPin)
             SettingsRow(stringResource(R.string.settings_autolock),
                 minutesStr,
+                icon = Icons.Outlined.Lock,
                 onClick = onNavigateToAutoLock)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_backup)) {
             SettingsRow(stringResource(R.string.settings_backup_restore), lastBackupLabel,
+                icon = Icons.Outlined.CloudUpload,
                 onClick = onNavigateToBackup)
             SettingsRow(stringResource(R.string.settings_export_pdf),
                 stringResource(R.string.settings_export_pdf_sub),
+                icon = Icons.Outlined.Description,
                 onClick = onNavigateToExport)
             SettingsRow(stringResource(R.string.settings_export_reset),
                 stringResource(R.string.settings_export_reset_sub),
+                icon = Icons.Outlined.DeleteForever,
                 danger = true, onClick = onNavigateToReset)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_app)) {
             SettingsRow(stringResource(R.string.settings_language),
                 if (prefs.language == "id") "Bahasa Indonesia" else "English",
+                icon = Icons.Outlined.Language,
                 onClick = onNavigateToLanguage)
             SettingsRow(stringResource(R.string.settings_replay_onboarding),
                 stringResource(R.string.settings_replay_onboarding_sub),
+                icon = Icons.Outlined.Replay,
                 onClick = onReplayOnboarding)
             SettingsRow(stringResource(R.string.settings_donate),
                 stringResource(R.string.settings_donate_sub),
+                icon = Icons.Outlined.Favorite,
                 onClick = onNavigateToDonate)
             SettingsRow(stringResource(R.string.settings_about), "v1.0",
+                icon = Icons.Outlined.Info,
                 onClick = onNavigateToAbout)
         }
     }
@@ -193,6 +216,7 @@ private fun SettingsRow(
     value: String,
     danger: Boolean = false,
     warning: Boolean = false,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     onClick: () -> Unit,
 ) {
     val sw = SwTheme.colors
@@ -205,9 +229,27 @@ private fun SettingsRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            // A11Y-004 minimum tap target; padding already brings 2-line rows
+            // to ~62dp but 1-line variants would drop to ~48dp without this.
+            .heightIn(min = 48.dp)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
+        // Leading 40dp icon tile per prototype screens-settings.jsx — every
+        // settings row carries a category glyph in a primaryContainer-bg
+        // squircle. Danger rows tint the tile danger soft + danger fg.
+        if (icon != null) {
+            val tileBg = if (danger) sw.dangerSoft else sw.primaryContainer
+            val tileFg = if (danger) sw.danger else sw.onPrimaryContainer
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(tileBg),
+            ) { Icon(icon, null, tint = tileFg, modifier = Modifier.size(20.dp)) }
+            Spacer(Modifier.size(width = 12.dp, height = 1.dp))
+        }
         Column(Modifier.weight(1f)) {
             Text(label, color = labelColor,
                 style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))

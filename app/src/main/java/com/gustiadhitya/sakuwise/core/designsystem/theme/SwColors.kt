@@ -68,7 +68,9 @@ val DarkSwColors = SwColors(
     danger = DangerDark, dangerSoft = DangerSoftDark,
     info = InfoDark, infoSoft = InfoSoftDark,
     track = TrackDark,
-    fixedDarkOnMint = FixedDarkOnMint,
+    // Inverted in dark mode — mint bg is now dark (AccentDark = #2D5E48),
+    // so the "fixed on mint" fg becomes light.
+    fixedDarkOnMint = FixedDarkOnMintDark,
     isDark = true,
 )
 

@@ -128,15 +128,16 @@ private fun DashboardContent(
             allocations = state.allocations,
             onTap = onNavigateToPlan,
         )
+        // Order per screens-dashboard.jsx:384-390 — top spend BEFORE assets link.
+        if (state.topCategories.isNotEmpty()) {
+            DashboardTopCategories(items = state.topCategories)
+        }
         DashboardAssetsLink(
             accountsCount = state.accounts.size,
             accountsTotal = state.accountsTotal,
             hide = hide,
             onTap = onNavigateToAssets,
         )
-        if (state.topCategories.isNotEmpty()) {
-            DashboardTopCategories(items = state.topCategories)
-        }
         DashboardRecentTxns(
             txns = state.recentTransactions,
             accountNameLookup = { id -> state.accounts.firstOrNull { it.id == id }?.name },
@@ -696,8 +697,10 @@ private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
         ) { Icon(Icons.Outlined.Shield, null, tint = Color.White, modifier = Modifier.size(18.dp)) }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
+            // 13sp per proto screens-dashboard.jsx:332 (was 16sp, made banner
+            // taller than proto and unbalanced the dashboard bottom).
             Text(label, color = sw.ink,
-                style = SwType.LabelStrong.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
             Text("Amankan data uangmu — backup sekarang.",
                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
         }
@@ -716,40 +719,38 @@ private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
     }
 }
 
+/**
+ * Top-expense categories tile. Per prototype screens-dashboard.jsx:154-170:
+ * - SectionLabel "Pengeluaran Teratas" (uppercase) — matches other dashboard sections
+ * - No rank prefix
+ * - 6dp bar tinted to a per-rank palette (primary/accent/warning/info/danger)
+ * - Right-aligned amount in the SAME palette color
+ */
 @Composable
 private fun DashboardTopCategories(
     items: List<com.gustiadhitya.sakuwise.feature.dashboard.viewmodel.TopCategorySpend>,
 ) {
     val sw = SwTheme.colors
     val maxAmount = items.maxOfOrNull { it.amount }?.coerceAtLeast(1L) ?: 1L
+    val palette = listOf(sw.primary, sw.accent, sw.warning, sw.info, sw.danger)
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH, vertical = 8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.dashboard_top_expenses), color = sw.ink,
-                style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.dashboard_active_period), color = sw.inkSubtle,
-                style = SwType.LabelSmall.copy(fontSize = 11.sp))
-        }
-        Spacer(Modifier.height(8.dp))
+        SwSectionLabel(text = stringResource(R.string.dashboard_top_expenses))
         SwCard(padding = PaddingValues(14.dp)) {
             Column {
                 items.forEachIndexed { i, item ->
+                    val tint = palette[i % palette.size]
                     if (i > 0) Spacer(Modifier.height(10.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("${i + 1}.", color = sw.inkSubtle,
-                            style = SwType.LabelStrong.copy(fontSize = 12.sp),
-                            modifier = Modifier.width(20.dp))
                         Column(Modifier.weight(1f)) {
                             Text(item.name, color = sw.ink,
                                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
-                            Spacer(Modifier.height(4.dp))
-                            // mini bar — proportional to max
+                            Spacer(Modifier.height(6.dp))
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(4.dp)
-                                    .clip(RoundedCornerShape(2.dp))
-                                    .background(sw.border),
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp))
+                                    .background(sw.track),
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -758,15 +759,15 @@ private fun DashboardTopCategories(
                                                 .coerceIn(0f, 1f),
                                         )
                                         .fillMaxHeight()
-                                        .clip(RoundedCornerShape(2.dp))
-                                        .background(sw.danger),
+                                        .clip(RoundedCornerShape(3.dp))
+                                        .background(tint),
                                 )
                             }
                         }
                         Spacer(Modifier.width(10.dp))
                         RupiahText(value = item.amount, short = true,
                             style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
-                            color = sw.danger)
+                            color = tint)
                     }
                 }
             }

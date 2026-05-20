@@ -164,20 +164,25 @@ fun DepositListScreen(
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
                     .background(sw.accent).clickable(onClick = onAdd)) {
-                Icon(Icons.Outlined.Add, stringResource(R.string.deposit_add_cd), tint = sw.onPrimaryContainer, modifier = Modifier.size(20.dp))
+                Icon(Icons.Outlined.Add, stringResource(R.string.deposit_add_cd),
+                    tint = sw.fixedDarkOnMint, modifier = Modifier.size(20.dp))
             }
         },
     ) {
         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
             .background(sw.accent).padding(20.dp)) {
             Column {
-                Text(stringResource(R.string.deposit_hero_label), color = sw.onPrimaryContainer.copy(alpha = 0.85f),
+                // Deposito hero bg=accent (mint). Use fixedDarkOnMint as fg —
+                // sw.onPrimaryContainer is ALSO mint in dark mode (same hue),
+                // which rendered the entire card invisible to dark-mode users.
+                Text(stringResource(R.string.deposit_hero_label),
+                    color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = total, color = sw.onPrimaryContainer, style = SwType.AmountXL)
+                RupiahText(value = total, color = sw.fixedDarkOnMint, style = SwType.AmountXL)
                 Spacer(Modifier.height(6.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
-                    color = sw.onPrimaryContainer.copy(alpha = 0.85f),
+                    color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
                     style = SwType.LabelSmall.copy(fontSize = 12.sp))
             }
         }

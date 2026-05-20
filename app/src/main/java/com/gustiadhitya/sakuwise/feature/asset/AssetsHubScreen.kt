@@ -105,7 +105,35 @@ fun AssetsHubScreen(
                 Text(stringResource(R.string.assets_total_wealth), color = sw.onPrimary.copy(alpha = 0.78f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = nw.total, color = sw.onPrimary, style = SwType.AmountXL)
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    RupiahText(value = nw.total, color = sw.onPrimary, style = SwType.AmountXL)
+                    // YTD delta pill per screens-dashboard.jsx:220 — only render when we
+                    // have enough trend history to compute a meaningful first vs last.
+                    val series = state.netWorthTrend
+                    if (series.size >= 2) {
+                        val first = series.first().second
+                        val last = series.last().second
+                        if (first != 0L) {
+                            val deltaPct = (last - first) * 100.0 / first
+                            val sign = if (deltaPct >= 0) "+" else "−"
+                            val firstMonth = series.first().first.format(
+                                java.time.format.DateTimeFormatter.ofPattern("MMM", java.util.Locale.getDefault()),
+                            )
+                            Box(modifier = Modifier
+                                .clip(RoundedCornerShape(99.dp))
+                                .background(sw.successSoft)
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                                contentAlignment = Alignment.Center) {
+                                Text(
+                                    "$sign${"%.1f".format(kotlin.math.abs(deltaPct))}% sejak $firstMonth",
+                                    color = sw.success,
+                                    style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                                        fontFeatureSettings = "tnum"),
+                                )
+                            }
+                        }
+                    }
+                }
                 Spacer(Modifier.height(14.dp))
                 Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.15f)))
                 Spacer(Modifier.height(12.dp))
@@ -118,9 +146,11 @@ fun AssetsHubScreen(
                 ) {
                     val totalPos = (nw.accountsTotal + nw.goldTotal + nw.landTotal + nw.depositTotal)
                         .coerceAtLeast(1L)
+                    // Slice palette per screens-dashboard.jsx:220-225 — Akun=primary,
+                    // Emas=warning, Properti=info, Deposito=accent.
                     if (nw.accountsTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.accountsTotal.toFloat() / totalPos)
-                        .background(sw.accent))
+                        .background(sw.primary))
                     if (nw.goldTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.goldTotal.toFloat() / totalPos)
                         .background(sw.warning))
@@ -129,7 +159,7 @@ fun AssetsHubScreen(
                         .background(sw.info))
                     if (nw.depositTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.depositTotal.toFloat() / totalPos)
-                        .background(sw.accent.copy(alpha = 0.7f)))
+                        .background(sw.accent))
                 }
             }
         }

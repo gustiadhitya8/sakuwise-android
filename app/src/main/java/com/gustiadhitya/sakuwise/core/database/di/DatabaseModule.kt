@@ -2,6 +2,7 @@ package com.gustiadhitya.sakuwise.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.RoomDatabase
 import com.gustiadhitya.sakuwise.core.crypto.KeyManager
@@ -43,13 +44,37 @@ object DatabaseModule {
             return Room.databaseBuilder(ctx, SakuwiseDatabase::class.java, "sakuwise.db")
                 .openHelperFactory(factory)
                 .addCallback(seedCallback())
-                // v1 → v2: adds net_worth_snapshots table. Pre-prod schema bump;
-                // existing dev installs will have their DB wiped. Safe because
-                // there are no production users yet.
+                .addMigrations(MIGRATION_1_2)
+                // Keep destructive fallback as a safety net for any other
+                // schema drift not yet covered by a Migration. Real launches
+                // should remove this once we trust the migration chain.
                 .fallbackToDestructiveMigration()
                 .build()
         } finally {
             keyManager.zeroize(dek)
+        }
+    }
+
+    /**
+     * v1 → v2 — adds the `net_worth_snapshots` table for the daily worker that
+     * writes one row/day. Schema must match NetWorthSnapshotEntity exactly:
+     * `epochDay` PK, six Long columns. Index implied by the PK; no FKs.
+     */
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS net_worth_snapshots (
+                    epochDay INTEGER NOT NULL PRIMARY KEY,
+                    accountsTotal INTEGER NOT NULL,
+                    goldTotal INTEGER NOT NULL,
+                    landTotal INTEGER NOT NULL,
+                    depositTotal INTEGER NOT NULL,
+                    debtsTotal INTEGER NOT NULL,
+                    total INTEGER NOT NULL
+                )
+                """.trimIndent(),
+            )
         }
     }
 

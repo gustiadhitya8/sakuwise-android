@@ -74,12 +74,30 @@ class PlanViewModel @Inject constructor(
     val allPlans: StateFlow<List<Plan>> = planRepo.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val state: StateFlow<PlanScreenState> = observeCurrentPlan().flatMapLatest { plan ->
-        if (plan == null) flowOf(PlanScreenState(loading = false)) else {
-            planRepo.observeAllocations(plan.id).flatMapLatest { allocs ->
-                if (allocs.isEmpty()) flowOf(PlanScreenState(plan = plan, loading = false))
-                else combine(allocs.map { alloc -> allocationRowFlow(alloc) }) { rows ->
-                    PlanScreenState(plan = plan, allocations = rows.toList(), loading = false)
+    /**
+     * When non-null, the Plan tab renders this plan instead of the auto-computed
+     * current one. Declared here (before `state`) because `state` reads it.
+     */
+    private val _viewedPlanId = MutableStateFlow<String?>(null)
+    val viewedPlanId: StateFlow<String?> = _viewedPlanId
+    fun setViewedPlan(id: String?) { _viewedPlanId.value = id }
+
+    // When _viewedPlanId is null we follow the current period. When set, we
+    // observe that specific plan instead. This lets MonthPickerSheet switch
+    // the viewed plan without changing the device clock.
+    val state: StateFlow<PlanScreenState> = kotlinx.coroutines.flow.combine(
+        observeCurrentPlan(),
+        _viewedPlanId,
+    ) { current, viewedId -> current to viewedId }.flatMapLatest { (current, viewedId) ->
+        val pickedFlow = if (viewedId == null) flowOf(current)
+        else planRepo.observeById(viewedId)
+        pickedFlow.flatMapLatest { plan ->
+            if (plan == null) flowOf(PlanScreenState(loading = false)) else {
+                planRepo.observeAllocations(plan.id).flatMapLatest { allocs ->
+                    if (allocs.isEmpty()) flowOf(PlanScreenState(plan = plan, loading = false))
+                    else combine(allocs.map { alloc -> allocationRowFlow(alloc) }) { rows ->
+                        PlanScreenState(plan = plan, allocations = rows.toList(), loading = false)
+                    }
                 }
             }
         }
@@ -212,14 +230,27 @@ class PlanViewModel @Inject constructor(
         }
     }
 
-    /** PRD §7.5 — generate next period's plan, carrying over recurring items. */
+    /**
+     * PRD §7.5 — generate the NEXT period's plan after the latest existing one.
+     *
+     * Bug fix: previously used `state.value.plan` (the *current* plan) as the
+     * base, so clicking twice tried to create the same next-month plan twice
+     * (duplicate row, no visible progress). Now we always base off the latest
+     * plan by end-date, so chained clicks generate Jun → Jul → Aug …
+     */
     fun regenerateNextPeriodPlan() {
         viewModelScope.launch {
-            val plan = state.value.plan ?: return@launch
+            val all = allPlans.value
+            val base = all.maxByOrNull { it.end } ?: state.value.plan ?: return@launch
             val startDay = prefsRepo.prefs.first().planPeriodStartDay
-            regenerateNextPlan(previousPlan = plan, planStartDay = startDay)
+            val result = regenerateNextPlan(previousPlan = base, planStartDay = startDay)
+            _planCreatedResult.value = result.getOrNull()?.label
         }
     }
+
+    private val _planCreatedResult = MutableStateFlow<String?>(null)
+    val planCreatedResult: StateFlow<String?> = _planCreatedResult
+    fun clearPlanCreatedResult() { _planCreatedResult.value = null }
 
     private val _recurringResult = MutableStateFlow<Int?>(null)
     val recurringResult: StateFlow<Int?> = _recurringResult

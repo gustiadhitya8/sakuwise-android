@@ -31,8 +31,10 @@ val InfoSoft            = Color(0xFFD6E0EE)
 val TrackLight          = Color(0xFFEDE5CF)
 val TrackDark           = Color(0xFF2A332E)
 
-// Fixed contrast text on mint hero (Wants alloc) — WCAG AA 8.4:1
+// Fixed contrast text on mint hero (Wants alloc) — WCAG AA 8.4:1.
+// Light mode: deep green on light mint bg. Dark mode: light mint on deep mint bg.
 val FixedDarkOnMint     = Color(0xFF0A2820)
+val FixedDarkOnMintDark = Color(0xFFC4E8D4)
 
 // ─── Dark Theme ─────────────────────────────────────────────────
 val BgDark                  = Color(0xFF0F1411)
@@ -50,7 +52,11 @@ val OnPrimaryDark           = Color(0xFF0A1F18)
 // hero. New value keeps the green hue but raises luminance enough to read.
 val PrimaryContainerDark    = Color(0xFF26442F)
 val OnPrimaryContainerDark  = Color(0xFFC4E8D4)
-val AccentDark              = Color(0xFFC4E8D4)
+// Was 0xFFC4E8D4 (same as OnPrimaryContainerDark) — that made any mint-bg +
+// onPrimaryContainer-text combo invisible in dark mode (Deposito hero, etc.).
+// Use a deep mint container so backgrounds read as backgrounds and the light
+// onPrimaryContainer / fixedDarkOnMint text colors keep proper contrast.
+val AccentDark              = Color(0xFF2D5E48)
 val AccentSoftDark          = Color(0xFF1F3329)
 val SuccessDark             = Color(0xFF6DC48F)
 val SuccessSoftDark         = Color(0xFF1E3526)

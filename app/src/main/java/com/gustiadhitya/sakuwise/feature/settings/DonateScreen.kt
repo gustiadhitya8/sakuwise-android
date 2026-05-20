@@ -53,7 +53,8 @@ fun DonateScreen(onBack: () -> Unit) {
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = 0.18f)),
             ) {
-                Icon(Icons.Outlined.AutoAwesome, null, tint = sw.accent, modifier = Modifier.size(22.dp))
+                // White on primary per proto — accent tint was too dim against the green hero.
+                Icon(Icons.Outlined.AutoAwesome, null, tint = sw.onPrimary, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.size(width = 14.dp, height = 1.dp))
             Column(Modifier.weight(1f)) {

@@ -38,6 +38,9 @@ data class TxnFormState(
     val destAccountId: String? = null,   // transfer only
     val planItemId: String? = null,      // expense only
     val planItemName: String? = null,
+    // Allocation of the picked plan item — drives hero tint on expense form
+    // (Needs=primary, Wants=accent, Invest=info). Per prototype screens-addtxn.jsx:62.
+    val planItemAllocation: com.gustiadhitya.sakuwise.core.domain.model.AllocationId? = null,
     val transferFee: Long = 0L,
     val debtId: String? = null,          // expense only
     val debtLabel: String? = null,
@@ -120,8 +123,8 @@ class TxnFormViewModel @Inject constructor(
     fun setDate(d: LocalDate) { _state.value = _state.value.copy(date = d) }
     fun setAccount(id: String) { _state.value = _state.value.copy(accountId = id) }
     fun setDestAccount(id: String) { _state.value = _state.value.copy(destAccountId = id) }
-    fun setPlanItem(id: String, name: String) {
-        _state.value = _state.value.copy(planItemId = id, planItemName = name)
+    fun setPlanItem(id: String, name: String, allocation: com.gustiadhitya.sakuwise.core.domain.model.AllocationId? = null) {
+        _state.value = _state.value.copy(planItemId = id, planItemName = name, planItemAllocation = allocation)
     }
     fun setNote(v: String) { _state.value = _state.value.copy(note = v) }
     fun setFee(v: Long) { _state.value = _state.value.copy(transferFee = v) }

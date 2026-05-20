@@ -132,6 +132,7 @@
     <!-- Transaction forms -->
     <string name="txn_expense_title">Expense</string>
     <string name="txn_expense_amount_label">Expense Amount</string>
+    <string name="txn_expense_alloc_subtitle_format">Allocation %1$s</string>
     <string name="txn_income_title">Income</string>
     <string name="txn_income_amount_label">Income Amount</string>
     <string name="txn_transfer_title">Transfer</string>
@@ -243,7 +244,7 @@
     <string name="privacy_section_backup">Backups &amp; Your Control</string>
     <string name="privacy_backup_body">You decide when, where, and how to back up. The .sakuwise file is re-encrypted with the backup PIN you set (Argon2id KDF + AES-256-GCM). Sakuwise never stores that backup PIN — if you lose it, we cannot recover the file.</string>
     <string name="privacy_section_reset">Right to Erase</string>
-    <string name="privacy_reset_body">Open Me → Export &amp; Reset → type the confirmation phrase to permanently wipe every byte of app data. Once erased, no one can recover it unless you hold a valid backup file.</string>
+    <string name="privacy_reset_body">Open Me → Reset App → type the confirmation phrase to permanently wipe every byte of app data. Once erased, no one can recover it unless you hold a valid backup file.</string>
     <string name="privacy_section_camera">Camera (Optional)</string>
     <string name="privacy_camera_body">The Scan Receipt (OCR) feature asks for camera permission only when you use it. The image is processed 100%% on-device via ML Kit — nothing leaves your phone, and nothing is retained once extraction finishes.</string>
     <string name="privacy_section_contact_q">Questions?</string>
@@ -385,6 +386,9 @@
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
     <string name="plan_action_regen_incomes_sub">Scan income txns tagged [BERULANG] and write this month\'s</string>
     <string name="plan_recurring_result_format">%1$d recurring incomes added</string>
+    <string name="plan_created_toast_format">Plan %1$s created</string>
+    <string name="plan_month_picker_create_next">+ Create Next Month\'s Plan</string>
+    <string name="plan_month_picker_empty">No plan history yet.</string>
     <string name="plan_recurring_result_none">No recurring incomes needed to be added.</string>
 
     <!-- Account edit -->
@@ -687,4 +691,13 @@
     <string name="restore_success_body">Data from the backup file has been written into this install. Re-launch the app so every screen refreshes with the new data.</string>
     <string name="restore_relaunch">Relaunch App</string>
     <string name="restore_footer">Note: Your app PIN &amp; nickname are NOT restored — those live only in this install. Financial data (accounts, plans, transactions, assets) is back.</string>
+
+    <!-- AUDIT-CC2: externalized sheet/dialog titles (PLAN-7 EN walkthrough prep) -->
+    <string name="sheet_plan_month_picker_title">Choose Period</string>
+    <string name="sheet_plan_add_category_title">Add Category</string>
+    <string name="sheet_plan_delete_category_title">Delete category?</string>
+    <string name="sheet_plan_expected_income_title">Expected Income</string>
+    <string name="sheet_plan_reset_title">Reset plan?</string>
+    <string name="sheet_picker_debt_title">Choose debt</string>
+    <string name="sheet_picker_income_category_title">Source Category</string>
 </resources>
