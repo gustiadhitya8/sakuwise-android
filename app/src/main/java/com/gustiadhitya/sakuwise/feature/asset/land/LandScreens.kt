@@ -317,7 +317,7 @@ private fun AddTaxSheet(
 
     SwPickerSheet(title = stringResource(R.string.land_tax_sheet_title), onDismiss = onDismiss) {
         SwField(value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() } },
-            label = stringResource(R.string.land_tax_amount), prefix = "Rp", keyboardType = KeyboardType.Number)
+            label = stringResource(R.string.land_tax_amount), prefix = "Rp", rupiah = true, keyboardType = KeyboardType.Number)
         SwField(value = note, onValueChange = { note = it },
             label = stringResource(R.string.reconcile_note_label),
             placeholder = stringResource(R.string.land_tax_note_placeholder))
@@ -431,9 +431,9 @@ fun LandEditScreen(
         SwField(s.size, { v -> viewModel.set { it.copy(size = v.filter { c -> c.isDigit() }) } },
             label = stringResource(R.string.land_field_size), suffix = "m²", keyboardType = KeyboardType.Number)
         SwField(s.buyPrice, { v -> viewModel.set { it.copy(buyPrice = v.filter { c -> c.isDigit() }) } },
-            label = stringResource(R.string.land_field_buy_price), prefix = "Rp", keyboardType = KeyboardType.Number)
+            label = stringResource(R.string.land_field_buy_price), prefix = "Rp", rupiah = true, keyboardType = KeyboardType.Number)
         SwField(s.currentValue, { v -> viewModel.set { it.copy(currentValue = v.filter { c -> c.isDigit() }) } },
-            label = stringResource(R.string.land_edit_current_value_label), prefix = "Rp",
+            label = stringResource(R.string.land_edit_current_value_label), prefix = "Rp", rupiah = true,
             keyboardType = KeyboardType.Number,
             hint = stringResource(R.string.land_edit_current_value_hint))
     }

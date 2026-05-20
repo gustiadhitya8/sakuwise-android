@@ -71,7 +71,7 @@ fun GoldPriceSettingsScreen(
             value = displayValue,
             onValueChange = { v -> raw = v.filter { it.isDigit() } },
             label = stringResource(R.string.gold_price_field_label),
-            prefix = "Rp",
+            prefix = "Rp", rupiah = true,
             suffix = "/ gram",
             keyboardType = KeyboardType.Number,
         )

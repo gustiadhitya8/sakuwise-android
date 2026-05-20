@@ -65,11 +65,13 @@ fun OnbLanguageScreen(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(180.dp)
-                    .clip(RoundedCornerShape(60.dp))
+                    // Hero squircle reduced from 180dp → 140dp so all 4 onboarding
+                    // steps fit a single viewport without scroll on standard phones.
+                    .size(140.dp)
+                    .clip(RoundedCornerShape(46.dp))
                     .background(sw.primaryContainer),
             ) {
-                LogoDaun(sizeDp = 108)
+                LogoDaun(sizeDp = 84)
             }
         },
         title = stringResource(R.string.onb_step1_title),
@@ -84,9 +86,21 @@ fun OnbLanguageScreen(
             modifier = Modifier.padding(bottom = 10.dp),
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Source of truth for the radio is the ACTIVE locale (what's
+            // visibly painted), not the DataStore pref. On a fresh install
+            // DataStore defaults to "id" but the system locale (e.g. "en"
+            // on a device with English UI) is what's actually rendering —
+            // the previous version showed the wrong radio in that case.
+            val configLocale = androidx.compose.ui.platform.LocalConfiguration.current
+                .locales.get(0)?.language?.lowercase()
+            val activeLang = when {
+                configLocale == "en" -> "en"
+                configLocale == "id" -> "id"
+                else -> state.lang
+            }
             listOf("id" to (langId to langIdSub), "en" to (langEn to langEnSub))
                 .forEach { (id, pair) ->
-                    val active = state.lang == id
+                    val active = activeLang == id
                     LangRow(active, pair.first, pair.second) { onChange(state.copy(lang = id)) }
                 }
         }
@@ -136,7 +150,7 @@ fun OnbIdentityScreen(
     OnboardingShell(
         step = 2, total = 4,
         hero = {
-            Box(modifier = Modifier.size(180.dp)) {
+            Box(modifier = Modifier.size(140.dp)) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -235,8 +249,10 @@ fun OnbPrivacyScreen(onNext: () -> Unit) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(180.dp)
-                    .clip(RoundedCornerShape(60.dp))
+                    // Hero squircle reduced from 180dp → 140dp so all 4 onboarding
+                    // steps fit a single viewport without scroll on standard phones.
+                    .size(140.dp)
+                    .clip(RoundedCornerShape(46.dp))
                     .background(sw.primaryContainer),
             ) {
                 Icon(Icons.Outlined.Shield, null, tint = sw.primary, modifier = Modifier.size(100.dp))
@@ -321,7 +337,7 @@ fun OnbFirstAccountScreen(
                 ) {
                     // Watermark — swap squircle/leaf so the cream squircle reads on dark green
                     LogoDaun(
-                        sizeDp = 140,
+                        sizeDp = 108,
                         bg = sw.onPrimary.copy(alpha = 0.18f),
                         leaf = sw.primary.copy(alpha = 0.18f),
                         vein = sw.onPrimary.copy(alpha = 0.18f),
@@ -408,7 +424,7 @@ fun OnbFirstAccountScreen(
                 onChange(state.copy(accountBalance = parsed))
             },
             label = stringResource(R.string.onb_step4_balance_label),
-            prefix = "Rp",
+            prefix = "Rp", rupiah = true,
             placeholder = "0",
             hint = stringResource(R.string.onb_step4_balance_hint),
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,

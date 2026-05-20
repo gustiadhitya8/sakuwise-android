@@ -400,7 +400,7 @@ private fun AddPaymentSheet(
     SwPickerSheet(title = stringResource(R.string.debt_payment_sheet_title), onDismiss = onDismiss) {
         SwField(value = amount,
             onValueChange = { amount = it.filter { c -> c.isDigit() } },
-            label = stringResource(R.string.debt_payment_amount), prefix = "Rp", keyboardType = KeyboardType.Number)
+            label = stringResource(R.string.debt_payment_amount), prefix = "Rp", rupiah = true, keyboardType = KeyboardType.Number)
         SwField(value = note, onValueChange = { note = it }, label = stringResource(R.string.debt_payment_note))
 
         Text(
@@ -502,7 +502,7 @@ fun DebtEditScreen(
             label = stringResource(R.string.debt_counterparty_label),
             placeholder = stringResource(R.string.debt_counterparty_placeholder))
         SwField(s.principal, { v -> viewModel.set { it.copy(principal = v.filter { c -> c.isDigit() }) } },
-            label = stringResource(R.string.debt_principal_label), prefix = "Rp",
+            label = stringResource(R.string.debt_principal_label), prefix = "Rp", rupiah = true,
             keyboardType = KeyboardType.Number)
         Text(stringResource(R.string.debt_direction_label), color = sw.inkMuted,
             style = SwType.Caption.copy(fontSize = 12.sp))

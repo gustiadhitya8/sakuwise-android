@@ -134,53 +134,59 @@ fun AssetsHubScreen(
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    if (hideTotal) {
-                        Text("Rp ••••••",
-                            color = sw.onPrimaryHero,
-                            style = SwType.AmountXL)
-                    } else {
-                        RupiahText(value = nw.total, color = sw.onPrimaryHero, style = SwType.AmountXL)
-                    }
-                    // YTD delta pill per screens-dashboard.jsx:220 — only render when we
-                    // have enough trend history to compute a meaningful first vs last.
-                    val series = state.netWorthTrend
-                    if (series.size >= 2) {
-                        val first = series.first().second
-                        val last = series.last().second
-                        if (first != 0L) {
-                            val deltaPct = (last - first) * 100.0 / first
-                            val sign = if (deltaPct >= 0) "+" else "−"
-                            val firstMonth = series.first().first.format(
-                                java.time.format.DateTimeFormatter.ofPattern("MMM", java.util.Locale.getDefault()),
-                            )
-                            Box(modifier = Modifier
-                                .clip(RoundedCornerShape(99.dp))
-                                .background(sw.successSoft)
+                // Total — alone on its line. Growth pill goes BELOW per proto.
+                if (hideTotal) {
+                    Text("Rp ••••••",
+                        color = sw.onPrimaryHero,
+                        style = SwType.AmountXL)
+                } else {
+                    RupiahText(value = nw.total, color = sw.onPrimaryHero, style = SwType.AmountXL)
+                }
+                // Growth pill — per screens-assets.jsx, sits BELOW the total
+                // with marginTop:8 + bg = rgba(255,255,255,0.16). Inline-flex.
+                val series = state.netWorthTrend
+                if (series.size >= 2) {
+                    val first = series.first().second
+                    val last = series.last().second
+                    if (first != 0L) {
+                        val deltaPct = (last - first) * 100.0 / first
+                        val sign = if (deltaPct >= 0) "+" else "−"
+                        val firstMonth = series.first().first.format(
+                            java.time.format.DateTimeFormatter.ofPattern("MMM", java.util.Locale.getDefault()),
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.16f))
                                 .padding(horizontal = 10.dp, vertical = 4.dp),
-                                contentAlignment = Alignment.Center) {
-                                Text(
-                                    "$sign${"%.1f".format(kotlin.math.abs(deltaPct))}% sejak $firstMonth",
-                                    color = sw.success,
-                                    style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold,
-                                        fontFeatureSettings = "tnum"),
-                                )
-                            }
+                        ) {
+                            Icon(
+                                Icons.Outlined.TrendingUp, null,
+                                tint = sw.onPrimaryHero,
+                                modifier = Modifier.size(11.dp),
+                            )
+                            Text(
+                                "$sign${"%.1f".format(kotlin.math.abs(deltaPct))}% sejak $firstMonth",
+                                color = sw.onPrimaryHero,
+                                style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
+                            )
                         }
                     }
                 }
-                Spacer(Modifier.height(14.dp))
-                Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.15f)))
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
+                val totalPos = (nw.accountsTotal + nw.goldTotal + nw.landTotal + nw.depositTotal)
+                    .coerceAtLeast(1L)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(10.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color.White.copy(alpha = 0.18f)),
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White.copy(alpha = 0.12f)),
                 ) {
-                    val totalPos = (nw.accountsTotal + nw.goldTotal + nw.landTotal + nw.depositTotal)
-                        .coerceAtLeast(1L)
                     // Slice palette per screens-dashboard.jsx:220-225 — Akun=primary,
                     // Emas=warning, Properti=info, Deposito=accent.
                     if (nw.accountsTotal > 0) Box(Modifier.fillMaxHeight()
@@ -196,20 +202,24 @@ fun AssetsHubScreen(
                         .fillMaxWidth(nw.depositTotal.toFloat() / totalPos)
                         .background(sw.accent))
                 }
-                Spacer(Modifier.height(10.dp))
-                // Legend row — explains each slice color from the bar above.
-                // Simple Row + horizontal scroll keeps it inside the card on
-                // narrow screens without pulling in experimental FlowRow.
+                Spacer(Modifier.height(6.dp))
+                // Legend row — name + percentage of total per slice so the
+                // user can read the breakdown without doing the math.
+                val pct = { v: Long -> if (totalPos > 0L) ((v * 100.0) / totalPos).let { "%.0f".format(it) } else "0" }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState()),
                 ) {
-                    LegendDot(sw.primary, stringResource(R.string.assets_class_accounts))
-                    LegendDot(sw.warning, stringResource(R.string.assets_class_gold))
-                    LegendDot(sw.info, stringResource(R.string.assets_class_land))
-                    LegendDot(sw.accent, stringResource(R.string.assets_class_deposit))
+                    LegendDot(sw.primary,
+                        "${stringResource(R.string.assets_class_accounts)} ${pct(nw.accountsTotal)}%")
+                    LegendDot(sw.warning,
+                        "${stringResource(R.string.assets_class_gold)} ${pct(nw.goldTotal)}%")
+                    LegendDot(sw.info,
+                        "${stringResource(R.string.assets_class_land)} ${pct(nw.landTotal)}%")
+                    LegendDot(sw.accent,
+                        "${stringResource(R.string.assets_class_deposit)} ${pct(nw.depositTotal)}%")
                 }
             }
         }
@@ -299,10 +309,12 @@ private fun NetWorthTrendCard(seriesAll: List<Pair<java.time.LocalDate, Long>>) 
     var period by remember { mutableStateOf("6M") }
     val periods = listOf("3M", "6M", "1Y", stringResource(R.string.assets_trend_period_all))
     val series = seriesAll.map { it.second }
-    val window = when (period) {
-        "3M" -> series.takeLast(3); "6M" -> series.takeLast(6)
-        "1Y" -> series.takeLast(12); else -> series
+    val dates = seriesAll.map { it.first }
+    val n = when (period) {
+        "3M" -> 3; "6M" -> 6; "1Y" -> 12; else -> series.size
     }
+    val window = series.takeLast(n)
+    val windowDates = dates.takeLast(n)
     val delta = if (window.size >= 2) window.last() - window.first() else 0L
     val deltaPct = if (window.isNotEmpty() && window.first() != 0L)
         (delta * 100.0 / window.first()) else 0.0
@@ -367,6 +379,26 @@ private fun NetWorthTrendCard(seriesAll: List<Pair<java.time.LocalDate, Long>>) 
                 drawCircle(color = sw.primary,
                     radius = if (isLast) 4f * density else 2.5f * density,
                     center = Offset(xs[i], ys[i]))
+            }
+        }
+        // X-axis labels (mmm-yy). Show first, middle, last to avoid crowding.
+        // Per user feedback the prototype's chart has month labels along the
+        // bottom edge so users can tell which point is which period.
+        if (windowDates.size >= 2) {
+            val fmt = java.time.format.DateTimeFormatter.ofPattern("MMM yy", java.util.Locale.getDefault())
+            val indices = when {
+                windowDates.size <= 4 -> windowDates.indices.toList()
+                else -> listOf(0, windowDates.size / 2, windowDates.size - 1)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                indices.forEach { i ->
+                    Text(windowDates[i].format(fmt),
+                        color = sw.inkSubtle,
+                        style = SwType.LabelSmall.copy(fontSize = 10.sp, fontFeatureSettings = "tnum"))
+                }
             }
         }
         Spacer(Modifier.height(8.dp))

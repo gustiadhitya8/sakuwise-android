@@ -52,12 +52,23 @@ fun LanguageSettingsScreen(
             color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
         )
         Spacer(Modifier.height(16.dp))
+        // Display the ACTIVE locale (what's visibly painted), not just the
+        // DataStore pref — they can diverge on fresh install / first launch
+        // where AppCompatDelegate hasn't been set yet but DataStore defaults
+        // to "id". Without this, the radio lies about what the user sees.
+        val configLocale = androidx.compose.ui.platform.LocalConfiguration.current
+            .locales.get(0)?.language?.lowercase()
+        val activeLang = when {
+            configLocale == "en" -> "en"
+            configLocale == "id" -> "id"
+            else -> prefs.language
+        }
         listOf(
             "id" to (stringResource(R.string.onb_lang_id) to stringResource(R.string.onb_lang_id_sub)),
             "en" to (stringResource(R.string.onb_lang_en) to stringResource(R.string.onb_lang_en_sub)),
         ).forEach { (code, pair) ->
             LangRow(
-                active = prefs.language == code,
+                active = activeLang == code,
                 label = pair.first,
                 sub = pair.second,
                 onClick = {

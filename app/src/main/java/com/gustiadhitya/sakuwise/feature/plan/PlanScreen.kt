@@ -788,7 +788,7 @@ private fun EditPlanItemSheet(
             value = amount,
             onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
             label = stringResource(R.string.plan_item_amount_label),
-            prefix = "Rp", placeholder = "0",
+            prefix = "Rp", rupiah = true, placeholder = "0",
             keyboardType = KeyboardType.Number,
         )
         Text(stringResource(R.string.plan_item_recurrence_label), color = sw.inkMuted,
@@ -894,7 +894,7 @@ private fun EditExpectedIncomeSheet(
             value = amount,
             onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
             label = "Pemasukan diharapkan",
-            prefix = "Rp", placeholder = "0",
+            prefix = "Rp", rupiah = true, placeholder = "0",
             keyboardType = KeyboardType.Number,
         )
         Spacer(Modifier.height(16.dp))

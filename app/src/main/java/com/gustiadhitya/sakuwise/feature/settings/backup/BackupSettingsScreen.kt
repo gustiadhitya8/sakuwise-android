@@ -94,6 +94,19 @@ fun BackupSettingsScreen(
         }
         Spacer(Modifier.height(16.dp))
 
+        // REQ-2: cloud backup section moved to TOP per user feedback —
+        // Google Drive is the recommended path; local file backup is the
+        // fallback for offline / privacy-cautious users.
+        DriveBackupSection(
+            accountEmail = prefs.driveAccountEmail,
+            autoBackupEnabled = prefs.driveBackupEnabled,
+            lastDriveBackupTimestamp = prefs.lastDriveBackupTimestamp,
+            vm = vm,
+            onOpenDriveRestore = { driveRestoreOpen = true },
+        )
+        Spacer(Modifier.height(20.dp))
+
+        // Local file backup (legacy / advanced path)
         SwButton(
             text = stringResource(R.string.backup_now),
             onClick = { pinFlowOpen = true; vm.reset() },
@@ -124,16 +137,6 @@ fun BackupSettingsScreen(
                     stringResource(R.string.backup_step4_body))
             }
         }
-
-        Spacer(Modifier.height(16.dp))
-        // REQ-2: cloud backup section (Google Drive, AppDataFolder scope)
-        DriveBackupSection(
-            accountEmail = prefs.driveAccountEmail,
-            autoBackupEnabled = prefs.driveBackupEnabled,
-            lastDriveBackupTimestamp = prefs.lastDriveBackupTimestamp,
-            vm = vm,
-            onOpenDriveRestore = { driveRestoreOpen = true },
-        )
 
         if (pinFlowOpen) {
             BackupPinFlowSheet(

@@ -121,7 +121,7 @@ fun AccountEditScreen(
             },
             label = if (state.id == null) stringResource(R.string.account_edit_balance_label_new)
             else stringResource(R.string.account_edit_balance_label_existing),
-            prefix = "Rp",
+            prefix = "Rp", rupiah = true,
             placeholder = "0",
             hint = if (state.id == null) stringResource(R.string.account_edit_balance_hint_new)
             else stringResource(R.string.account_edit_balance_hint_existing),

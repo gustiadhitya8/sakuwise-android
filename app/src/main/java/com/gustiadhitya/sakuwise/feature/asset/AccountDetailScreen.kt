@@ -352,7 +352,7 @@ private fun ReconcileSheet(
                     value = observed,
                     onValueChange = { observed = it.filter { ch -> ch.isDigit() } },
                     label = stringResource(R.string.reconcile_observed_label),
-                    prefix = "Rp",
+                    prefix = "Rp", rupiah = true,
                     placeholder = "0",
                     keyboardType = KeyboardType.Number,
                 )

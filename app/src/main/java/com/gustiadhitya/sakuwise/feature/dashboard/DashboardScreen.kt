@@ -119,9 +119,14 @@ private fun DashboardContent(
     // PRD §7.12 — backup blocker modal at ≥60 days. Session-only dismiss: the
     // user taps "Nanti saja" → modal closes for this app session, reappears on
     // cold launch. Cold launch resets `dismissedBackup60Modal` to false.
+    // CRITICAL: Int.MAX_VALUE means "never backed up" — i.e. fresh install. The
+    // user might be 5 minutes old; popping a "Backup expired" blocker modal is
+    // wrong. Only fire on a REAL elapsed-day count >= 60. The dashboard banner
+    // (the lighter notice) handles the never-backed-up case below at >30.
     var dismissedBackup60Modal by remember { mutableStateOf(false) }
     val showBackup60Modal = !dismissedBackup60Modal &&
-        (state.backupOverdueDays >= 60 || state.backupOverdueDays == Int.MAX_VALUE)
+        state.backupOverdueDays >= 60 &&
+        state.backupOverdueDays != Int.MAX_VALUE
 
     Column(
         modifier = Modifier

@@ -278,7 +278,7 @@
     <!-- Contact Developer -->
     <string name="contact_intro">Sakuwise dibuat oleh tim kecil di Indonesia. Kami baca semua feedback yang masuk.</string>
     <string name="contact_email_label">Email</string>
-    <string name="contact_email_value">halo@sakuwise.id</string>
+    <string name="contact_email_value">gustiadhitya8@gmail.com</string>
     <string name="contact_github_label">GitHub Issues</string>
     <string name="contact_github_value">github.com/sakuwise/sakuwise/issues</string>
     <string name="contact_bug_label">Lapor Bug</string>

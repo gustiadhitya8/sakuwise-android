@@ -362,7 +362,7 @@ private fun AddSnapshotSheet(onSave: (LocalDate, Long, String?) -> Unit, onDismi
     SwPickerSheet(title = stringResource(R.string.deposit_snapshot_sheet_title), onDismiss = onDismiss) {
         SwField(value = balance,
             onValueChange = { balance = it.filter { c -> c.isDigit() } },
-            label = stringResource(R.string.deposit_snapshot_balance_label), prefix = "Rp", keyboardType = KeyboardType.Number)
+            label = stringResource(R.string.deposit_snapshot_balance_label), prefix = "Rp", rupiah = true, keyboardType = KeyboardType.Number)
         SwField(value = note, onValueChange = { note = it }, label = stringResource(R.string.deposit_snapshot_note_label))
         Text(
             stringResource(R.string.common_date_label),

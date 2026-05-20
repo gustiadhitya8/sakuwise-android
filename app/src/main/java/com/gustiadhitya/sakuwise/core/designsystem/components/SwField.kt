@@ -44,6 +44,13 @@ fun SwField(
     readOnly: Boolean = false,
     onClick: (() -> Unit)? = null,
     password: Boolean = false,
+    /**
+     * When true, the visible text is reformatted with Indonesian thousands
+     * separators (e.g. typed "1000000" displays as "1.000.000"). Pair with
+     * `keyboardType = KeyboardType.Number` and ensure the parent stores
+     * raw digits via `onValueChange = { it.filter { c -> c.isDigit() } }`.
+     */
+    rupiah: Boolean = false,
 ) {
     val sw = SwTheme.colors
     val isError = !error.isNullOrEmpty()
@@ -101,9 +108,11 @@ fun SwField(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = if (password) KeyboardType.Password else keyboardType,
                     ),
-                    visualTransformation = if (password)
-                        androidx.compose.ui.text.input.PasswordVisualTransformation()
-                    else androidx.compose.ui.text.input.VisualTransformation.None,
+                    visualTransformation = when {
+                        password -> androidx.compose.ui.text.input.PasswordVisualTransformation()
+                        rupiah -> RupiahVisualTransformation
+                        else -> androidx.compose.ui.text.input.VisualTransformation.None
+                    },
                     modifier = Modifier.weight(1f),
                     decorationBox = { inner ->
                         if (value.isEmpty() && placeholder != null) {
@@ -131,5 +140,54 @@ fun SwField(
                 modifier = Modifier.padding(top = 4.dp, start = 4.dp),
             )
         }
+    }
+}
+
+/**
+ * Live thousands-separator formatter for Indonesian Rupiah input fields.
+ * Display: "1000000" → "1.000.000". The underlying value stays raw digits.
+ *
+ * Cursor mapping: each dot inserted to the LEFT of the cursor shifts the
+ * transformed offset by +1. The reverse mapping subtracts the number of
+ * dots to the left of the transformed cursor.
+ */
+private val RupiahVisualTransformation = object : androidx.compose.ui.text.input.VisualTransformation {
+    override fun filter(text: androidx.compose.ui.text.AnnotatedString):
+        androidx.compose.ui.text.input.TransformedText {
+        val digits = text.text.filter { it.isDigit() }
+        if (digits.isEmpty()) {
+            return androidx.compose.ui.text.input.TransformedText(
+                text,
+                androidx.compose.ui.text.input.OffsetMapping.Identity,
+            )
+        }
+        // Insert dots every 3 from the right.
+        val sb = StringBuilder()
+        digits.reversed().forEachIndexed { i, c ->
+            if (i != 0 && i % 3 == 0) sb.append('.')
+            sb.append(c)
+        }
+        val formatted = sb.reverse().toString()
+
+        val mapping = object : androidx.compose.ui.text.input.OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 0) return 0
+                // Number of dots inserted to the LEFT of `offset` digits.
+                // For N digits, dots = (N - 1) / 3 from the right.
+                val dotsLeft = ((digits.length - offset) / 3).let {
+                    ((digits.length - 1) / 3) - it
+                }.coerceAtLeast(0)
+                return (offset + dotsLeft).coerceAtMost(formatted.length)
+            }
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 0) return 0
+                val dotsBefore = formatted.take(offset).count { it == '.' }
+                return (offset - dotsBefore).coerceIn(0, digits.length)
+            }
+        }
+        return androidx.compose.ui.text.input.TransformedText(
+            androidx.compose.ui.text.AnnotatedString(formatted),
+            mapping,
+        )
     }
 }

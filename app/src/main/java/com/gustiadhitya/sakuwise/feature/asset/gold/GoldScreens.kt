@@ -311,7 +311,7 @@ private fun GoldPriceInlineSheet(
             value = formatted,
             onValueChange = { raw = it.filter { c -> c.isDigit() } },
             label = stringResource(R.string.gold_price_field_label),
-            prefix = "Rp", suffix = "/ gram",
+            prefix = "Rp", rupiah = true, suffix = "/ gram",
             keyboardType = KeyboardType.Number,
         )
         Spacer(Modifier.height(4.dp))
@@ -488,7 +488,7 @@ private fun RecordSaleSheet(
             value = price,
             onValueChange = { price = it.filter { c -> c.isDigit() } },
             label = stringResource(R.string.gold_sale_price_label),
-            prefix = "Rp",
+            prefix = "Rp", rupiah = true,
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
         )
         SwField(
@@ -592,7 +592,7 @@ fun GoldEditScreen(
             label = stringResource(R.string.gold_edit_weight_label), suffix = "gram",
             keyboardType = KeyboardType.Number)
         SwField(value = state.buyPrice, onValueChange = viewModel::setBuyPrice,
-            label = stringResource(R.string.gold_edit_buy_price_label), prefix = "Rp",
+            label = stringResource(R.string.gold_edit_buy_price_label), prefix = "Rp", rupiah = true,
             keyboardType = KeyboardType.Number)
         SwField(value = state.serial, onValueChange = viewModel::setSerial,
             label = stringResource(R.string.gold_edit_serial_label),

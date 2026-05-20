@@ -112,7 +112,7 @@ fun TransferFormScreen(
             value = if (state.transferFee == 0L) "" else state.transferFee.toString(),
             onValueChange = { v -> viewModel.setFee(v.filter { it.isDigit() }.toLongOrNull() ?: 0L) },
             label = stringResource(R.string.txn_transfer_fee),
-            prefix = "Rp", placeholder = "0",
+            prefix = "Rp", rupiah = true, placeholder = "0",
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
         )
         // When the user enters a fee, surface a Plan Item picker (PRD §7.4 —
