@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Diamond
@@ -43,6 +45,7 @@ import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.app.MainViewModel
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
@@ -182,7 +185,10 @@ fun GoldListScreen(
             ) { Icon(Icons.Outlined.Add, stringResource(R.string.gold_add_cd), tint = Color.White, modifier = Modifier.size(20.dp)) }
         },
     ) {
-        // Hero
+        // Hero — per proto screens-assets-detail.jsx LandDetail pattern adapted
+        // for Gold: warning bg + WHITE text everywhere, profit/loss shown as a
+        // translucent-white pill chip (NOT green/red, which blends with the
+        // warning background). Includes an arrow_up_right glyph for direction.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -191,19 +197,13 @@ fun GoldListScreen(
                 .padding(20.dp),
         ) {
             Column {
-                Text(stringResource(R.string.gold_hero_label_format, totalWeight), color = Color.White.copy(alpha = 0.85f),
+                Text(stringResource(R.string.gold_hero_label_format, totalWeight),
+                    color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = totalValue, color = Color.White, style = SwType.AmountXL)
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    stringResource(R.string.gold_profit_format,
-                        if (profit >= 0) "+" else "−",
-                        kotlin.math.abs(profit)),
-                    // Standard finance convention: green = growth, red = decline.
-                    color = if (profit >= 0) sw.success else sw.danger,
-                    style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
-                )
+                Spacer(Modifier.height(10.dp))
+                GoldProfitChip(profit = profit, buyPrice = totalBuy.coerceAtLeast(1L))
             }
         }
         Spacer(Modifier.height(14.dp))
@@ -373,6 +373,9 @@ fun GoldDetailScreen(
         }
         val currentValue = g.weightGram * prefs.goldPriceGlobal
         val profit = currentValue - g.buyPrice
+        // Hero — see GoldListScreen hero for the proto compliance notes. White-
+        // on-warning with a translucent-white profit chip so the gain/loss
+        // text doesn't blend into the warning background.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -380,20 +383,27 @@ fun GoldDetailScreen(
                 .background(sw.warning)
                 .padding(20.dp),
         ) {
+            // Diamond watermark behind the content per proto land-detail
+            // pattern (icon at -20/-30 with opacity 0.18).
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 0.dp, bottom = 0.dp),
+            ) {
+                Icon(
+                    Icons.Outlined.Diamond, null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier.size(140.dp),
+                )
+            }
             Column {
-                Text(stringResource(R.string.gold_hero_value_label), color = Color.White.copy(alpha = 0.85f),
+                Text(stringResource(R.string.gold_hero_value_label),
+                    color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = currentValue, color = Color.White, style = SwType.AmountXL)
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    stringResource(R.string.gold_profit_format,
-                        if (profit >= 0) "+" else "−",
-                        kotlin.math.abs(profit)),
-                    // Standard finance convention: green = growth, red = decline.
-                    color = if (profit >= 0) sw.success else sw.danger,
-                    style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
-                )
+                Spacer(Modifier.height(10.dp))
+                GoldProfitChip(profit = profit, buyPrice = g.buyPrice.coerceAtLeast(1L))
             }
         }
         Spacer(Modifier.height(14.dp))
@@ -599,6 +609,41 @@ fun GoldEditScreen(
             placeholder = stringResource(R.string.gold_edit_serial_placeholder))
         SwField(value = state.note, onValueChange = viewModel::setNote,
             label = stringResource(R.string.gold_edit_note_label))
+    }
+}
+
+/**
+ * Per proto screens-assets-detail.jsx:97-100 — translucent-white pill that
+ * floats inside the warning-tinted hero. Uses white text + trend arrow so the
+ * gain/loss reads cleanly on the saffron background (green/red on warning
+ * blends and disappears).
+ */
+@Composable
+private fun GoldProfitChip(profit: Long, buyPrice: Long) {
+    val pct = if (buyPrice > 0) (profit.toFloat() / buyPrice.toFloat()) * 100f else 0f
+    val sign = if (profit >= 0) "+" else "−"
+    val pctSign = if (pct >= 0f) "+" else "−"
+    val abs = kotlin.math.abs(profit)
+    val absPct = kotlin.math.abs(pct)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.White.copy(alpha = 0.18f))
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+    ) {
+        Icon(
+            if (profit >= 0) androidx.compose.material.icons.Icons.AutoMirrored.Outlined.TrendingUp
+            else androidx.compose.material.icons.Icons.AutoMirrored.Outlined.TrendingDown,
+            null, tint = Color.White, modifier = Modifier.size(14.dp),
+        )
+        Spacer(Modifier.size(width = 6.dp, height = 1.dp))
+        Text(
+            "$sign ${abs.toRupiahShort()} · $pctSign${"%.1f".format(absPct)}%",
+            color = Color.White,
+            style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                fontFeatureSettings = "tnum"),
+        )
     }
 }
 

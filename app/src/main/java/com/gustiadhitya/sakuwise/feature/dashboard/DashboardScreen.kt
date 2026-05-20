@@ -460,7 +460,10 @@ private fun DashboardHero(
                 Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.15f)),
             )
             Row(modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
-                HeroMetric("Pemasukan", income, "+", sw.success, hide, Modifier.weight(1f))
+                // Per prototype screens-dashboard.jsx:87-89:
+                //   Pemasukan tint = c.accent (sand), Pengeluaran tint = c.onPrimary (white)
+                // Both render as 17sp bold tabular-nums with the sign at opacity 0.7.
+                HeroMetric("Pemasukan", income, "+", sw.accent, hide, Modifier.weight(1f))
                 Box(Modifier.width(1.dp).height(40.dp).background(Color.White.copy(alpha = 0.18f)))
                 HeroMetric("Pengeluaran", expense, "−", sw.onPrimaryHero, hide, Modifier.weight(1f))
             }
@@ -472,16 +475,20 @@ private fun DashboardHero(
 private fun HeroMetric(label: String, value: Long, sign: String, tint: Color, hide: Boolean, modifier: Modifier = Modifier) {
     val sw = SwTheme.colors
     Column(modifier = modifier.padding(horizontal = 4.dp)) {
+        // Per proto screens-dashboard.jsx:97 — 11sp, opacity 0.7, fontWeight 500.
         Text(label, color = sw.onPrimaryHero.copy(alpha = 0.7f),
-            style = SwType.Caption.copy(fontSize = 11.sp))
+            style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium))
+        Spacer(Modifier.height(2.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(sign, color = tint.copy(alpha = 0.7f),
-                style = SwType.Amount.copy(fontSize = 17.sp))
+                style = SwType.Amount.copy(fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                    fontFeatureSettings = "tnum"))
             Spacer(Modifier.width(2.dp))
             Text(
                 if (hide) "•••" else value.toRupiahShort(),
                 color = tint,
-                style = SwType.Amount.copy(fontSize = 17.sp, fontWeight = FontWeight.Bold),
+                style = SwType.Amount.copy(fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                    fontFeatureSettings = "tnum"),
             )
         }
     }
@@ -863,34 +870,50 @@ private fun DashboardTopCategories(
                 items.forEachIndexed { i, item ->
                     val tint = palette[i % palette.size]
                     if (i > 0) Spacer(Modifier.height(10.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text(item.name, color = sw.ink,
-                                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
-                            Spacer(Modifier.height(6.dp))
+                    // Per proto screens-dashboard.jsx:158-167 — name + amount sit
+                    // on a single row ABOVE the bar; amount color = ink (NOT the
+                    // bar tint) so the row reads cleanly. 13sp name w500,
+                    // 12sp amount w600. Bar 6dp tinted by rank.
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                item.name, color = sw.ink,
+                                style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium),
+                                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                            )
+                            RupiahText(
+                                value = item.amount, short = true,
+                                style = SwType.Amount.copy(fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFeatureSettings = "tnum"),
+                                color = sw.ink,
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(sw.track),
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
+                                    .fillMaxWidth(
+                                        (item.amount.toFloat() / maxAmount.toFloat())
+                                            .coerceIn(0f, 1f),
+                                    )
+                                    .fillMaxHeight()
                                     .clip(RoundedCornerShape(3.dp))
-                                    .background(sw.track),
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(
-                                            (item.amount.toFloat() / maxAmount.toFloat())
-                                                .coerceIn(0f, 1f),
-                                        )
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(3.dp))
-                                        .background(tint),
-                                )
-                            }
+                                    .background(tint),
+                            )
                         }
-                        Spacer(Modifier.width(10.dp))
-                        RupiahText(value = item.amount, short = true,
-                            style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),
-                            color = tint)
                     }
                 }
             }

@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -57,6 +59,7 @@ import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
 import androidx.compose.ui.res.stringResource
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester
+import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwSpace
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
@@ -133,24 +136,75 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         }
         Spacer(Modifier.height(10.dp))
 
-        // Per prototype screens-plan.jsx — Pemasukan Diharapkan card BEFORE
-        // the filter chips, not after.
+        // Per prototype screens-plan.jsx:53-70 — Pemasukan Diharapkan card BEFORE
+        // the filter chips. Layout: section label + amount on the left, large
+        // primaryContainer Edit pill on the right, SwBar, then a "Terpakai X /
+        // dari Y" footer row.
         Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
-            SwCard(onClick = { incomeSheetOpen = true }) {
+            SwCard {
                 Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.plan_expected_income), color = sw.inkSubtle,
-                            style = SwType.SectionLabel.copy(fontSize = 11.sp),
-                            modifier = Modifier.weight(1f))
-                        Icon(Icons.Outlined.Edit, null, tint = sw.inkSubtle, modifier = Modifier.size(14.dp))
+                    Row(
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.plan_expected_income),
+                                color = sw.inkSubtle,
+                                style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                            Spacer(Modifier.height(6.dp))
+                            RupiahText(
+                                value = state.plan?.expectedIncome ?: 0L,
+                                // Proto size=26 weight=700; SwType.AmountL is
+                                // already in that ballpark — pin explicitly so
+                                // it doesn't drift if AmountL tweaks later.
+                                style = SwType.AmountL.copy(fontSize = 26.sp,
+                                    fontWeight = FontWeight.Bold),
+                                color = sw.ink,
+                            )
+                        }
+                        // Big primaryContainer edit pill (32×32 r10) per proto
+                        // line 60. Was previously a tiny inline 14sp icon.
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(sw.primaryContainer)
+                                .clickable { incomeSheetOpen = true },
+                        ) {
+                            Icon(Icons.Outlined.Edit, "Ubah pemasukan",
+                                tint = sw.onPrimaryContainer,
+                                modifier = Modifier.size(16.dp))
+                        }
                     }
-                    Spacer(Modifier.height(4.dp))
-                    RupiahText(value = state.plan?.expectedIncome ?: 0L,
-                        style = SwType.AmountL, color = sw.ink)
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(14.dp))
                     val totalUsed = state.allocations.sumOf { it.used }
                     val totalPlan = state.allocations.sumOf { it.plan }.coerceAtLeast(1L)
                     SwBar(used = totalUsed, plan = totalPlan)
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Terpakai ", color = sw.inkMuted,
+                                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                            RupiahText(value = totalUsed, short = true,
+                                style = SwType.Amount.copy(fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFeatureSettings = "tnum"),
+                                color = sw.ink)
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("dari ", color = sw.inkMuted,
+                                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                            RupiahText(value = totalPlan, short = true,
+                                style = SwType.Amount.copy(fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFeatureSettings = "tnum"),
+                                color = sw.ink)
+                        }
+                    }
                 }
             }
         }
@@ -515,7 +569,13 @@ private fun MonthPickerSheet(
     }
 }
 
-// ─── CategoryCard ─── PARENT: filled card, vertical accent bar, bold title
+// ─── CategoryCard ─── Per prototype screens-plan.jsx:184-213. Padding 14/16
+// inside the card, title 14sp bold, used/plan on the same row (used = bold
+// ink/danger, plan = inkSubtle), 6dp bar tinted by allocation, then a footer
+// row: "{items} item · {pct}%" (inkSubtle 10sp) + optional "Over X" (danger
+// 10sp bold). Chevron drives expand/collapse; the trailing MoreHoriz pill
+// stays for delete-category, but lives outside the proto-spec area so it
+// doesn't visually clutter the row.
 @Composable
 private fun CategoryCard(
     name: String, plan: Long, used: Long,
@@ -524,44 +584,64 @@ private fun CategoryCard(
     onMore: () -> Unit = {},
 ) {
     val sw = SwTheme.colors
-    SwCard(onClick = onToggle) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(width = 4.dp, height = 22.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(allocColor),
-                )
-                Spacer(Modifier.size(width = 10.dp, height = 1.dp))
-                Text(name, color = sw.ink,
-                    style = SwType.H3.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
-                    modifier = Modifier.weight(1f))
-                RupiahText(value = used, short = true,
-                    style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                    color = if (used > plan) sw.danger else sw.ink)
-                Text(" / ", color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 11.sp))
-                RupiahText(value = plan, short = true,
-                    style = SwType.Amount.copy(fontSize = 13.sp), color = sw.inkSubtle)
-                Spacer(Modifier.size(width = 6.dp, height = 1.dp))
-                Icon(
-                    if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
-                    null, tint = sw.inkSubtle, modifier = Modifier.size(20.dp),
-                )
-                Spacer(Modifier.size(width = 2.dp, height = 1.dp))
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onMore),
-                ) { Icon(Icons.Outlined.MoreHoriz, "Hapus kategori", tint = sw.inkSubtle, modifier = Modifier.size(18.dp)) }
+    val over = used > plan
+    val pct = if (plan > 0) ((used.toFloat() / plan.toFloat()) * 100f).toInt() else 0
+    SwCard(padding = PaddingValues(0.dp), onClick = onToggle) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
+            Column(Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(name, color = sw.ink,
+                        style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f))
+                    Spacer(Modifier.width(8.dp))
+                    RupiahText(value = used, short = true,
+                        style = SwType.Amount.copy(fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
+                        color = if (over) sw.danger else sw.ink)
+                    Text(" / ", color = sw.inkSubtle,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                    RupiahText(value = plan, short = true,
+                        style = SwType.Amount.copy(fontSize = 12.sp,
+                            fontFeatureSettings = "tnum"),
+                        color = sw.inkSubtle)
+                }
+                Spacer(Modifier.height(8.dp))
+                SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor)
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text("$items item · $pct%", color = sw.inkSubtle,
+                        style = SwType.LabelSmall.copy(fontSize = 10.sp,
+                            fontFeatureSettings = "tnum"))
+                    if (over) {
+                        Text("Over ${(used - plan).toRupiahShort()}",
+                            color = sw.danger,
+                            style = SwType.LabelSmall.copy(fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold))
+                    }
+                }
             }
-            Spacer(Modifier.height(8.dp))
-            SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor)
-            Spacer(Modifier.height(4.dp))
-            Text("$items item", color = sw.inkSubtle,
-                style = SwType.LabelSmall.copy(fontSize = 11.sp))
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                null, tint = sw.inkSubtle, modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.width(2.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onMore),
+            ) { Icon(Icons.Outlined.MoreHoriz, "Hapus kategori", tint = sw.inkSubtle, modifier = Modifier.size(18.dp)) }
         }
     }
 }

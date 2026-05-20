@@ -370,7 +370,8 @@
     <string name="account_detail_txns_empty">Belum ada transaksi di akun ini.</string>
     <string name="reconcile_title">Rekonsiliasi</string>
     <string name="reconcile_intro">Buka aplikasi bank / e-wallet, lihat saldo aslinya. Tulis di sini — Sakuwise akan otomatis catat selisih sebagai transaksi penyesuaian.</string>
-    <string name="reconcile_app_balance">Saldo Sakuwise (terkomputasi)</string>
+    <string name="reconcile_app_balance">Saldo Sakuwise</string>
+    <string name="reconcile_app_balance_sub">Terkomputasi dari transaksi tercatat</string>
     <string name="reconcile_observed_label">Saldo Asli di Bank / E-Wallet</string>
     <string name="reconcile_note_label">Catatan (opsional)</string>
     <string name="reconcile_note_placeholder">Misal: Jajan lupa input</string>

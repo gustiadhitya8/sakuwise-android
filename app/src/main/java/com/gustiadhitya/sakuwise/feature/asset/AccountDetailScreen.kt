@@ -98,7 +98,9 @@ fun AccountDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = SwSpace.pageH),
         ) {
-            // Hero
+            // Hero — green card with SALDO · {type} label, big amount, and a
+            // sub line that includes the last reconcile date + the diff (so
+            // the user sees how stale/accurate the balance is) per proto.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,13 +119,37 @@ fun AccountDetailScreen(
                     RupiahText(value = state.balance, color = sw.onPrimaryHero, style = SwType.AmountXL)
                     Spacer(Modifier.height(6.dp))
                     val lastSnap = state.snapshots.firstOrNull()
-                    Text(
-                        if (lastSnap != null)
-                            stringResource(R.string.account_detail_last_recon_format, lastSnap.date.toAbsoluteId())
-                        else stringResource(R.string.account_detail_no_recon),
-                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
-                        style = SwType.LabelSmall.copy(fontSize = 12.sp),
-                    )
+                    if (lastSnap != null) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                stringResource(R.string.account_detail_last_recon_format,
+                                    lastSnap.date.toAbsoluteId()),
+                                color = sw.onPrimaryHero.copy(alpha = 0.78f),
+                                style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                            )
+                            // Show last selisih inline so the user sees the
+                            // health of the latest reconcile at a glance.
+                            if (lastSnap.diff != 0L) {
+                                Text(" · selisih ",
+                                    color = sw.onPrimaryHero.copy(alpha = 0.78f),
+                                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                                RupiahText(
+                                    value = lastSnap.diff,
+                                    short = true,
+                                    style = SwType.LabelSmall.copy(fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold),
+                                    color = if (lastSnap.diff > 0) sw.accent
+                                    else sw.onPrimaryHero,
+                                )
+                            }
+                        }
+                    } else {
+                        Text(
+                            stringResource(R.string.account_detail_no_recon),
+                            color = sw.onPrimaryHero.copy(alpha = 0.78f),
+                            style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -332,19 +358,35 @@ private fun ReconcileSheet(
                     color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
                 )
                 Spacer(Modifier.height(12.dp))
+                // Per proto reconcile-input ref (screen 48): subtle card with
+                // surface bg + border. Section label UPPERCASE, big ink amount,
+                // muted helper sub. Was previously a filled primaryContainer
+                // which looked like a CTA instead of a read-only summary.
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(sw.primaryContainer)
+                        .background(sw.surface)
+                        .border(1.dp, sw.border, RoundedCornerShape(14.dp))
                         .padding(16.dp),
                 ) {
                     Column {
-                        Text(stringResource(R.string.reconcile_app_balance), color = sw.onPrimaryContainer,
-                            style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            stringResource(R.string.reconcile_app_balance).uppercase(),
+                            color = sw.inkSubtle,
+                            style = SwType.SectionLabel.copy(fontSize = 11.sp),
+                        )
+                        Spacer(Modifier.height(6.dp))
                         RupiahText(value = currentBalance,
-                            style = SwType.AmountL.copy(fontSize = 22.sp), color = sw.onPrimaryContainer)
+                            style = SwType.AmountL.copy(fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold),
+                            color = sw.ink)
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            stringResource(R.string.reconcile_app_balance_sub),
+                            color = sw.inkMuted,
+                            style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                        )
                     }
                 }
                 Spacer(Modifier.height(12.dp))

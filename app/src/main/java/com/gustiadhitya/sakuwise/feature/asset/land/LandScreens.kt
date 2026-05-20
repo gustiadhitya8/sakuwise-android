@@ -40,6 +40,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
@@ -236,13 +237,49 @@ fun LandDetailScreen(
                 style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)) }
         },
     ) {
-        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+        // Hero — per proto screens-assets-detail.jsx:84-103. Info-blue bg,
+        // landscape watermark at bottom-right (opacity 0.18), and a
+        // translucent-white profit chip showing gain since buy.
+        val value = l.currentValue ?: l.buyPrice
+        val profit = value - l.buyPrice
+        val pctProfit = if (l.buyPrice > 0) (profit.toFloat() / l.buyPrice.toFloat()) * 100f else 0f
+        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
             .background(sw.info).padding(20.dp)) {
+            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                Icon(
+                    Icons.Outlined.Landscape, null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier.size(160.dp),
+                )
+            }
             Column {
-                Text(stringResource(R.string.land_detail_value_label), color = Color.White.copy(alpha = 0.85f),
+                Text(stringResource(R.string.land_detail_value_label),
+                    color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = l.currentValue ?: l.buyPrice, color = Color.White, style = SwType.AmountXL)
+                RupiahText(value = value, color = Color.White, style = SwType.AmountXL)
+                if (profit != 0L) {
+                    Spacer(Modifier.height(10.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.18f))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            (if (profit >= 0) "+ " else "− ") +
+                                kotlin.math.abs(profit).toRupiahShort() +
+                                " sejak beli · " +
+                                (if (pctProfit >= 0f) "+" else "−") +
+                                "%.1f".format(kotlin.math.abs(pctProfit)) + "%",
+                            color = Color.White,
+                            style = SwType.LabelStrong.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                        )
+                    }
+                }
             }
         }
         Spacer(Modifier.height(14.dp))

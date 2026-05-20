@@ -370,7 +370,8 @@
     <string name="account_detail_txns_empty">No transactions in this account yet.</string>
     <string name="reconcile_title">Reconcile</string>
     <string name="reconcile_intro">Open your bank / e-wallet app, check the real balance, type it here — Sakuwise will log the difference as an adjustment transaction.</string>
-    <string name="reconcile_app_balance">Sakuwise balance (computed)</string>
+    <string name="reconcile_app_balance">Sakuwise balance</string>
+    <string name="reconcile_app_balance_sub">Computed from logged transactions</string>
     <string name="reconcile_observed_label">Real Balance at Bank / E-Wallet</string>
     <string name="reconcile_note_label">Note (optional)</string>
     <string name="reconcile_note_placeholder">E.g. Forgot to log a snack</string>

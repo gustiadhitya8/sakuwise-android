@@ -242,22 +242,59 @@ fun DepositDetailScreen(
             }
         },
     ) {
-        SwCard {
+        // Hero — per proto screens-assets-detail.jsx:255-268. Surface bg with
+        // border, SALDO TERBARU label + amount + green growth percentage on
+        // the same baseline, "Per {date}" muted sub, and the snapshot line
+        // chart embedded INSIDE the same card (not as a separate tile).
+        val first = snapshots.firstOrNull()
+        val growthPct = if (latest != null && first != null && first.balance > 0L)
+            ((latest.balance - first.balance).toFloat() / first.balance.toFloat()) * 100f
+        else 0f
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(sw.surface)
+                .border(1.dp, sw.border, RoundedCornerShape(22.dp))
+                .padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 14.dp),
+        ) {
             Column {
-                Text(stringResource(R.string.deposit_balance_latest_label), color = sw.inkSubtle,
+                Text(stringResource(R.string.deposit_balance_latest_label),
+                    color = sw.inkSubtle,
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = latest?.balance ?: 0L, style = SwType.AmountXL, color = sw.ink)
+                Row(verticalAlignment = Alignment.Bottom) {
+                    RupiahText(value = latest?.balance ?: 0L,
+                        style = SwType.AmountXL.copy(fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold),
+                        color = sw.ink)
+                    if (snapshots.size >= 2 && growthPct != 0f) {
+                        Spacer(Modifier.size(width = 8.dp, height = 1.dp))
+                        Text(
+                            (if (growthPct >= 0f) "+" else "−") +
+                                "%.1f".format(kotlin.math.abs(growthPct)) + "%",
+                            color = if (growthPct >= 0f) sw.success else sw.danger,
+                            style = SwType.LabelStrong.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+                    }
+                }
                 if (latest != null) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(stringResource(R.string.deposit_balance_per_format, latest.date.toAbsoluteId()),
-                        color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                    Text(
+                        stringResource(R.string.deposit_balance_per_format,
+                            latest.date.toAbsoluteId()),
+                        color = sw.inkMuted,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+                if (snapshots.size >= 2) {
+                    Spacer(Modifier.height(12.dp))
+                    InlineSnapshotChart(snapshots = snapshots, lineColor = sw.primary)
                 }
             }
-        }
-        if (snapshots.size >= 2) {
-            Spacer(Modifier.height(14.dp))
-            SnapshotChart(snapshots = snapshots, lineColor = sw.primary)
         }
         Spacer(Modifier.height(14.dp))
         SwCard(padding = PaddingValues(0.dp)) {
@@ -303,6 +340,45 @@ fun DepositDetailScreen(
             onSave = { d2, a, n -> viewModel.addSnapshot(d2, a, n); addSnap = false },
             onDismiss = { addSnap = false },
         )
+    }
+}
+
+/**
+ * Bare chart canvas — no card chrome, no header. Used embedded inside the
+ * Deposit hero per proto.
+ */
+@Composable
+private fun InlineSnapshotChart(snapshots: List<DepositSnapshot>, lineColor: Color) {
+    if (snapshots.size < 2) return
+    Canvas(modifier = Modifier.fillMaxWidth().height(110.dp)) {
+        val maxV = snapshots.maxOf { it.balance }.toFloat()
+        val minV = snapshots.minOf { it.balance }.toFloat()
+        val range = (maxV - minV).coerceAtLeast(1f)
+        val w = size.width; val h = size.height
+        val xs = snapshots.indices.map { it * w / (snapshots.size - 1) }
+        val ys = snapshots.map { h - ((it.balance - minV) / range) * h * 0.85f - h * 0.05f }
+        val area = Path().apply {
+            moveTo(xs[0], h)
+            for (i in xs.indices) lineTo(xs[i], ys[i])
+            lineTo(xs.last(), h); close()
+        }
+        drawPath(area, brush = Brush.verticalGradient(
+            listOf(lineColor.copy(alpha = 0.22f), Color.Transparent),
+        ))
+        val line = Path().apply {
+            moveTo(xs[0], ys[0])
+            for (i in 1 until xs.size) lineTo(xs[i], ys[i])
+        }
+        drawPath(line, color = lineColor,
+            style = Stroke(width = 2.2f * density, cap = StrokeCap.Round))
+        for (i in xs.indices) {
+            val isLast = i == xs.size - 1
+            drawCircle(
+                color = lineColor,
+                radius = if (isLast) 4f * density else 2.5f * density,
+                center = Offset(xs[i], ys[i]),
+            )
+        }
     }
 }
 
