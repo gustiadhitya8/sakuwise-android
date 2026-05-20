@@ -53,6 +53,7 @@ fun BackupSettingsScreen(
     val prefs by main.prefs.collectAsState()
     val state by vm.state.collectAsState()
     var pinFlowOpen by remember { mutableStateOf(false) }
+    var driveRestoreOpen by remember { mutableStateOf(false) }
 
     val daysAgo = if (prefs.lastBackupTimestamp == 0L) -1
         else ((System.currentTimeMillis() - prefs.lastBackupTimestamp) / 86_400_000L).toInt()
@@ -124,11 +125,28 @@ fun BackupSettingsScreen(
             }
         }
 
+        Spacer(Modifier.height(16.dp))
+        // REQ-2: cloud backup section (Google Drive, AppDataFolder scope)
+        DriveBackupSection(
+            accountEmail = prefs.driveAccountEmail,
+            autoBackupEnabled = prefs.driveBackupEnabled,
+            lastDriveBackupTimestamp = prefs.lastDriveBackupTimestamp,
+            vm = vm,
+            onOpenDriveRestore = { driveRestoreOpen = true },
+        )
+
         if (pinFlowOpen) {
             BackupPinFlowSheet(
                 state = state,
                 onSubmitPin = vm::startBackup,
                 onDismiss = { pinFlowOpen = false; vm.reset() },
+            )
+        }
+
+        if (driveRestoreOpen) {
+            DriveRestoreSheet(
+                vm = vm,
+                onDismiss = { driveRestoreOpen = false },
             )
         }
     }

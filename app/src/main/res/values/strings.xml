@@ -710,4 +710,25 @@
     <string name="sheet_plan_reset_title">Reset Plan?</string>
     <string name="sheet_picker_debt_title">Pilih hutang</string>
     <string name="sheet_picker_income_category_title">Kategori Sumber</string>
+
+    <!-- REQ-2: Google Drive cloud backup (AppData scope) -->
+    <string name="drive_section_title">Cloud Backup (Google Drive)</string>
+    <string name="drive_section_subtitle">File backup tersimpan di folder app-data yang privat — tidak terlihat di Drive biasa.</string>
+    <string name="drive_connect">Hubungkan Google Drive</string>
+    <string name="drive_signed_in_as">Terhubung sebagai %1$s</string>
+    <string name="drive_signout">Logout dari Drive</string>
+    <string name="drive_auto_toggle">Auto-backup ke Drive</string>
+    <string name="drive_auto_toggle_hint">V1.2 — saat ini upload masih manual.</string>
+    <string name="drive_backup_now">Backup ke Drive Sekarang</string>
+    <string name="drive_restore_open">Pulihkan dari Drive</string>
+    <string name="drive_last_backup_format">Backup Drive terakhir: %1$s</string>
+    <string name="drive_last_backup_never">Belum pernah backup ke Drive</string>
+    <string name="drive_list_title">Backup Tersedia di Drive</string>
+    <string name="drive_list_empty">Belum ada file backup di Drive ini.</string>
+    <string name="drive_entry_size_format">%1$d KB</string>
+    <string name="drive_restore_btn">Pulihkan</string>
+    <string name="drive_delete_btn">Hapus</string>
+    <string name="drive_restore_pin_label">PIN backup file ini</string>
+    <string name="drive_restore_confirm">Pulihkan dari Drive</string>
+    <string name="drive_restore_intro">Masukkan PIN backup yang kamu pakai saat membuat file ini. Data sekarang akan TERGANTIKAN.</string>
 </resources>

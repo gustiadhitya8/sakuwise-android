@@ -38,6 +38,10 @@ data class UserPreferences(
     val investPct: Int,
     val goldPriceGlobal: Long,
     val lastBackupTimestamp: Long,
+    // REQ-2 Google Drive (AppData scope) backup
+    val driveBackupEnabled: Boolean,
+    val driveAccountEmail: String?,
+    val lastDriveBackupTimestamp: Long,
 ) {
     companion object {
         val DEFAULTS = UserPreferences(
@@ -55,6 +59,9 @@ data class UserPreferences(
             investPct = 20,
             goldPriceGlobal = 1_050_000L, // sample default — user can change in Settings
             lastBackupTimestamp = 0L,
+            driveBackupEnabled = false,
+            driveAccountEmail = null,
+            lastDriveBackupTimestamp = 0L,
         )
     }
 }
@@ -77,6 +84,9 @@ interface UserPreferencesRepository {
     suspend fun setAllocationPercentages(needs: Int, wants: Int, invest: Int)
     suspend fun setGoldPriceGlobal(pricePerGram: Long)
     suspend fun markBackupNow(epochMs: Long)
+    suspend fun setDriveBackupEnabled(enabled: Boolean)
+    suspend fun setDriveAccountEmail(email: String?)
+    suspend fun markDriveBackupNow(epochMs: Long)
     suspend fun setOnboardingIncomplete()
     suspend fun resetAll()
 }
@@ -96,6 +106,9 @@ internal object PrefKeys {
     val ALLOC_INVEST_PCT = intPreferencesKey("alloc_invest_pct")
     val GOLD_PRICE_GLOBAL = longPreferencesKey("gold_price_global")
     val LAST_BACKUP_TIMESTAMP = longPreferencesKey("last_backup_timestamp")
+    val DRIVE_BACKUP_ENABLED = booleanPreferencesKey("drive_backup_enabled")
+    val DRIVE_ACCOUNT_EMAIL = stringPreferencesKey("drive_account_email")
+    val LAST_DRIVE_BACKUP_TIMESTAMP = longPreferencesKey("last_drive_backup_timestamp")
 }
 
 class UserPreferencesRepositoryImpl(
@@ -120,6 +133,9 @@ class UserPreferencesRepositoryImpl(
             investPct = p[PrefKeys.ALLOC_INVEST_PCT] ?: d.investPct,
             goldPriceGlobal = p[PrefKeys.GOLD_PRICE_GLOBAL] ?: d.goldPriceGlobal,
             lastBackupTimestamp = p[PrefKeys.LAST_BACKUP_TIMESTAMP] ?: d.lastBackupTimestamp,
+            driveBackupEnabled = p[PrefKeys.DRIVE_BACKUP_ENABLED] ?: d.driveBackupEnabled,
+            driveAccountEmail = p[PrefKeys.DRIVE_ACCOUNT_EMAIL] ?: d.driveAccountEmail,
+            lastDriveBackupTimestamp = p[PrefKeys.LAST_DRIVE_BACKUP_TIMESTAMP] ?: d.lastDriveBackupTimestamp,
         )
     }
 
@@ -185,6 +201,21 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun markBackupNow(epochMs: Long) {
         dataStore.edit { it[PrefKeys.LAST_BACKUP_TIMESTAMP] = epochMs }
+    }
+
+    override suspend fun setDriveBackupEnabled(enabled: Boolean) {
+        dataStore.edit { it[PrefKeys.DRIVE_BACKUP_ENABLED] = enabled }
+    }
+
+    override suspend fun setDriveAccountEmail(email: String?) {
+        dataStore.edit { p ->
+            if (email == null) p.remove(PrefKeys.DRIVE_ACCOUNT_EMAIL)
+            else p[PrefKeys.DRIVE_ACCOUNT_EMAIL] = email
+        }
+    }
+
+    override suspend fun markDriveBackupNow(epochMs: Long) {
+        dataStore.edit { it[PrefKeys.LAST_DRIVE_BACKUP_TIMESTAMP] = epochMs }
     }
 
     override suspend fun setOnboardingIncomplete() {

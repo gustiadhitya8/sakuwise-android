@@ -710,4 +710,25 @@
     <string name="sheet_plan_reset_title">Reset plan?</string>
     <string name="sheet_picker_debt_title">Choose debt</string>
     <string name="sheet_picker_income_category_title">Source Category</string>
+
+    <!-- REQ-2: Google Drive cloud backup (AppData scope) -->
+    <string name="drive_section_title">Cloud Backup (Google Drive)</string>
+    <string name="drive_section_subtitle">Backups go to a private app-data folder — they don\'t show up in regular Drive.</string>
+    <string name="drive_connect">Connect Google Drive</string>
+    <string name="drive_signed_in_as">Signed in as %1$s</string>
+    <string name="drive_signout">Sign out of Drive</string>
+    <string name="drive_auto_toggle">Auto-backup to Drive</string>
+    <string name="drive_auto_toggle_hint">V1.2 — manual upload only for now.</string>
+    <string name="drive_backup_now">Back up to Drive now</string>
+    <string name="drive_restore_open">Restore from Drive</string>
+    <string name="drive_last_backup_format">Last Drive backup: %1$s</string>
+    <string name="drive_last_backup_never">No Drive backup yet</string>
+    <string name="drive_list_title">Backups in Drive</string>
+    <string name="drive_list_empty">No backup files in this Drive yet.</string>
+    <string name="drive_entry_size_format">%1$d KB</string>
+    <string name="drive_restore_btn">Restore</string>
+    <string name="drive_delete_btn">Delete</string>
+    <string name="drive_restore_pin_label">Backup PIN for this file</string>
+    <string name="drive_restore_confirm">Restore from Drive</string>
+    <string name="drive_restore_intro">Enter the backup PIN you used when creating this file. The current data WILL be replaced.</string>
 </resources>

@@ -53,6 +53,16 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // Google API client + Drive bring overlapping META-INF resources
+            // from multiple jars — strip the duplicates so the APK packager
+            // doesn't trip over them. (REQ-2 Drive deps.)
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/io.netty.versions.properties"
         }
     }
 }
@@ -97,6 +107,21 @@ dependencies {
 
     // OCR
     implementation(libs.mlkit.text.recognition)
+
+    // Google Drive (AppData scope) — REQ-2 cloud backup.
+    // Deliberate PRD §9.7 exception: this is the ONLY place that touches the
+    // network; the rest of the app remains offline-only.
+    implementation(libs.play.services.auth)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.google.api.client.android) {
+        exclude(group = "org.apache.httpcomponents")
+    }
+    implementation(libs.google.api.services.drive) {
+        exclude(group = "org.apache.httpcomponents")
+    }
+    implementation(libs.google.http.client.gson) {
+        exclude(group = "org.apache.httpcomponents")
+    }
 
     debugImplementation(libs.androidx.ui.tooling)
 
