@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,6 +29,8 @@ import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Landscape
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Savings
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -101,12 +105,41 @@ fun AssetsHubScreen(
                     vein = sw.onPrimary.copy(alpha = 0.10f),
                 )
             }
+            // Local mask state per prototype eye toggle.
+            var hideTotal by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
             Column(modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 18.dp)) {
-                Text(stringResource(R.string.assets_total_wealth), color = sw.onPrimary.copy(alpha = 0.78f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.assets_total_wealth),
+                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        style = SwType.SectionLabel.copy(fontSize = 11.sp),
+                        modifier = Modifier.weight(1f))
+                    // Eye toggle mirrors the dashboard "hide saldo" affordance.
+                    androidx.compose.foundation.layout.Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.16f))
+                            .clickable { hideTotal = !hideTotal },
+                    ) {
+                        Icon(
+                            if (hideTotal) androidx.compose.material.icons.Icons.Outlined.VisibilityOff
+                            else androidx.compose.material.icons.Icons.Outlined.Visibility,
+                            null,
+                            tint = sw.onPrimary,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    RupiahText(value = nw.total, color = sw.onPrimary, style = SwType.AmountXL)
+                    if (hideTotal) {
+                        Text("Rp ••••••",
+                            color = sw.onPrimary,
+                            style = SwType.AmountXL)
+                    } else {
+                        RupiahText(value = nw.total, color = sw.onPrimary, style = SwType.AmountXL)
+                    }
                     // YTD delta pill per screens-dashboard.jsx:220 — only render when we
                     // have enough trend history to compute a meaningful first vs last.
                     val series = state.netWorthTrend
@@ -160,6 +193,21 @@ fun AssetsHubScreen(
                     if (nw.depositTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.depositTotal.toFloat() / totalPos)
                         .background(sw.accent))
+                }
+                Spacer(Modifier.height(10.dp))
+                // Legend row — explains each slice color from the bar above.
+                // Simple Row + horizontal scroll keeps it inside the card on
+                // narrow screens without pulling in experimental FlowRow.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                ) {
+                    LegendDot(sw.primary, stringResource(R.string.assets_class_accounts))
+                    LegendDot(sw.warning, stringResource(R.string.assets_class_gold))
+                    LegendDot(sw.info, stringResource(R.string.assets_class_land))
+                    LegendDot(sw.accent, stringResource(R.string.assets_class_deposit))
                 }
             }
         }
@@ -363,24 +411,49 @@ private fun AssetClassCard(
     onClick: (() -> Unit)? = null,
 ) {
     val sw = SwTheme.colors
-    SwCard(modifier = modifier, padding = PaddingValues(14.dp), onClick = onClick) {
-        Column {
-            Box(
-                contentAlignment = Alignment.Center,
+    SwCard(modifier = modifier, padding = PaddingValues(0.dp), onClick = onClick) {
+        Box {
+            // Watermark icon in the bottom-right corner of each asset class
+            // card — per prototype screens-assets.jsx. Subtle, tinted, oversized.
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = tint.copy(alpha = 0.10f),
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(11.dp))
-                    .background(tint.copy(alpha = 0.15f)),
-            ) { Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp)) }
-            Spacer(Modifier.height(10.dp))
-            Text(title, color = sw.ink,
-                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-            Text(sub, color = sw.inkMuted,
-                style = SwType.LabelSmall.copy(fontSize = 11.sp))
-            Spacer(Modifier.height(8.dp))
-            RupiahText(value = value, short = true,
-                style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                color = sw.ink)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 14.dp, y = 14.dp)
+                    .size(96.dp),
+            )
+            Column(modifier = Modifier.padding(14.dp)) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(tint.copy(alpha = 0.15f)),
+                ) { Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp)) }
+                Spacer(Modifier.height(10.dp))
+                Text(title, color = sw.ink,
+                    style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                Text(sub, color = sw.inkMuted,
+                    style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                Spacer(Modifier.height(8.dp))
+                RupiahText(value = value, short = true,
+                    style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    color = sw.ink)
+            }
         }
+    }
+}
+
+@Composable
+private fun LegendDot(color: androidx.compose.ui.graphics.Color, label: String) {
+    val sw = SwTheme.colors
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(label,
+            color = sw.onPrimary.copy(alpha = 0.85f),
+            style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium))
     }
 }

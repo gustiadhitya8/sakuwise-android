@@ -133,28 +133,8 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         }
         Spacer(Modifier.height(10.dp))
 
-        // Filter chips: Semua / Needs / Wants / Investment
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(horizontal = SwSpace.pageH)
-                .horizontalScroll(rememberScrollState()),
-        ) {
-            FilterChip(label = stringResource(R.string.plan_filter_all),
-                selected = filter == null,
-                accent = sw.ink, onClick = { filter = null })
-            FilterChip(label = stringResource(R.string.plan_filter_needs),
-                selected = filter == AllocationId.Needs,
-                accent = sw.primary, onClick = { filter = AllocationId.Needs })
-            FilterChip(label = stringResource(R.string.plan_filter_wants),
-                selected = filter == AllocationId.Wants,
-                accent = sw.accent, onClick = { filter = AllocationId.Wants })
-            FilterChip(label = stringResource(R.string.plan_filter_invest),
-                selected = filter == AllocationId.Invest,
-                accent = sw.info, onClick = { filter = AllocationId.Invest })
-        }
-        Spacer(Modifier.height(14.dp))
-
+        // Per prototype screens-plan.jsx — Pemasukan Diharapkan card BEFORE
+        // the filter chips, not after.
         Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
             SwCard(onClick = { incomeSheetOpen = true }) {
                 Column {
@@ -173,6 +153,28 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                     SwBar(used = totalUsed, plan = totalPlan)
                 }
             }
+        }
+        Spacer(Modifier.height(14.dp))
+
+        // Filter chips moved below the income card per prototype.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(horizontal = SwSpace.pageH)
+                .horizontalScroll(rememberScrollState()),
+        ) {
+            FilterChip(label = stringResource(R.string.plan_filter_all),
+                selected = filter == null,
+                accent = sw.ink, onClick = { filter = null })
+            FilterChip(label = stringResource(R.string.plan_filter_needs),
+                selected = filter == AllocationId.Needs,
+                accent = sw.primary, onClick = { filter = AllocationId.Needs })
+            FilterChip(label = stringResource(R.string.plan_filter_wants),
+                selected = filter == AllocationId.Wants,
+                accent = sw.accent, onClick = { filter = AllocationId.Wants })
+            FilterChip(label = stringResource(R.string.plan_filter_invest),
+                selected = filter == AllocationId.Invest,
+                accent = sw.info, onClick = { filter = AllocationId.Invest })
         }
         Spacer(Modifier.height(14.dp))
 
