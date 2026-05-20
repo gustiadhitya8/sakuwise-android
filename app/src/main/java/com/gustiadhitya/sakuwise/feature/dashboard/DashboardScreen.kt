@@ -33,6 +33,9 @@ import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -109,6 +112,17 @@ private fun DashboardContent(
     val nickname = state.nickname.ifBlank { "Teman" }
     val initial = (nickname.firstOrNull()?.uppercase() ?: "S")
 
+    // PRD §7.13 — overspending banner fires when ANY allocation has used > plan.
+    // We compute it here so DashboardAlloc + the dedicated banner stay in sync.
+    val overspent = state.allocations.any { it.used > it.plan && it.plan > 0L }
+
+    // PRD §7.12 — backup blocker modal at ≥60 days. Session-only dismiss: the
+    // user taps "Nanti saja" → modal closes for this app session, reappears on
+    // cold launch. Cold launch resets `dismissedBackup60Modal` to false.
+    var dismissedBackup60Modal by remember { mutableStateOf(false) }
+    val showBackup60Modal = !dismissedBackup60Modal &&
+        (state.backupOverdueDays >= 60 || state.backupOverdueDays == Int.MAX_VALUE)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -127,6 +141,9 @@ private fun DashboardContent(
             hide = hide,
             onToggleHide = { hide = !hide },
         )
+        if (overspent) {
+            DashboardOverspendBanner(onTap = onNavigateToPlan)
+        }
         DashboardAlloc(
             allocations = state.allocations,
             onTap = onNavigateToPlan,
@@ -149,6 +166,120 @@ private fun DashboardContent(
         if (state.backupOverdueDays > 30 || state.backupOverdueDays == Int.MAX_VALUE) {
             DashboardBanner(overdueDays = state.backupOverdueDays, onTap = onBackupTap)
         }
+    }
+
+    if (showBackup60Modal) {
+        BackupOverdueModal(
+            overdueDays = state.backupOverdueDays,
+            onDismissForSession = { dismissedBackup60Modal = true },
+            onBackup = {
+                dismissedBackup60Modal = true
+                onBackupTap()
+            },
+        )
+    }
+}
+
+/**
+ * PRD §7.12 — modal blocker for backups ≥ 60 days overdue.
+ *
+ * Two routes out of the modal:
+ *  • "Nanti saja" → session-only dismiss (re-fires on cold launch).
+ *  • "Backup Sekarang" → dismiss + invoke [onBackup] → routes user into the
+ *    Backup settings flow.
+ *
+ * The modal is intentionally non-blocking for the PIN unlock — it renders
+ * inside DashboardScreen which only mounts AFTER unlock.
+ */
+@Composable
+private fun BackupOverdueModal(
+    overdueDays: Int,
+    onDismissForSession: () -> Unit,
+    onBackup: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    val daysLabel = if (overdueDays == Int.MAX_VALUE) "—" else overdueDays.toString()
+    AlertDialog(
+        onDismissRequest = onDismissForSession,
+        icon = {
+            Icon(Icons.Outlined.Shield, null, tint = sw.warning, modifier = Modifier.size(28.dp))
+        },
+        title = {
+            Text(
+                stringResource(R.string.dashboard_backup60_title),
+                color = sw.ink,
+                style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+            )
+        },
+        text = {
+            Text(
+                stringResource(R.string.dashboard_backup60_body_format, daysLabel),
+                color = sw.inkMuted,
+                style = SwType.Body.copy(fontSize = 14.sp),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onBackup) {
+                Text(stringResource(R.string.dashboard_backup60_cta),
+                    color = sw.primary,
+                    style = SwType.LabelStrong.copy(fontWeight = FontWeight.SemiBold))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissForSession) {
+                Text(stringResource(R.string.dashboard_backup60_later),
+                    color = sw.inkMuted)
+            }
+        },
+        containerColor = sw.surface,
+    )
+}
+
+/**
+ * PRD §7.13 — overspending banner. Renders above the alloc bars when any
+ * allocation's actual spend has crossed its planned amount. Tap → Plan tab.
+ */
+@Composable
+private fun DashboardOverspendBanner(onTap: () -> Unit) {
+    val sw = SwTheme.colors
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = SwSpace.pageH, vertical = 4.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(sw.dangerSoft)
+            .border(1.dp, sw.danger.copy(alpha = 0.2f), RoundedCornerShape(14.dp))
+            .clickable(onClick = onTap)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(sw.danger),
+        ) {
+            Icon(Icons.Outlined.WarningAmber, null,
+                tint = Color.White, modifier = Modifier.size(18.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.dashboard_overspend_title),
+                color = sw.ink,
+                style = SwType.LabelStrong.copy(
+                    fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                ),
+            )
+            Text(
+                stringResource(R.string.dashboard_overspend_body),
+                color = sw.inkMuted,
+                style = SwType.LabelSmall.copy(fontSize = 11.sp),
+            )
+        }
+        Icon(Icons.Outlined.ChevronRight, null,
+            tint = sw.inkSubtle, modifier = Modifier.size(18.dp))
     }
 }
 

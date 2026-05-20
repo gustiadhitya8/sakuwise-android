@@ -204,6 +204,21 @@ class AddIncomeUseCase @Inject constructor(private val repo: TransactionReposito
 }
 
 class AddTransferUseCase @Inject constructor(private val repo: TransactionRepository) {
+    /**
+     * PRD §7.4 — Transfer fee.
+     *
+     * Two paths:
+     *  1. No [feePlanItemId]: legacy behaviour. Fee lives on the Transfer
+     *     row's `transferFee` column and is subtracted from the source
+     *     account balance by the AccountDao SQL. Fee does NOT count against
+     *     any plan item (it just leaks out of the budget).
+     *  2. [feePlanItemId] provided: PRD-conformant. We DROP `transferFee`
+     *     from the Transfer row (so AccountDao doesn't double-subtract) and
+     *     write a sibling Expense Transaction(amount=fee, planItemId=…,
+     *     sourceAccount=fromAccount). The Expense row is then aggregated
+     *     into the plan period totals like any other expense, satisfying
+     *     "fee terhitung sebagai pengeluaran terhadap plan item".
+     */
     suspend operator fun invoke(
         amount: Long,
         date: LocalDate,
@@ -211,9 +226,11 @@ class AddTransferUseCase @Inject constructor(private val repo: TransactionReposi
         toAccountId: String,
         feeAmount: Long = 0L,
         note: String? = null,
+        feePlanItemId: String? = null,
     ): Result<Transaction> = runCatching {
         require(amount > 0) { "amount must be positive" }
         require(fromAccountId != toAccountId) { "from and to must differ" }
+        val bookFeeAsExpense = feeAmount > 0 && feePlanItemId != null
         val txn = Transaction(
             id = UUID.randomUUID().toString(),
             date = date,
@@ -222,7 +239,9 @@ class AddTransferUseCase @Inject constructor(private val repo: TransactionReposi
             planItemId = null,
             sourceAccountId = fromAccountId,
             destAccountId = toAccountId,
-            transferFee = feeAmount.takeIf { it > 0 },
+            // When fee is booked as a separate Expense row, null this out so
+            // the AccountDao balance SQL doesn't double-subtract.
+            transferFee = if (bookFeeAsExpense) null else feeAmount.takeIf { it > 0 },
             debtId = null,
             photoBlob = null,
             incomeCategoryId = null,
@@ -230,6 +249,25 @@ class AddTransferUseCase @Inject constructor(private val repo: TransactionReposi
             createdAt = System.currentTimeMillis(),
         )
         repo.upsert(txn)
+        if (bookFeeAsExpense) {
+            repo.upsert(
+                Transaction(
+                    id = UUID.randomUUID().toString(),
+                    date = date,
+                    amount = feeAmount,
+                    type = TxnType.Expense,
+                    planItemId = feePlanItemId,
+                    sourceAccountId = fromAccountId,
+                    destAccountId = null,
+                    transferFee = null,
+                    debtId = null,
+                    photoBlob = null,
+                    incomeCategoryId = null,
+                    note = "Biaya transfer",
+                    createdAt = System.currentTimeMillis(),
+                ),
+            )
+        }
         txn
     }
 }

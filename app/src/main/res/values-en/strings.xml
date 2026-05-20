@@ -305,7 +305,7 @@
     <string name="onb_step2_biometric_title">Unlock with biometric</string>
     <string name="onb_step2_biometric_sub">Fingerprint / face — faster than typing the PIN.</string>
     <string name="onb_step3_title">Your data stays right here.</string>
-    <string name="onb_step3_subtitle">No servers. No telemetry. No internet permission requested.</string>
+    <string name="onb_step3_subtitle">No Sakuwise servers. No telemetry. Internet is only used if you opt in to Google Drive backup — even then the file is encrypted on-device before upload.</string>
     <string name="onb_step3_primary">I understand</string>
     <string name="onb_step3_p1_title">Encrypted on disk</string>
     <string name="onb_step3_p1_sub">The database &amp; receipt photos are all encrypted with AES-256.</string>
@@ -731,4 +731,26 @@
     <string name="drive_restore_pin_label">Backup PIN for this file</string>
     <string name="drive_restore_confirm">Restore from Drive</string>
     <string name="drive_restore_intro">Enter the backup PIN you used when creating this file. The current data WILL be replaced.</string>
+
+    <!-- PRD §7.4 + §7.11 — receipt photo attach on the Expense form -->
+    <string name="txn_expense_photo_label">Receipt photo</string>
+    <string name="txn_expense_photo_hint">Optional. Saved on device, never uploaded.</string>
+    <string name="txn_expense_photo_attached">Photo attached</string>
+    <string name="txn_expense_photo_camera_cd">Take a photo with the camera</string>
+    <string name="txn_expense_photo_gallery_cd">Pick a photo from the gallery</string>
+    <string name="txn_expense_photo_remove_cd">Remove photo</string>
+
+    <!-- PRD §7.4 — transfer fee assigned to a plan item -->
+    <string name="txn_transfer_fee_plan_item">Plan item for the fee</string>
+    <string name="txn_transfer_fee_plan_item_placeholder">Pick a plan item…</string>
+
+    <!-- PRD §7.12 — 60-day backup blocker modal -->
+    <string name="dashboard_backup60_title">Backup is overdue</string>
+    <string name="dashboard_backup60_body_format">It\'s been %1$s days since your last backup. Back up now to protect your data.</string>
+    <string name="dashboard_backup60_cta">Back up now</string>
+    <string name="dashboard_backup60_later">Later</string>
+
+    <!-- PRD §7.13 — overspending banner -->
+    <string name="dashboard_overspend_title">Spending exceeds allocation</string>
+    <string name="dashboard_overspend_body">An allocation crossed 100%. Tap to see details.</string>
 </resources>

@@ -13,6 +13,12 @@ data class ReceiptDraft(
     val date: LocalDate?,
     val totalAmount: Long?,
     val confidence: OcrConfidence,
+    /**
+     * Compressed JPEG (q=70, max edge ≤1600px) of the captured receipt. Per
+     * PRD §7.11 the photo must be persisted as a BLOB on the resulting
+     * Expense Transaction so the user can re-verify the receipt later.
+     */
+    val photoBlob: ByteArray? = null,
 )
 
 /**

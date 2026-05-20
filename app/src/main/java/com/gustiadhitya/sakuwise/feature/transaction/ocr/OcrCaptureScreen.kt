@@ -71,7 +71,14 @@ class OcrCaptureViewModel @Inject constructor(
     fun process(bitmap: Bitmap) {
         _stage.value = OcrStage.Processing
         viewModelScope.launch {
-            runCatching { ocr.extractReceipt(bitmap) }
+            runCatching {
+                // Persist the photo BLOB alongside the parsed text (PRD §7.11).
+                // We encode the SAME bitmap the OCR engine sees — the rescale
+                // happens inside the helper if needed.
+                val jpeg = com.gustiadhitya.sakuwise.core.common.ImageCompression
+                    .toCompressedJpeg(bitmap)
+                ocr.extractReceipt(bitmap).copy(photoBlob = jpeg)
+            }
                 .onSuccess { _stage.value = OcrStage.Ready(it) }
                 .onFailure {
                     _stage.value = OcrStage.Failure(it.message ?: "OCR gagal — coba foto ulang.")

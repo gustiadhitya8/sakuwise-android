@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +39,11 @@ import com.gustiadhitya.sakuwise.core.ui.RupiahText
 import com.gustiadhitya.sakuwise.feature.transaction.ui.AccountPickerSheet
 import com.gustiadhitya.sakuwise.feature.transaction.ui.DatePickerSheet
 import com.gustiadhitya.sakuwise.feature.transaction.ui.FieldButton
+import com.gustiadhitya.sakuwise.feature.transaction.ui.PlanItemPickerSheet
 import com.gustiadhitya.sakuwise.feature.transaction.ui.TxnFormShell
 import com.gustiadhitya.sakuwise.feature.transaction.viewmodel.TxnFormViewModel
 
-private enum class TransferPicker { From, To, Date }
+private enum class TransferPicker { From, To, Date, FeePlanItem }
 
 @Composable
 fun TransferFormScreen(
@@ -51,6 +53,7 @@ fun TransferFormScreen(
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
+    val planItems by viewModel.planItemOptions.collectAsState()
     var picker by remember { mutableStateOf<TransferPicker?>(null) }
 
     LaunchedEffect(state.saved) { if (state.saved) onClose() }
@@ -112,6 +115,19 @@ fun TransferFormScreen(
             prefix = "Rp", placeholder = "0",
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
         )
+        // When the user enters a fee, surface a Plan Item picker (PRD §7.4 —
+        // fee must count as an expense against the assigned plan item). The
+        // picker stays hidden until fee > 0 so the form doesn't gain noise
+        // for fee-less transfers.
+        if (state.transferFee > 0L) {
+            FieldButton(
+                label = stringResource(R.string.txn_transfer_fee_plan_item),
+                value = state.feePlanItemName.orEmpty(),
+                placeholder = stringResource(R.string.txn_transfer_fee_plan_item_placeholder),
+                leadingIcon = Icons.Outlined.Checklist,
+                onClick = { picker = TransferPicker.FeePlanItem },
+            )
+        }
         SwField(
             value = state.note,
             onValueChange = viewModel::setNote,
@@ -146,6 +162,12 @@ fun TransferFormScreen(
         TransferPicker.Date -> DatePickerSheet(
             selected = state.date,
             onPick = viewModel::setDate,
+            onDismiss = { picker = null },
+        )
+        TransferPicker.FeePlanItem -> PlanItemPickerSheet(
+            grouped = planItems,
+            selectedId = state.feePlanItemId,
+            onPick = { viewModel.setFeePlanItem(it.id, it.name) },
             onDismiss = { picker = null },
         )
         null -> Unit

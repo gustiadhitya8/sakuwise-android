@@ -305,7 +305,7 @@
     <string name="onb_step2_biometric_title">Buka pakai biometrik</string>
     <string name="onb_step2_biometric_sub">Sidik jari / wajah — lebih cepat dari ketik PIN.</string>
     <string name="onb_step3_title">Data kamu tinggal di sini.</string>
-    <string name="onb_step3_subtitle">Tidak ada server. Tidak ada telemetry. Tidak ada permintaan akses internet.</string>
+    <string name="onb_step3_subtitle">Tidak ada server Sakuwise. Tidak ada telemetry. Internet hanya dipakai jika kamu memilih backup ke Google Drive — file-nya tetap dienkripsi di HP sebelum diunggah.</string>
     <string name="onb_step3_primary">Saya mengerti</string>
     <string name="onb_step3_p1_title">Terenkripsi di disk</string>
     <string name="onb_step3_p1_sub">Database &amp; foto struk semua dienkripsi pakai AES-256.</string>
@@ -731,4 +731,26 @@
     <string name="drive_restore_pin_label">PIN backup file ini</string>
     <string name="drive_restore_confirm">Pulihkan dari Drive</string>
     <string name="drive_restore_intro">Masukkan PIN backup yang kamu pakai saat membuat file ini. Data sekarang akan TERGANTIKAN.</string>
+
+    <!-- PRD §7.4 + §7.11 — receipt photo attach on the Expense form -->
+    <string name="txn_expense_photo_label">Foto struk</string>
+    <string name="txn_expense_photo_hint">Opsional. Disimpan di HP, tidak ke cloud.</string>
+    <string name="txn_expense_photo_attached">Foto terlampir</string>
+    <string name="txn_expense_photo_camera_cd">Ambil foto dengan kamera</string>
+    <string name="txn_expense_photo_gallery_cd">Pilih foto dari galeri</string>
+    <string name="txn_expense_photo_remove_cd">Hapus foto</string>
+
+    <!-- PRD §7.4 — transfer fee assigned to a plan item -->
+    <string name="txn_transfer_fee_plan_item">Plan item untuk biaya</string>
+    <string name="txn_transfer_fee_plan_item_placeholder">Pilih plan item…</string>
+
+    <!-- PRD §7.12 — 60-day backup blocker modal -->
+    <string name="dashboard_backup60_title">Backup tertunda lama</string>
+    <string name="dashboard_backup60_body_format">Sudah %1$s hari sejak backup terakhir. Backup sekarang untuk amankan datamu.</string>
+    <string name="dashboard_backup60_cta">Backup Sekarang</string>
+    <string name="dashboard_backup60_later">Nanti saja</string>
+
+    <!-- PRD §7.13 — overspending banner -->
+    <string name="dashboard_overspend_title">Pengeluaran melebihi alokasi</string>
+    <string name="dashboard_overspend_body">Salah satu alokasi sudah lewat 100%. Tap untuk cek detail.</string>
 </resources>

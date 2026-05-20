@@ -74,13 +74,18 @@ fun DonateScreen(onBack: () -> Unit) {
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                val saweriaUrl = stringResource(R.string.donate_platform_saweria_url)
+                val trakteerUrl = stringResource(R.string.donate_platform_trakteer_url)
                 DonateRow("S", Color(0xFFFFC107),
                     stringResource(R.string.donate_platform_saweria),
-                    stringResource(R.string.donate_platform_saweria_url), onClick = {})
+                    saweriaUrl,
+                    onClick = { openUrl(ctx, saweriaUrl) })
                 Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
                 DonateRow("T", Color(0xFF9333EA),
                     stringResource(R.string.donate_platform_trakteer),
-                    stringResource(R.string.donate_platform_trakteer_url), onClick = {})
+                    trakteerUrl,
+                    onClick = { openUrl(ctx, trakteerUrl) })
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -120,4 +125,18 @@ private fun DonateRow(initial: String, accent: Color, name: String, url: String,
         }
         Icon(Icons.Outlined.ChevronRight, null, tint = sw.inkSubtle, modifier = Modifier.size(18.dp))
     }
+}
+
+/**
+ * Launch an external URL in the user's default browser. Used by Donate rows
+ * to open Saweria / Trakteer. Wrapped in try/catch in case no browser is
+ * installed (shouldn't happen in practice but rendering a stack trace would
+ * leak through to a user-visible crash).
+ */
+private fun openUrl(ctx: android.content.Context, url: String) {
+    val intent = android.content.Intent(
+        android.content.Intent.ACTION_VIEW,
+        android.net.Uri.parse(url),
+    ).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
+    runCatching { ctx.startActivity(intent) }
 }

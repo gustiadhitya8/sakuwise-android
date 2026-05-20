@@ -201,6 +201,7 @@ private fun MainShell() {
                                 amount = draft.totalAmount,
                                 date = draft.date,
                                 merchant = draft.merchant,
+                                photoBlob = draft.photoBlob,
                             )
                             overlay = FullScreenOverlay.Expense
                         },

@@ -50,6 +50,14 @@ data class TxnFormState(
     val note: String = "",
     val saving: Boolean = false,
     val saved: Boolean = false,
+    // Expense only — JPEG BLOB of the attached receipt photo (PRD §7.4 + §7.11).
+    // Populated either by OCR prefill or by the camera/gallery picker on the
+    // standalone Expense form. Compressed to ≤ ~200 KB upstream.
+    val photoBlob: ByteArray? = null,
+    // Transfer only — when fee > 0 and a plan item is picked, the fee is booked
+    // as a separate Expense child txn against this plan item (PRD §7.4).
+    val feePlanItemId: String? = null,
+    val feePlanItemName: String? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -145,12 +153,26 @@ class TxnFormViewModel @Inject constructor(
         amount: Long?,
         date: LocalDate?,
         merchant: String?,
+        photoBlob: ByteArray? = null,
     ) {
         _state.value = _state.value.copy(
             amount = amount ?: _state.value.amount,
             date = date ?: _state.value.date,
             note = listOfNotNull(merchant, _state.value.note.ifBlank { null }).joinToString(" · "),
+            // OCR-supplied JPEG. If null (helper failed) we leave any existing
+            // photoBlob alone so manual picker selections aren't clobbered.
+            photoBlob = photoBlob ?: _state.value.photoBlob,
         )
+    }
+
+    /** Standalone Expense form: attach (or clear) a receipt JPEG. */
+    fun setPhotoBlob(bytes: ByteArray?) {
+        _state.value = _state.value.copy(photoBlob = bytes)
+    }
+
+    /** Transfer form: assign / clear the plan item the transfer fee charges to. */
+    fun setFeePlanItem(id: String?, name: String?) {
+        _state.value = _state.value.copy(feePlanItemId = id, feePlanItemName = name)
     }
     fun swap() {
         val s = _state.value
@@ -164,6 +186,8 @@ class TxnFormViewModel @Inject constructor(
      * accounts/planItems flows intact (they're upstream).
      */
     fun resetForNewEntry() {
+        // Explicitly null out photoBlob + feePlanItem so a previous OCR/manual
+        // attach doesn't bleed into the next unrelated form opening.
         _state.value = TxnFormState(accounts = _state.value.accounts)
     }
 
@@ -175,6 +199,7 @@ class TxnFormViewModel @Inject constructor(
             addExpense(
                 amount = s.amount, date = s.date, planItemId = s.planItemId,
                 accountId = s.accountId, note = s.note.ifBlank { null },
+                photoBlob = s.photoBlob,
                 debtId = s.debtId,
             )
             _state.value = _state.value.copy(saving = false, saved = true)
@@ -208,6 +233,7 @@ class TxnFormViewModel @Inject constructor(
                 amount = s.amount, date = s.date,
                 fromAccountId = s.accountId, toAccountId = s.destAccountId,
                 feeAmount = s.transferFee, note = s.note.ifBlank { null },
+                feePlanItemId = s.feePlanItemId,
             )
             _state.value = _state.value.copy(saving = false, saved = true)
         }
