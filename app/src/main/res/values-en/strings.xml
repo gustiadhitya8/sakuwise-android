@@ -1,0 +1,690 @@
+<resources>
+    <string name="app_name">Sakuwise</string>
+
+    <!-- Bottom tab bar -->
+    <string name="tab_home">Home</string>
+    <string name="tab_plan">Plan</string>
+    <string name="tab_assets">Assets</string>
+    <string name="tab_me">Me</string>
+    <string name="tab_add">Add</string>
+
+    <!-- Common buttons / chrome -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_back">Back</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_done">Done</string>
+    <string name="action_open">Open</string>
+    <string name="action_add">Add</string>
+    <string name="common_date_label">Date</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting_morning">Good morning</string>
+    <string name="dashboard_greeting_noon">Good afternoon</string>
+    <string name="dashboard_greeting_afternoon">Good afternoon</string>
+    <string name="dashboard_greeting_evening">Good evening</string>
+    <string name="dashboard_default_name">Friend</string>
+    <string name="dashboard_top_expenses">Top Expenses</string>
+    <string name="dashboard_active_period">active period</string>
+    <string name="dashboard_no_plan">No plan for this month yet</string>
+    <string name="dashboard_period_format">%1$s · %2$d days left</string>
+    <string name="dashboard_notifications">Notifications</string>
+    <string name="dashboard_add_txn">Add transaction</string>
+
+    <!-- Plan -->
+    <string name="plan_title">Plan</string>
+    <string name="plan_no_plan">No plan yet</string>
+    <string name="plan_expected_income">EXPECTED INCOME</string>
+    <string name="plan_filter_all">All</string>
+    <string name="plan_filter_needs">Needs</string>
+    <string name="plan_filter_wants">Wants</string>
+    <string name="plan_filter_invest">Investment</string>
+
+    <!-- Allocation display names -->
+    <string name="alloc_needs">Needs</string>
+    <string name="alloc_wants">Wants</string>
+    <string name="alloc_invest">Investment</string>
+    <string name="alloc_add_category_format">+ Add Category to %1$s</string>
+    <string name="plan_action_sheet_title">Plan Actions</string>
+    <string name="plan_action_set_income">Set Expected Income</string>
+    <string name="plan_action_apply_starter">Apply Starter Template</string>
+    <string name="plan_action_regen_next">Create Next Month\'s Plan</string>
+    <string name="plan_action_reset">Reset This Month\'s Plan</string>
+    <string name="plan_action_set_income_sub">Set the income target for this period</string>
+    <string name="plan_action_apply_starter_sub">Add 23 standard categories to this plan</string>
+    <string name="plan_action_regen_next_sub">Carry over recurring items (monthly/quarterly/yearly) to the next period</string>
+    <string name="plan_action_reset_sub">Delete ALL categories &amp; items — start over</string>
+    <string name="plan_action_edit_allocations">Adjust This Month\'s Allocations</string>
+    <string name="plan_action_edit_allocations_sub">Override Needs / Wants / Invest percentages for this plan only</string>
+    <string name="plan_alloc_editor_title">Adjust Allocations</string>
+    <string name="plan_alloc_editor_intro">These percentages only apply to this plan period. The default in Settings stays the same.</string>
+    <string name="plan_alloc_sum_ok_format">Total %1$d%% · exactly 100</string>
+    <string name="plan_alloc_sum_warn_format">Total %1$d%% — should be 100. Percentages will be auto-normalized in calculations.</string>
+    <string name="plan_empty_no_allocs">This plan has no allocations yet (Needs/Wants/Investment).</string>
+    <string name="plan_apply_starter_btn">Apply Starter Template</string>
+
+    <!-- Settings hub -->
+    <string name="settings_title">Me</string>
+    <string name="settings_group_plan">Plan</string>
+    <string name="settings_group_security">Security</string>
+    <string name="settings_group_backup">Backup &amp; Data</string>
+    <string name="settings_group_app">App</string>
+    <string name="settings_default_alloc">Default Allocation</string>
+    <string name="settings_period_start">Period Start Day</string>
+    <string name="settings_pin_bio">PIN &amp; Biometric</string>
+    <string name="settings_autolock">Auto-lock</string>
+    <string name="settings_backup_restore">Backup &amp; Restore</string>
+    <string name="settings_export_reset">Reset App</string>
+    <string name="settings_export_reset_sub">Wipe everything and start over</string>
+    <string name="settings_export_pdf">Export PDF</string>
+    <string name="settings_export_pdf_sub">Generate a compact report to share or archive</string>
+
+    <!-- Export PDF screen (V1.1 / M49) -->
+    <string name="export_pdf_title">Export PDF</string>
+    <string name="export_pdf_intro">Generate a PDF report summarizing your net worth, accounts, transactions, and top expenses. The file is stored temporarily on this device — you decide whether to share or archive it.</string>
+    <string name="export_pdf_period_label">Period</string>
+    <string name="export_pdf_period_current_month">This month</string>
+    <string name="export_pdf_period_last_30d">Last 30 days</string>
+    <string name="export_pdf_period_this_year">This year</string>
+    <string name="export_pdf_period_all_time">All time</string>
+    <string name="export_pdf_action">Export PDF</string>
+    <string name="export_pdf_action_working">Preparing report…</string>
+    <string name="export_pdf_ready_title">Report ready</string>
+    <string name="export_pdf_ready_body">PDF generated. Open to preview or share it with another app.</string>
+    <string name="export_pdf_open">Open PDF</string>
+    <string name="export_pdf_share">Share</string>
+    <string name="export_pdf_again">Export again</string>
+    <string name="export_pdf_failed_title">Couldn\'t generate PDF</string>
+    <string name="export_pdf_retry">Try again</string>
+    <string name="export_pdf_footnote">The PDF lives in the app cache and may be cleared by the system at any time. If you need to keep it, use Share to save it to Files / Drive.</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_replay_onboarding">Replay Onboarding</string>
+    <string name="settings_replay_onboarding_sub">Show the intro tour &amp; reset initial preferences</string>
+    <string name="settings_donate">Donate</string>
+    <string name="settings_donate_sub">Support Sakuwise development</string>
+    <string name="settings_about">About Sakuwise</string>
+    <string name="settings_active">On</string>
+    <string name="settings_inactive">Off</string>
+    <string name="settings_minutes_format">%1$d min</string>
+
+    <!-- Lock screen -->
+    <string name="lock_welcome_back">Welcome back</string>
+    <string name="lock_hint">Enter your PIN or use biometric to unlock.</string>
+    <string name="lock_use_biometric">Use Biometric</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_set_pin_and_unlock">Set PIN &amp; Unlock</string>
+    <string name="lock_pin_six_digits">Please enter your 6-digit PIN.</string>
+    <string name="lock_pin_wrong">Incorrect PIN.</string>
+
+    <!-- AddTxn picker -->
+    <string name="addtxn_question">What do you want to log?</string>
+    <string name="addtxn_expense">Expense</string>
+    <string name="addtxn_expense_sub">Track outgoing money — must be tied to a plan item</string>
+    <string name="addtxn_income">Income</string>
+    <string name="addtxn_income_sub">Salary, bonus, THR, side income</string>
+    <string name="addtxn_transfer">Transfer</string>
+    <string name="addtxn_transfer_sub">Move money between your own accounts</string>
+    <string name="addtxn_ocr">Scan Receipt (OCR)</string>
+    <string name="addtxn_ocr_sub">Snap a receipt → auto-fills an expense draft</string>
+
+    <!-- Transaction forms -->
+    <string name="txn_expense_title">Expense</string>
+    <string name="txn_expense_amount_label">Expense Amount</string>
+    <string name="txn_income_title">Income</string>
+    <string name="txn_income_amount_label">Income Amount</string>
+    <string name="txn_transfer_title">Transfer</string>
+    <string name="txn_transfer_amount_label">Transfer Amount</string>
+
+    <!-- Transaction form field labels -->
+    <string name="txn_field_plan_item">Plan Item</string>
+    <string name="txn_field_plan_item_placeholder">Choose plan item…</string>
+    <string name="txn_field_account">Account</string>
+    <string name="txn_field_account_placeholder">Choose account…</string>
+    <string name="txn_field_account_dest">Destination account</string>
+    <string name="txn_field_date">Date</string>
+    <string name="txn_field_note">Note (optional)</string>
+    <string name="txn_field_note_expense_placeholder">E.g. Kopi Kenangan</string>
+    <string name="txn_field_note_income_placeholder">E.g. May salary</string>
+    <string name="txn_link_debt_label">Link to a debt</string>
+    <string name="txn_link_debt_hint">Mark this expense as a debt repayment.</string>
+    <string name="txn_link_debt_attached_format">Linked: %1$s</string>
+    <string name="txn_income_recurring_label">Recurring income</string>
+    <string name="txn_income_recurring_hint">Mark if this income is monthly (e.g. salary). Shown as a reminder in the next period.</string>
+    <string name="txn_field_category_source">Source category</string>
+    <string name="txn_field_category_source_placeholder">Choose category…</string>
+    <string name="txn_transfer_from">From account</string>
+    <string name="txn_transfer_from_placeholder">Choose source account…</string>
+    <string name="txn_transfer_to">To account</string>
+    <string name="txn_transfer_to_placeholder">Choose destination…</string>
+    <string name="txn_transfer_swap">Swap direction</string>
+    <string name="txn_transfer_fee">Transfer fee (optional)</string>
+    <string name="txn_field_note_transfer_placeholder">E.g. monthly savings</string>
+
+    <!-- TxnType display labels (used as fallback when transaction has no note) -->
+    <string name="txntype_income">Income</string>
+    <string name="txntype_expense">Expense</string>
+    <string name="txntype_transfer">Transfer</string>
+    <string name="txntype_debt_inflow">Debt received</string>
+    <string name="txntype_debt_outflow">Debt repayment</string>
+    <string name="txntype_reconciliation">Reconciliation</string>
+
+    <!-- Plan add/edit item sheet -->
+    <string name="plan_item_add_title">Add Plan Item</string>
+    <string name="plan_item_edit_title">Edit Plan Item</string>
+    <string name="plan_item_name_label">Plan item name</string>
+    <string name="plan_item_name_placeholder">E.g. Internet</string>
+    <string name="plan_item_amount_label">Amount</string>
+    <string name="plan_item_recurrence_label">Recurrence</string>
+
+    <!-- Debt form -->
+    <string name="debt_new_title">New Debt</string>
+    <string name="debt_edit_title">Edit Debt</string>
+    <string name="debt_counterparty_label">Counterparty</string>
+    <string name="debt_counterparty_placeholder">E.g. Mortgage Bank Mandiri</string>
+    <string name="debt_principal_label">Principal</string>
+    <string name="debt_direction_label">Direction</string>
+    <string name="debt_direction_i_owe">I owe</string>
+    <string name="debt_direction_owed_to_me">They owe me</string>
+    <string name="debt_direction_owed_to_me_long">Owed to me</string>
+
+    <!-- Default allocation editor -->
+    <string name="settings_alloc_title">Default Allocation</string>
+    <string name="settings_alloc_intro">Default percentages for Needs / Wants / Investment. Total must be 100%. Applies to future plans.</string>
+    <string name="settings_alloc_total_label">Total</string>
+
+    <!-- About screen -->
+    <string name="about_title">About Sakuwise</string>
+    <string name="about_privacy">Privacy Policy</string>
+    <string name="about_licenses">Open Source Licenses</string>
+    <string name="about_contact">Contact Developer</string>
+
+    <!-- Deposit type labels -->
+    <string name="deposit_type_dplk">DPLK</string>
+    <string name="deposit_type_bpjstk">BPJSTK</string>
+    <string name="deposit_type_deposito">Time Deposit</string>
+    <string name="deposit_type_other">Other</string>
+
+    <!-- Exit confirm + back handling -->
+    <string name="exit_confirm_title">Close Sakuwise?</string>
+    <string name="exit_confirm_body">Your data stays safe &amp; encrypted on this phone. Open the app again anytime.</string>
+    <string name="exit_confirm_yes">Yes, close</string>
+    <string name="exit_confirm_no">Cancel</string>
+
+    <!-- Picker sheets -->
+    <string name="picker_choose_plan_item">Choose plan item</string>
+    <string name="picker_choose_account">Choose account</string>
+    <string name="picker_no_plan_items">No plan items yet. Create some in the Plan tab.</string>
+    <string name="picker_no_plan_items_for_filter">No items match this filter.</string>
+
+    <!-- Account type display names -->
+    <string name="account_type_cash">Cash</string>
+    <string name="account_type_bank">Bank</string>
+    <string name="account_type_ewallet">E-Wallet</string>
+    <string name="account_type_other">Other</string>
+
+    <!-- Recurrence labels -->
+    <string name="recurrence_oneoff">One-off</string>
+    <string name="recurrence_monthly">Monthly</string>
+    <string name="recurrence_quarterly">Quarterly</string>
+    <string name="recurrence_yearly">Yearly</string>
+    <string name="recurrence_chip_monthly">monthly</string>
+    <string name="recurrence_chip_quarterly">quarterly</string>
+    <string name="recurrence_chip_yearly">yearly</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_section_principle">Our Principle</string>
+    <string name="privacy_principle_body">Sakuwise was built on one principle: your financial data is yours alone. The app never sends anything to our servers or any third party — we don\'t even run servers.</string>
+    <string name="privacy_section_collect">What\'s Stored</string>
+    <string name="privacy_collect_body">All your data — accounts, transactions, plans, assets, debts, notes, reminders — is stored only on this phone, inside a SQLCipher database encrypted with AES-256 using a key protected by the Android Keystore (hardware-backed on devices that support it).</string>
+    <string name="privacy_section_share">What\'s NOT Shared</string>
+    <string name="privacy_share_body">Sakuwise does not declare INTERNET permission. No analytics, telemetry, crash reporting, A/B testing, or ads. No PII (full name, email, national ID, phone number) is asked for or stored. Only a short nickname for greetings, and that stays local.</string>
+    <string name="privacy_section_backup">Backups &amp; Your Control</string>
+    <string name="privacy_backup_body">You decide when, where, and how to back up. The .sakuwise file is re-encrypted with the backup PIN you set (Argon2id KDF + AES-256-GCM). Sakuwise never stores that backup PIN — if you lose it, we cannot recover the file.</string>
+    <string name="privacy_section_reset">Right to Erase</string>
+    <string name="privacy_reset_body">Open Me → Export &amp; Reset → type the confirmation phrase to permanently wipe every byte of app data. Once erased, no one can recover it unless you hold a valid backup file.</string>
+    <string name="privacy_section_camera">Camera (Optional)</string>
+    <string name="privacy_camera_body">The Scan Receipt (OCR) feature asks for camera permission only when you use it. The image is processed 100%% on-device via ML Kit — nothing leaves your phone, and nothing is retained once extraction finishes.</string>
+    <string name="privacy_section_contact_q">Questions?</string>
+    <string name="privacy_contact_body">See the Contact Developer page under About Sakuwise.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="licenses_intro">Sakuwise stands on the shoulders of giants. Key libraries:</string>
+    <string name="licenses_lib_kotlin">Kotlin · JetBrains</string>
+    <string name="licenses_lib_compose">Jetpack Compose &amp; AndroidX · Google</string>
+    <string name="licenses_lib_hilt">Hilt (Dagger) · Google</string>
+    <string name="licenses_lib_room">Room &amp; SQLite · Google</string>
+    <string name="licenses_lib_sqlcipher">SQLCipher Android · Zetetic LLC</string>
+    <string name="licenses_lib_argon2">argon2kt · Daniel Lambert</string>
+    <string name="licenses_lib_mlkit">ML Kit Text Recognition · Google</string>
+    <string name="licenses_lib_workmanager">WorkManager · Google</string>
+    <string name="licenses_lib_security">androidx.security.crypto · Google</string>
+    <string name="licenses_lib_appcompat">AppCompat &amp; Material 3 · Google</string>
+    <string name="licenses_apache">Apache License 2.0</string>
+    <string name="licenses_bsd">BSD-style License</string>
+    <string name="licenses_footer">Full license text for each library is available in its upstream repository. Sakuwise itself is not yet open source in V1 — we\'ll release it in steps as the project matures.</string>
+
+    <!-- Contact Developer -->
+    <string name="contact_intro">Sakuwise is built by a small team in Indonesia. We read every piece of feedback that comes in.</string>
+    <string name="contact_email_label">Email</string>
+    <string name="contact_email_value">halo@sakuwise.id</string>
+    <string name="contact_github_label">GitHub Issues</string>
+    <string name="contact_github_value">github.com/sakuwise/sakuwise/issues</string>
+    <string name="contact_bug_label">Report a Bug</string>
+    <string name="contact_bug_body">Include reproduction steps, screenshots, and the app version (see About). Please don\'t send raw backup files — we don\'t need them and you don\'t want them circulating.</string>
+    <string name="contact_feature_label">Suggest a Feature</string>
+    <string name="contact_feature_body">Have an idea for the V2 roadmap? Drop us an email or open an issue on GitHub.</string>
+
+    <!-- Onboarding -->
+    <string name="onb_step1_title">Hi, let\'s get acquainted</string>
+    <string name="onb_step1_subtitle">Sakuwise is a local-first budgeting app — all your data lives on your phone, no cloud, no tracking.</string>
+    <string name="onb_step1_primary">Start</string>
+    <string name="onb_step1_section">CHOOSE LANGUAGE</string>
+    <string name="onb_lang_id">Bahasa Indonesia</string>
+    <string name="onb_lang_id_sub">Default</string>
+    <string name="onb_lang_en">English</string>
+    <string name="onb_lang_en_sub">Available too</string>
+    <string name="onb_step2_title">Set up a short identity</string>
+    <string name="onb_step2_subtitle">Just for greetings and security. Nothing goes to a server — it all stays on your phone.</string>
+    <string name="onb_step2_nickname_label">Nickname</string>
+    <string name="onb_step2_nickname_placeholder">E.g. Gusti</string>
+    <string name="onb_step2_nickname_hint">Used for the greeting on Home.</string>
+    <string name="onb_step2_pin_label">6-digit PIN (biometric fallback)</string>
+    <string name="onb_step2_pin_hint">Used if biometric fails. Can be changed anytime in Settings.</string>
+    <string name="onb_step2_biometric_title">Unlock with biometric</string>
+    <string name="onb_step2_biometric_sub">Fingerprint / face — faster than typing the PIN.</string>
+    <string name="onb_step3_title">Your data stays right here.</string>
+    <string name="onb_step3_subtitle">No servers. No telemetry. No internet permission requested.</string>
+    <string name="onb_step3_primary">I understand</string>
+    <string name="onb_step3_p1_title">Encrypted on disk</string>
+    <string name="onb_step3_p1_sub">The database &amp; receipt photos are all encrypted with AES-256.</string>
+    <string name="onb_step3_p2_title">No accounts, no email</string>
+    <string name="onb_step3_p2_sub">No login. Sakuwise doesn\'t know who you are.</string>
+    <string name="onb_step3_p3_title">Backups stay with you</string>
+    <string name="onb_step3_p3_sub">Backup files are encrypted — you keep the file, you keep the PIN.</string>
+    <string name="onb_type_cash">Cash</string>
+    <string name="onb_type_bank">Bank</string>
+    <string name="onb_type_ewallet">Wallet</string>
+    <string name="onb_step4_account_prefix">ACCOUNT · %1$s</string>
+    <string name="onb_step4_account_default_name">Cash</string>
+    <string name="onb_step4_title">Your first account</string>
+    <string name="onb_step4_subtitle">We\'ll set up a Cash account first. Rename it, change the balance, or continue as-is.</string>
+    <string name="onb_step4_primary">Done · Go to Home</string>
+    <string name="onb_step4_secondary">Add other accounts later</string>
+    <string name="onb_step4_name_label">Account name</string>
+    <string name="onb_step4_name_placeholder">E.g. Cash, Mandiri, GoPay</string>
+    <string name="onb_step4_type_label">Type</string>
+    <string name="onb_step4_balance_label">Starting balance</string>
+    <string name="onb_step4_balance_hint">0 is fine — you can update later.</string>
+    <string name="splash_tagline">Plan. Track. Relax.</string>
+
+    <!-- Assets hub -->
+    <string name="assets_title">Assets &amp; Wealth</string>
+    <string name="assets_total_wealth">TOTAL WEALTH</string>
+    <string name="assets_class_section">Asset Classes</string>
+    <string name="assets_class_accounts">Accounts</string>
+    <string name="assets_class_gold">Gold</string>
+    <string name="assets_class_land">Property</string>
+    <string name="assets_class_deposit">Deposits</string>
+    <string name="assets_class_active_format">%1$d active</string>
+    <string name="assets_class_count_format">%1$d items</string>
+    <string name="assets_debt_section">Debts</string>
+    <string name="assets_debt_i_owe">I owe</string>
+    <string name="assets_debt_outstanding">Total outstanding</string>
+    <string name="assets_debt_title">Debts &amp; Loans</string>
+    <string name="assets_debt_empty">No debts recorded yet</string>
+    <string name="assets_trend_label">WEALTH TREND</string>
+    <string name="assets_trend_period_all">All</string>
+
+    <!-- Accounts list -->
+    <string name="accounts_title">Accounts</string>
+    <string name="accounts_add_cd">Add account</string>
+    <string name="accounts_empty">No accounts yet. Tap + to add your first one.</string>
+
+    <!-- Account detail -->
+    <string name="account_detail_default_title">Account</string>
+    <string name="account_detail_balance_prefix">BALANCE · %1$s</string>
+    <string name="account_detail_last_recon_format">Last reconciled %1$s</string>
+    <string name="account_detail_no_recon">Never reconciled</string>
+    <string name="account_detail_btn_reconcile">Reconcile</string>
+    <string name="account_detail_btn_edit">Edit</string>
+    <string name="account_detail_section_snapshots">Snapshot History</string>
+    <string name="account_detail_snapshots_empty">No snapshots yet. Tap Reconcile to log the real balance and align it with the app balance.</string>
+    <string name="account_detail_col_date">DATE</string>
+    <string name="account_detail_col_observed">REAL BALANCE</string>
+    <string name="account_detail_col_diff">DIFF</string>
+    <string name="account_detail_section_txns">Account Transactions</string>
+    <string name="account_detail_txns_empty">No transactions in this account yet.</string>
+    <string name="reconcile_title">Reconcile</string>
+    <string name="reconcile_intro">Open your bank / e-wallet app, check the real balance, type it here — Sakuwise will log the difference as an adjustment transaction.</string>
+    <string name="reconcile_app_balance">Sakuwise balance (computed)</string>
+    <string name="reconcile_observed_label">Real Balance at Bank / E-Wallet</string>
+    <string name="reconcile_note_label">Note (optional)</string>
+    <string name="reconcile_note_placeholder">E.g. Forgot to log a snack</string>
+    <string name="reconcile_submit">Save Adjustment</string>
+    <string name="reconcile_confirm_title">Confirm Adjustment</string>
+    <string name="reconcile_confirm_intro">Review the difference below. An automatic transaction will be recorded.</string>
+    <string name="reconcile_delta_positive">Difference (real balance is higher)</string>
+    <string name="reconcile_delta_negative">Difference (real balance is lower)</string>
+    <string name="reconcile_will_add">Will be added as an adjustment income.</string>
+    <string name="reconcile_will_subtract">Will be recorded as an adjustment expense.</string>
+    <string name="reconcile_done_title">Adjustment complete</string>
+    <string name="reconcile_done_body">Your Sakuwise balance now matches your bank/e-wallet.</string>
+    <string name="snapshot_sheet_title">Reconciliation Detail</string>
+    <string name="snapshot_delete_confirm">Delete this reconciliation snapshot? Any linked adjustment transactions remain — only this balance record will be removed.</string>
+    <string name="pin_settings_passphrase_title">Use passphrase</string>
+    <string name="pin_settings_passphrase_sub">Use a long passphrase (≥8 chars) instead of a 6-digit PIN. After enabling, set it via the button below.</string>
+    <string name="passphrase_field_label">Passphrase</string>
+    <string name="passphrase_field_placeholder">Type your passphrase…</string>
+    <string name="passphrase_min_hint_format">Minimum %1$d characters.</string>
+    <string name="plan_item_schedule_reminder">Schedule reminder</string>
+    <string name="plan_item_cancel_reminder">Cancel reminder</string>
+    <string name="reminder_notif_title">Sakuwise bill due</string>
+    <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
+    <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
+    <string name="plan_action_regen_incomes_sub">Scan income txns tagged [BERULANG] and write this month\'s</string>
+    <string name="plan_recurring_result_format">%1$d recurring incomes added</string>
+    <string name="plan_recurring_result_none">No recurring incomes needed to be added.</string>
+
+    <!-- Account edit -->
+    <string name="account_edit_new_title">New Account</string>
+    <string name="account_edit_edit_title">Edit Account</string>
+    <string name="account_edit_name_label">Account name</string>
+    <string name="account_edit_name_placeholder">E.g. Mandiri, GoPay, Cash</string>
+    <string name="account_edit_type_label">Type</string>
+    <string name="account_edit_balance_label_new">Starting balance</string>
+    <string name="account_edit_balance_label_existing">Starting balance (shifts baseline)</string>
+    <string name="account_edit_balance_hint_new">0 is fine — you can update later.</string>
+    <string name="account_edit_balance_hint_existing">Changing the starting balance shifts every balance calculation for this account.</string>
+    <string name="account_edit_archive_title">Archive account</string>
+    <string name="account_edit_archive_sub">Archived accounts hide from pickers but transaction history stays visible.</string>
+
+    <!-- Common -->
+    <string name="cd_back">Back</string>
+    <string name="loading">Loading…</string>
+
+    <!-- Land / Property -->
+    <string name="land_title">Property</string>
+    <string name="land_add_cd">Add property</string>
+    <string name="land_hero_total">TOTAL ESTIMATED VALUE</string>
+    <string name="land_hero_sub_format">%1$d items · update value manually</string>
+    <string name="land_empty">No property yet. Tap + to add your first asset.</string>
+    <string name="land_item_sub_format">%1$s · %2$d m²</string>
+    <string name="land_detail_default_title">Property Detail</string>
+    <string name="land_detail_value_label">ESTIMATED VALUE</string>
+    <string name="land_field_location">Location</string>
+    <string name="land_field_size">Size</string>
+    <string name="land_field_size_value_format">%1$d m²</string>
+    <string name="land_field_certificate">Certificate</string>
+    <string name="land_field_buy_price">Purchase price</string>
+    <string name="land_field_current_value">Current value</string>
+    <string name="land_section_tax">Tax Payments (PBB)</string>
+    <string name="land_tax_add">+ Add</string>
+    <string name="land_tax_empty">No PBB payments recorded.</string>
+    <string name="land_tax_default_note">PBB</string>
+    <string name="land_delete">Delete property</string>
+    <string name="land_tax_sheet_title">Add PBB Payment</string>
+    <string name="land_tax_amount">Amount</string>
+    <string name="land_tax_note_placeholder">E.g. PBB 2026</string>
+    <string name="land_tax_account_label">Paying account (optional)</string>
+    <string name="land_tax_account_empty">Not linked to an account</string>
+    <string name="land_tax_effect_format">Will be recorded as an expense in %1$s.</string>
+    <string name="land_tax_effect_none">Leave empty for documentation only (no balance impact).</string>
+    <string name="land_edit_new_title">New Property</string>
+    <string name="land_edit_edit_title">Edit Property</string>
+    <string name="land_edit_name">Name</string>
+    <string name="land_edit_name_placeholder">E.g. Tegal Field</string>
+    <string name="land_edit_certificate">Certificate No. (SHM)</string>
+    <string name="land_edit_current_value_label">Current value (optional)</string>
+    <string name="land_edit_current_value_hint">Update manually based on market estimate</string>
+
+    <!-- Gold -->
+    <string name="gold_title">Gold</string>
+    <string name="gold_add_cd">Add gold</string>
+    <string name="gold_hero_label_format">CURRENT VALUE · %1$d grams</string>
+    <string name="gold_hero_value_label">CURRENT VALUE</string>
+    <string name="gold_profit_format">Profit %1$sRp %2$d</string>
+    <string name="gold_price_card_title">Global Gold Sell Price</string>
+    <string name="gold_price_card_sub_format">Rp %1$s / gram · manual update</string>
+    <string name="gold_empty">No gold batches yet. Tap + to add your first purchase.</string>
+    <string name="gold_item_title_format">%1$d grams</string>
+    <string name="gold_item_title_with_serial_format">%1$d grams · %2$s</string>
+    <string name="gold_item_buy_date_format">Bought %1$s</string>
+    <string name="gold_price_sheet_title">Global Gold Price</string>
+    <string name="gold_price_sheet_intro">Update manually based on today\'s gold sell price (Antam, Pegadaian, etc.). Auto-fetch is coming in V2.</string>
+    <string name="gold_price_field_label">Price per gram</string>
+    <string name="gold_price_tip">Tip: Monthly updates are enough. Gold prices don\'t fluctuate wildly day-to-day, and Sakuwise stores this as a snapshot — recallable anytime.</string>
+    <string name="gold_detail_default_title">Gold Detail</string>
+    <string name="gold_field_weight">Weight</string>
+    <string name="gold_field_weight_value_format">%1$d grams</string>
+    <string name="gold_field_buy_date">Purchase date</string>
+    <string name="gold_field_buy_price">Purchase price</string>
+    <string name="gold_field_price_per_gram">Price / gram at purchase</string>
+    <string name="gold_field_serial">Serial number</string>
+    <string name="gold_delete">Delete batch</string>
+    <string name="gold_record_sale">Record Sale</string>
+    <string name="gold_sold_label">SOLD</string>
+    <string name="gold_sold_summary_format">Sold %1$s</string>
+    <string name="gold_sale_intro">Record the final sale price. If you pick an account, the proceeds will be logged as automatic income.</string>
+    <string name="gold_sale_price_label">Total sale price</string>
+    <string name="gold_sale_note_placeholder">E.g. sold to gold shop</string>
+    <string name="gold_sale_account_label">Deposit to account</string>
+    <string name="gold_sale_account_empty">— Not selected (record without income)</string>
+    <string name="gold_sale_effect_format">Will be added as income to %1$s.</string>
+    <string name="gold_sale_effect_none">Will not be recorded as income.</string>
+    <string name="gold_sale_confirm">Save &amp; Mark Sold</string>
+    <string name="gold_edit_new_title">New Gold</string>
+    <string name="gold_edit_edit_title">Edit Gold</string>
+    <string name="gold_edit_weight_label">Weight (grams)</string>
+    <string name="gold_edit_buy_price_label">Total purchase price</string>
+    <string name="gold_edit_serial_label">Serial number (optional)</string>
+    <string name="gold_edit_serial_placeholder">E.g. ANTAM-12345</string>
+    <string name="gold_edit_note_label">Note (optional)</string>
+    <string name="gold_dash">—</string>
+
+    <!-- Deposit -->
+    <string name="deposit_title">Deposits</string>
+    <string name="deposit_add_cd">Add deposit</string>
+    <string name="deposit_hero_label">LATEST SNAPSHOT BALANCE</string>
+    <string name="deposit_hero_sub_format">%1$d items · update when slip arrives</string>
+    <string name="deposit_empty">No deposits/pension yet. Tap + to add.</string>
+    <string name="deposit_item_sub_format">%1$s · %2$d snapshots</string>
+    <string name="deposit_detail_default_title">Deposit Detail</string>
+    <string name="deposit_balance_latest_label">LATEST BALANCE</string>
+    <string name="deposit_balance_per_format">As of %1$s</string>
+    <string name="deposit_chart_label">Growth</string>
+    <string name="deposit_field_type">Type</string>
+    <string name="deposit_field_institution">Institution</string>
+    <string name="deposit_section_snapshot">Snapshots</string>
+    <string name="deposit_snapshot_add">+ Add</string>
+    <string name="deposit_snapshot_empty">No snapshots yet.</string>
+    <string name="deposit_delete">Delete deposit</string>
+    <string name="deposit_snapshot_sheet_title">New Snapshot</string>
+    <string name="deposit_snapshot_balance_label">Latest balance</string>
+    <string name="deposit_snapshot_note_label">Note (optional)</string>
+    <string name="deposit_edit_new_title">New Deposit</string>
+    <string name="deposit_edit_edit_title">Edit Deposit</string>
+    <string name="deposit_edit_name_label">Name</string>
+    <string name="deposit_edit_name_placeholder">E.g. BPJSTK JHT</string>
+    <string name="deposit_edit_institution_label">Institution (optional)</string>
+    <string name="deposit_edit_institution_placeholder">E.g. Bank Mandiri</string>
+    <string name="deposit_edit_type_label">Type</string>
+
+    <!-- Debt -->
+    <string name="debt_title">Debts &amp; Loans</string>
+    <string name="debt_add_cd">Add debt</string>
+    <string name="debt_section_i_owe">I Owe</string>
+    <string name="debt_section_owed">Lent Out</string>
+    <string name="debt_list_empty">No debts recorded yet. Tap + to add.</string>
+    <string name="debt_start_format">Started %1$s</string>
+    <string name="debt_detail_default_title">Debt Detail</string>
+    <string name="debt_outstanding_negative">REMAINING DEBT</string>
+    <string name="debt_outstanding_positive">NOT RETURNED YET</string>
+    <string name="debt_progress_format">Paid Rp %1$d (%2$d%%) of Rp %3$d</string>
+    <string name="debt_field_principal">Principal</string>
+    <string name="debt_field_start">Start</string>
+    <string name="debt_field_due">Due date</string>
+    <string name="debt_due_optional">Pick (optional)</string>
+    <string name="debt_due_clear">Clear due date</string>
+    <string name="debt_field_status">Status</string>
+    <string name="debt_status_open">Open</string>
+    <string name="debt_status_paid">Paid off</string>
+    <string name="debt_section_payments">Payments</string>
+    <string name="debt_chart_label">OUTSTANDING BALANCE</string>
+    <string name="debt_chart_payments_count_format">%1$d payments</string>
+    <string name="debt_payment_add">+ Add</string>
+    <string name="debt_payments_empty">No payments yet.</string>
+    <string name="debt_mark_paid">Mark Paid</string>
+    <string name="debt_payment_sheet_title">Add Payment</string>
+    <string name="debt_payment_amount">Amount</string>
+    <string name="debt_payment_note">Note (optional)</string>
+    <string name="debt_payment_account_payer">Paying account</string>
+    <string name="debt_payment_account_receiver">Receiving account</string>
+    <string name="debt_payment_account_label_format">%1$s (optional)</string>
+    <string name="debt_payment_account_empty">Not linked to an account</string>
+    <string name="debt_payment_effect_expense_format">Will be recorded as an expense in %1$s.</string>
+    <string name="debt_payment_effect_income_format">Will be recorded as income in %1$s.</string>
+    <string name="debt_payment_account_fallback">account</string>
+    <string name="debt_payment_effect_none">Leave empty for note only (no balance impact).</string>
+
+    <!-- PIN settings -->
+    <string name="pin_settings_title">PIN &amp; Biometric</string>
+    <string name="pin_settings_bio_title">Unlock with biometric</string>
+    <string name="pin_settings_bio_sub">Fingerprint / face. Available if your device supports it.</string>
+    <string name="pin_settings_change_title">Change device PIN</string>
+    <string name="pin_settings_set_title">Set device PIN</string>
+    <string name="pin_settings_change_sub">6 digits, used when biometric fails.</string>
+    <string name="pin_settings_set_sub">No PIN yet — set one so the app stays secure without biometric.</string>
+    <string name="pin_settings_change_btn">Change</string>
+    <string name="pin_settings_set_btn">Set</string>
+    <string name="pin_settings_info">The device PIN unlocks the app day-to-day. The separate backup PIN is only used when exporting a backup file — set lazily the first time you tap Backup.</string>
+    <string name="pin_sheet_verify_title">Verify current PIN</string>
+    <string name="pin_sheet_new_title">New PIN</string>
+    <string name="pin_sheet_confirm_title">Repeat new PIN</string>
+    <string name="pin_sheet_next">Continue</string>
+    <string name="pin_sheet_save">Save PIN</string>
+    <string name="pin_sheet_err_wrong">Wrong PIN.</string>
+    <string name="pin_sheet_err_mismatch">PIN doesn\'t match the previous step.</string>
+
+    <!-- Auto-lock settings -->
+    <string name="autolock_title">Auto-lock</string>
+    <string name="autolock_intro">How long before the app locks itself. Reopen with PIN or biometric.</string>
+    <string name="autolock_opt_instant">Instant</string>
+    <string name="autolock_opt_instant_sub">Lock as soon as the app moves to background</string>
+    <string name="autolock_opt_1">1 minute</string>
+    <string name="autolock_opt_1_sub">Good if you switch context often</string>
+    <string name="autolock_opt_5">5 minutes</string>
+    <string name="autolock_opt_5_sub">Default — balanced privacy &amp; convenience</string>
+    <string name="autolock_opt_15">15 minutes</string>
+    <string name="autolock_opt_15_sub">Fewer PIN/biometric prompts</string>
+    <string name="autolock_opt_30">30 minutes</string>
+    <string name="autolock_opt_30_sub">For long intensive sessions</string>
+
+    <!-- Period start settings -->
+    <string name="period_start_title">Period Start Day</string>
+    <string name="period_start_intro">Which day of the month a monthly plan starts. Default is the 1st (calendar month). Set to 25 if payday is the 25th.</string>
+    <string name="period_start_note">Note: For February (28/29 days), start days greater than the last day of the month fall on the last day of that month.</string>
+
+    <!-- Language settings -->
+    <string name="language_title">Language</string>
+    <string name="language_intro">App interface language. Takes effect on the next screen you open.</string>
+
+    <!-- Allocation editor -->
+    <string name="alloc_save">Save</string>
+    <string name="alloc_invalid_total">Total must equal 100% before you can save.</string>
+
+    <!-- Profile settings -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_intro">This nickname is only for the greeting on Home. Sakuwise doesn\'t store an email or any other identifier.</string>
+    <string name="profile_nickname_label">Nickname</string>
+    <string name="profile_nickname_placeholder">E.g. Gusti</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_privacy_note">Privacy: Sakuwise doesn\'t store full name, email, national ID, or any other identity — just a nickname for greetings.</string>
+
+    <!-- About / Legal -->
+    <string name="about_version">Version 1.0 · Build 1</string>
+    <string name="about_blurb">Sakuwise is a local-first, encrypted budgeting app with Indonesian context. Your data never leaves this phone.</string>
+
+    <!-- Gold price settings (full screen) -->
+    <string name="gold_price_settings_title">Global Gold Price</string>
+    <string name="gold_price_settings_intro">Update manually based on today\'s gold sell price (Antam, Pegadaian, etc.). Auto-fetch is coming in V2.</string>
+    <string name="gold_price_tip_prefix">Tip: </string>
+    <string name="gold_price_tip_body">Monthly updates are enough. Gold prices don\'t fluctuate wildly day-to-day, and Sakuwise stores this as a snapshot — recallable anytime.</string>
+    <string name="gold_price_save">Save</string>
+
+    <!-- Reset App -->
+    <string name="reset_title">Reset App</string>
+    <string name="reset_hero_title">Wipe all data and start over</string>
+    <string name="reset_hero_body">All accounts, transactions, plans, assets, debts, and reminders will be permanently deleted. Your last .sakuwise backup is NOT removed from storage.</string>
+    <string name="reset_confirm_title">Confirm</string>
+    <string name="reset_confirm_intro_format">Type "%1$s" to enable the reset button.</string>
+    <string name="reset_confirm_label">Confirmation phrase</string>
+    <string name="reset_action">Reset all data now</string>
+    <string name="reset_cancel">Cancel</string>
+
+    <!-- Donate -->
+    <string name="donate_title">Donate</string>
+    <string name="donate_hero_title">Buy a Coffee</string>
+    <string name="donate_hero_body">Sakuwise is free for everyone. If it helps you, buy us a coffee to say thanks.</string>
+    <string name="donate_section_platform">CHOOSE PLATFORM</string>
+    <string name="donate_section_qris">SCAN QRIS</string>
+    <string name="donate_qris_sub">QRIS · every Indonesian bank &amp; e-wallet</string>
+    <string name="donate_nmid">NMID 9320 0203 88</string>
+    <string name="donate_footnote">Sakuwise doesn\'t process payments inside the app. All donations flow through external platforms.</string>
+    <string name="donate_platform_saweria">Saweria</string>
+    <string name="donate_platform_saweria_url">saweria.co/sakuwise</string>
+    <string name="donate_platform_trakteer">Trakteer</string>
+    <string name="donate_platform_trakteer_url">trakteer.id/sakuwise</string>
+
+    <!-- Backup settings -->
+    <string name="backup_title">Backup &amp; Restore</string>
+    <string name="backup_status_never">Never backed up</string>
+    <string name="backup_status_today">Last backup today</string>
+    <string name="backup_status_overdue_format">Backup overdue by %1$d days</string>
+    <string name="backup_status_body">Regular backups protect your data if your phone goes missing. After 60 days a blocking modal appears on app launch.</string>
+    <string name="backup_now">Backup Now</string>
+    <string name="backup_restore">Restore from File</string>
+    <string name="backup_how_title">How it works</string>
+    <string name="backup_step1_title">Set a backup PIN</string>
+    <string name="backup_step1_body">6 digits, separate from the device PIN. Used to encrypt the backup file.</string>
+    <string name="backup_step2_title">App encrypts the data</string>
+    <string name="backup_step2_body">All data → an AES-256-GCM encrypted .sakuwise file. Your PIN is the key.</string>
+    <string name="backup_step3_title">You pick where to store it</string>
+    <string name="backup_step3_body">Local storage, USB, or manually upload to Google Drive / iCloud. Sakuwise never auto-uploads.</string>
+    <string name="backup_step4_title">Restore on old/new device</string>
+    <string name="backup_step4_body">Pick the file → enter the backup PIN → everything comes back.</string>
+
+    <!-- Backup PIN flow -->
+    <string name="backup_pin_title_encrypting">Encrypting data…</string>
+    <string name="backup_pin_title_done">Backup saved</string>
+    <string name="backup_pin_title_create">Create backup PIN</string>
+    <string name="backup_pin_title_confirm">Confirm PIN</string>
+    <string name="backup_pin_intro_enter">A 6-digit PIN to encrypt the backup file. Write it down somewhere safe — Sakuwise does not store this PIN.</string>
+    <string name="backup_pin_intro_confirm">Enter the PIN once more to confirm.</string>
+    <string name="backup_pin_err_mismatch">PINs don\'t match.</string>
+    <string name="backup_pin_next">Continue</string>
+    <string name="backup_pin_confirm_start">Confirm &amp; Start Backup</string>
+    <string name="backup_pin_warning">⚠ Important: If you lose this PIN, the backup file cannot be restored. Sakuwise is zero-knowledge — there is no backdoor.</string>
+    <string name="backup_encrypting_body">AES-256-GCM. Argon2id KDF. No data leaves this phone.</string>
+    <string name="backup_done_title">Backup file ready</string>
+    <string name="backup_done_size_format">%1$s · %2$d KB</string>
+    <string name="backup_done_finish">Done</string>
+
+    <!-- Restore flow -->
+    <string name="restore_title">Restore from Backup</string>
+    <string name="restore_intro">Pick the .sakuwise file you saved earlier, then enter the backup PIN. Restore will REPLACE all data in this app.</string>
+    <string name="restore_no_file">No file selected</string>
+    <string name="restore_change_file">Tap \'Change\' to pick a different file</string>
+    <string name="restore_choose_file">Tap \'Pick file\' to browse</string>
+    <string name="restore_btn_pick">Pick</string>
+    <string name="restore_btn_change">Change</string>
+    <string name="restore_pin_label">Enter backup PIN</string>
+    <string name="restore_btn_decrypting">Decrypting…</string>
+    <string name="restore_btn_restore">Restore Data</string>
+    <string name="restore_warning">⚠ Restore will REPLACE all current app data with the backup file\'s data. Make sure that\'s what you want.</string>
+    <string name="restore_success_title">Restore complete</string>
+    <string name="restore_success_body">Data from the backup file has been written into this install. Re-launch the app so every screen refreshes with the new data.</string>
+    <string name="restore_relaunch">Relaunch App</string>
+    <string name="restore_footer">Note: Your app PIN &amp; nickname are NOT restored — those live only in this install. Financial data (accounts, plans, transactions, assets) is back.</string>
+</resources>

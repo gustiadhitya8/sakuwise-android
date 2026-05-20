@@ -1,0 +1,25 @@
+*.iml
+.gradle/
+.idea/
+local.properties
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystores / secrets — never check in
+*.jks
+*.keystore
+google-services.json
+
+# Generated schema exports (Room) — opt back in via app/schemas/.gitkeep if you want them tracked
+app/schemas/
+
+# Test reports + Paparazzi golden diff outputs
+**/build/reports/
+**/build/test-results/
+**/paparazzi/snapshots-diff/
+
+# Claude Code local state — agent transcripts/settings, not source
+.claude/

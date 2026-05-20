@@ -1,0 +1,973 @@
+package com.gustiadhitya.sakuwise.feature.plan
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.MonetizationOn
+import androidx.compose.material.icons.outlined.RestartAlt
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwBar
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
+import androidx.compose.ui.res.stringResource
+import com.gustiadhitya.sakuwise.R
+import com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester
+import com.gustiadhitya.sakuwise.core.designsystem.theme.SwSpace
+import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
+import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
+import com.gustiadhitya.sakuwise.core.domain.model.AllocationId
+import com.gustiadhitya.sakuwise.core.domain.model.PlanItem
+import com.gustiadhitya.sakuwise.core.domain.model.Recurrence
+import com.gustiadhitya.sakuwise.core.ui.RupiahText
+import com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanViewModel
+import com.gustiadhitya.sakuwise.feature.transaction.ui.SwPickerSheet
+
+@Composable
+fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
+    val sw = SwTheme.colors
+    val state by viewModel.state.collectAsState()
+    val allPlans by viewModel.allPlans.collectAsState()
+    val expanded = remember { mutableStateMapOf<String, Boolean>() }
+    var addToCategory by remember { mutableStateOf<String?>(null) }
+    var addCategoryToAlloc by remember { mutableStateOf<String?>(null) }
+    var editItem by remember { mutableStateOf<PlanItem?>(null) }
+    var deleteCategoryConfirm by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var actionSheetOpen by remember { mutableStateOf(false) }
+    var incomeSheetOpen by remember { mutableStateOf(false) }
+    var confirmReset by remember { mutableStateOf(false) }
+    var monthPickerOpen by remember { mutableStateOf(false) }
+    var filter by remember { mutableStateOf<AllocationId?>(null) } // null = Semua
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(sw.bg)
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = SwSpace.bottomBarClear),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = SwSpace.pageH)
+                .padding(top = 6.dp, bottom = 12.dp),
+        ) {
+            Text(stringResource(R.string.plan_title), color = sw.ink,
+                style = SwType.H1.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.weight(1f))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(sw.surface)
+                    .border(1.dp, sw.border, RoundedCornerShape(12.dp))
+                    .clickable { actionSheetOpen = true },
+            ) { Icon(Icons.Outlined.MoreHoriz, "Aksi plan", tint = sw.ink, modifier = Modifier.size(20.dp)) }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(horizontal = SwSpace.pageH, vertical = 4.dp)
+                .clip(RoundedCornerShape(99.dp))
+                .background(sw.primaryContainer)
+                .clickable { monthPickerOpen = true }
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+        ) {
+            Icon(Icons.Outlined.CalendarToday, null,
+                tint = sw.onPrimaryContainer, modifier = Modifier.size(14.dp))
+            Text(
+                state.plan?.label ?: stringResource(R.string.plan_no_plan),
+                color = sw.onPrimaryContainer,
+                style = SwType.Caption.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold),
+            )
+            Icon(Icons.Outlined.ChevronRight, null,
+                tint = sw.onPrimaryContainer, modifier = Modifier.size(14.dp))
+        }
+        Spacer(Modifier.height(10.dp))
+
+        // Filter chips: Semua / Needs / Wants / Investment
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(horizontal = SwSpace.pageH)
+                .horizontalScroll(rememberScrollState()),
+        ) {
+            FilterChip(label = stringResource(R.string.plan_filter_all),
+                selected = filter == null,
+                accent = sw.ink, onClick = { filter = null })
+            FilterChip(label = stringResource(R.string.plan_filter_needs),
+                selected = filter == AllocationId.Needs,
+                accent = sw.primary, onClick = { filter = AllocationId.Needs })
+            FilterChip(label = stringResource(R.string.plan_filter_wants),
+                selected = filter == AllocationId.Wants,
+                accent = sw.accent, onClick = { filter = AllocationId.Wants })
+            FilterChip(label = stringResource(R.string.plan_filter_invest),
+                selected = filter == AllocationId.Invest,
+                accent = sw.info, onClick = { filter = AllocationId.Invest })
+        }
+        Spacer(Modifier.height(14.dp))
+
+        Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
+            SwCard(onClick = { incomeSheetOpen = true }) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.plan_expected_income), color = sw.inkSubtle,
+                            style = SwType.SectionLabel.copy(fontSize = 11.sp),
+                            modifier = Modifier.weight(1f))
+                        Icon(Icons.Outlined.Edit, null, tint = sw.inkSubtle, modifier = Modifier.size(14.dp))
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    RupiahText(value = state.plan?.expectedIncome ?: 0L,
+                        style = SwType.AmountL, color = sw.ink)
+                    Spacer(Modifier.height(12.dp))
+                    val totalUsed = state.allocations.sumOf { it.used }
+                    val totalPlan = state.allocations.sumOf { it.plan }.coerceAtLeast(1L)
+                    SwBar(used = totalUsed, plan = totalPlan)
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+
+        Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
+            val visibleAllocations = if (filter == null) state.allocations
+            else state.allocations.filter { AllocationId.fromName(it.allocation.name) == filter }
+            visibleAllocations.forEach { row ->
+                val a = row.allocation
+                val allocId = AllocationId.fromName(a.name)
+                val allocColor = when (allocId) {
+                    AllocationId.Needs -> sw.primary
+                    AllocationId.Wants -> sw.accent
+                    AllocationId.Invest -> sw.info
+                }
+                val allocLabel = allocId.displayName()
+                // Allocation header — visually distinct as TOP-level grouping
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(top = 18.dp, bottom = 10.dp, start = 4.dp),
+                ) {
+                    Box(Modifier.size(10.dp).clip(CircleShape).background(allocColor))
+                    Text(allocLabel, color = sw.ink,
+                        style = SwType.H3.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
+                    Text("${a.targetPct}%", color = sw.inkSubtle,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"))
+                }
+                row.categories.forEach { cat ->
+                    val isOpen = expanded[cat.category.id] != false
+                    CategoryCard(
+                        name = cat.category.name,
+                        plan = cat.plan, used = cat.used,
+                        allocColor = allocColor,
+                        items = cat.items.size,
+                        expanded = isOpen,
+                        onToggle = { expanded[cat.category.id] = !isOpen },
+                        onMore = { deleteCategoryConfirm = cat.category.id to cat.category.name },
+                    )
+                    if (isOpen) {
+                        Column(modifier = Modifier.padding(start = 14.dp, top = 4.dp, bottom = 2.dp)) {
+                            cat.items.forEach { pi ->
+                                PlanItemRow(
+                                    name = pi.item.name,
+                                    plan = pi.item.plannedAmount,
+                                    used = pi.used,
+                                    allocColor = allocColor,
+                                    recurrence = pi.item.recurrence,
+                                    onClick = { editItem = pi.item },
+                                )
+                            }
+                            DashedAddButton("+ Tambah item",
+                                onClick = { addToCategory = cat.category.id })
+                        }
+                        Spacer(Modifier.height(12.dp))
+                    } else {
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+                // Always-visible add-category button — recovers from full delete
+                Spacer(Modifier.height(4.dp))
+                DashedAddCategoryButton(
+                    text = stringResource(R.string.alloc_add_category_format, allocLabel),
+                    accentColor = allocColor,
+                    onClick = { addCategoryToAlloc = a.id },
+                )
+            }
+            if (state.allocations.isEmpty() && !state.loading) {
+                SwCard {
+                    Column {
+                        Text(
+                            stringResource(R.string.plan_empty_no_allocs),
+                            color = sw.inkMuted, style = SwType.Body,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        SwButton(
+                            text = stringResource(R.string.plan_apply_starter_btn),
+                            onClick = { viewModel.applyStarterTemplateToCurrentPlan() },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (addCategoryToAlloc != null) {
+        AddCategorySheet(
+            onSave = { name ->
+                viewModel.addCategoryToAllocation(addCategoryToAlloc!!, name)
+                addCategoryToAlloc = null
+            },
+            onDismiss = { addCategoryToAlloc = null },
+        )
+    }
+    if (deleteCategoryConfirm != null) {
+        val (catId, catName) = deleteCategoryConfirm!!
+        ConfirmDeleteCategorySheet(
+            categoryName = catName,
+            onConfirm = {
+                viewModel.deleteCategory(catId)
+                deleteCategoryConfirm = null
+            },
+            onDismiss = { deleteCategoryConfirm = null },
+        )
+    }
+    // POST_NOTIFICATIONS: prompt lazily when a recurring plan item is saved.
+    // Reminder scheduling is what *needs* the permission — asking on cold start
+    // is premature and asking later (after save) is fine because the worker
+    // posts the next reminder ≥1 day out.
+    val requestNotifPerm = rememberNotificationPermissionRequester(onResult = {})
+    if (addToCategory != null) {
+        EditPlanItemSheet(
+            existing = null,
+            onSave = { _, name, amount, recurrence ->
+                viewModel.addPlanItem(addToCategory!!, name, amount, recurrence)
+                if (recurrence != Recurrence.OneOff) requestNotifPerm()
+                addToCategory = null
+            },
+            onDelete = null,
+            onDismiss = { addToCategory = null },
+        )
+    }
+    if (editItem != null) {
+        EditPlanItemSheet(
+            existing = editItem,
+            onSave = { item, name, amount, recurrence ->
+                val wasRecurring = item!!.recurrence != Recurrence.OneOff
+                viewModel.updatePlanItem(
+                    item.copy(name = name, plannedAmount = amount, recurrence = recurrence),
+                )
+                if (!wasRecurring && recurrence != Recurrence.OneOff) requestNotifPerm()
+                editItem = null
+            },
+            onDelete = { item -> viewModel.deletePlanItem(item.id); editItem = null },
+            onDismiss = { editItem = null },
+        )
+    }
+    var allocEditorOpen by remember { mutableStateOf(false) }
+    if (actionSheetOpen) {
+        PlanActionSheet(
+            onApplyStarter = { viewModel.applyStarterTemplateToCurrentPlan(); actionSheetOpen = false },
+            onSetIncome = { actionSheetOpen = false; incomeSheetOpen = true },
+            onEditAllocations = { actionSheetOpen = false; allocEditorOpen = true },
+            onRegenerateNext = { viewModel.regenerateNextPeriodPlan(); actionSheetOpen = false },
+            onRegenerateIncomes = { viewModel.regenerateRecurringIncomesNow(); actionSheetOpen = false },
+            onResetPlan = { actionSheetOpen = false; confirmReset = true },
+            onDismiss = { actionSheetOpen = false },
+        )
+    }
+    if (allocEditorOpen) {
+        PerPlanAllocationEditorSheet(
+            allocations = state.allocations.map { it.allocation },
+            onSave = { updates ->
+                viewModel.updateAllocationPcts(updates)
+                allocEditorOpen = false
+            },
+            onDismiss = { allocEditorOpen = false },
+        )
+    }
+    if (incomeSheetOpen) {
+        EditExpectedIncomeSheet(
+            current = state.plan?.expectedIncome ?: 0L,
+            onSave = { amount -> viewModel.setExpectedIncomeAmount(amount); incomeSheetOpen = false },
+            onDismiss = { incomeSheetOpen = false },
+        )
+    }
+    if (confirmReset) {
+        ConfirmResetSheet(
+            onConfirm = { viewModel.resetCurrentPlan(); confirmReset = false },
+            onDismiss = { confirmReset = false },
+        )
+    }
+    if (monthPickerOpen) {
+        MonthPickerSheet(
+            plans = allPlans,
+            activeId = state.plan?.id,
+            onDismiss = { monthPickerOpen = false },
+        )
+    }
+}
+
+/** Localized display name for an allocation — Bahasa/English based on current locale. */
+@Composable
+fun AllocationId.displayName(): String = stringResource(
+    when (this) {
+        AllocationId.Needs -> R.string.alloc_needs
+        AllocationId.Wants -> R.string.alloc_wants
+        AllocationId.Invest -> R.string.alloc_invest
+    },
+)
+
+@Composable
+private fun FilterChip(label: String, selected: Boolean, accent: Color, onClick: () -> Unit) {
+    val sw = SwTheme.colors
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(99.dp))
+            .background(if (selected) accent else sw.surface)
+            .border(
+                1.dp,
+                if (selected) accent else sw.border,
+                RoundedCornerShape(99.dp),
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+    ) {
+        Text(
+            label,
+            color = if (selected) sw.onPrimary else sw.ink,
+            style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+        )
+    }
+}
+
+@Composable
+private fun MonthPickerSheet(
+    plans: List<com.gustiadhitya.sakuwise.core.domain.model.Plan>,
+    activeId: String?,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    SwPickerSheet(title = "Periode Plan", onDismiss = onDismiss) {
+        if (plans.isEmpty()) {
+            Text("Belum ada riwayat plan.", color = sw.inkMuted, style = SwType.Body)
+            return@SwPickerSheet
+        }
+        Column {
+            plans.sortedByDescending { it.start }.forEach { plan ->
+                val active = plan.id == activeId
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (active) sw.primaryContainer else Color.Transparent)
+                        .padding(vertical = 10.dp, horizontal = 12.dp),
+                ) {
+                    Icon(Icons.Outlined.CalendarToday, null,
+                        tint = if (active) sw.onPrimaryContainer else sw.inkSubtle,
+                        modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(plan.label,
+                            color = if (active) sw.onPrimaryContainer else sw.ink,
+                            style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
+                        Text("${plan.start} → ${plan.end}",
+                            color = if (active) sw.onPrimaryContainer.copy(alpha = 0.7f) else sw.inkSubtle,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                    }
+                    if (active) {
+                        Text("AKTIF",
+                            color = sw.onPrimaryContainer,
+                            style = SwType.SectionLabel.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold))
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Periode aktif ditentukan otomatis dari Tanggal Mulai Periode di Pengaturan. " +
+                    "Plan lama bersifat read-only.",
+                color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            )
+        }
+    }
+}
+
+// ─── CategoryCard ─── PARENT: filled card, vertical accent bar, bold title
+@Composable
+private fun CategoryCard(
+    name: String, plan: Long, used: Long,
+    allocColor: Color,
+    items: Int, expanded: Boolean, onToggle: () -> Unit,
+    onMore: () -> Unit = {},
+) {
+    val sw = SwTheme.colors
+    SwCard(onClick = onToggle) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 4.dp, height = 22.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(allocColor),
+                )
+                Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+                Text(name, color = sw.ink,
+                    style = SwType.H3.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.weight(1f))
+                RupiahText(value = used, short = true,
+                    style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    color = if (used > plan) sw.danger else sw.ink)
+                Text(" / ", color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                RupiahText(value = plan, short = true,
+                    style = SwType.Amount.copy(fontSize = 13.sp), color = sw.inkSubtle)
+                Spacer(Modifier.size(width = 6.dp, height = 1.dp))
+                Icon(
+                    if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                    null, tint = sw.inkSubtle, modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.size(width = 2.dp, height = 1.dp))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onMore),
+                ) { Icon(Icons.Outlined.MoreHoriz, "Hapus kategori", tint = sw.inkSubtle, modifier = Modifier.size(18.dp)) }
+            }
+            Spacer(Modifier.height(8.dp))
+            SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor)
+            Spacer(Modifier.height(4.dp))
+            Text("$items item", color = sw.inkSubtle,
+                style = SwType.LabelSmall.copy(fontSize = 11.sp))
+        }
+    }
+}
+
+@Composable
+private fun DashedAddCategoryButton(text: String, accentColor: Color, onClick: () -> Unit) {
+    val sw = SwTheme.colors
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .border(1.5.dp, accentColor.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+    ) {
+        Text(text, color = accentColor,
+            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
+    }
+}
+
+@Composable
+private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
+    var name by remember { mutableStateOf("") }
+    SwPickerSheet(title = "Tambah Kategori", onDismiss = onDismiss) {
+        SwField(value = name, onValueChange = { name = it },
+            label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
+        Spacer(Modifier.height(16.dp))
+        SwButton(text = "Simpan",
+            onClick = { onSave(name.trim()) },
+            enabled = name.isNotBlank())
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+@Composable
+private fun ConfirmDeleteCategorySheet(
+    categoryName: String, onConfirm: () -> Unit, onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    SwPickerSheet(title = "Hapus Kategori?", onDismiss = onDismiss) {
+        Text(
+            "Hapus kategori \"$categoryName\" dan semua plan item di dalamnya. " +
+                "Tindakan ini tidak bisa dibatalkan.",
+            color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
+        )
+        Spacer(Modifier.height(16.dp))
+        SwButton(text = "Ya, hapus kategori", onClick = onConfirm,
+            variant = SwButtonVariant.Danger,
+            leading = { Icon(Icons.Outlined.Delete, null,
+                tint = Color.White, modifier = Modifier.size(16.dp)) })
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+// ─── PlanItemRow ─── CHILD: no card chrome, indent guide line, smaller text
+@Composable
+private fun PlanItemRow(
+    name: String, plan: Long, used: Long,
+    allocColor: Color,
+    recurrence: Recurrence,
+    onClick: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    Row(
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp),
+    ) {
+        // Indent guide
+        Box(
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .size(width = 2.dp, height = 32.dp)
+                .clip(RoundedCornerShape(1.dp))
+                .background(allocColor.copy(alpha = 0.5f)),
+        )
+        Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(name, color = sw.ink,
+                    style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium),
+                    modifier = Modifier.weight(1f))
+                if (recurrence != Recurrence.OneOff) {
+                    val chipText = when (recurrence) {
+                        Recurrence.Monthly -> stringResource(R.string.recurrence_chip_monthly)
+                        Recurrence.Quarterly -> stringResource(R.string.recurrence_chip_quarterly)
+                        Recurrence.Yearly -> stringResource(R.string.recurrence_chip_yearly)
+                        else -> ""
+                    }
+                    Text(
+                        "⟳ $chipText",
+                        color = sw.inkSubtle,
+                        style = SwType.LabelSmall.copy(fontSize = 10.sp),
+                    )
+                    Spacer(Modifier.size(width = 6.dp, height = 1.dp))
+                }
+                RupiahText(value = used, short = true,
+                    style = SwType.Amount.copy(fontSize = 12.sp,
+                        fontWeight = if (used > plan) FontWeight.Bold else FontWeight.SemiBold),
+                    color = if (used > plan) sw.danger else sw.ink)
+                Text(" / ", color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 10.sp))
+                RupiahText(value = plan, short = true,
+                    style = SwType.Amount.copy(fontSize = 12.sp), color = sw.inkSubtle)
+            }
+            Spacer(Modifier.height(4.dp))
+            SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor, heightDp = 4)
+        }
+    }
+}
+
+@Composable
+private fun DashedAddButton(text: String, onClick: () -> Unit) {
+    val sw = SwTheme.colors
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(start = 12.dp, top = 10.dp, bottom = 4.dp),
+    ) {
+        Text(text, color = sw.primary,
+            style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
+    }
+}
+
+@Composable
+private fun PlanActionSheet(
+    onApplyStarter: () -> Unit,
+    onSetIncome: () -> Unit,
+    onEditAllocations: () -> Unit,
+    onRegenerateNext: () -> Unit,
+    onRegenerateIncomes: () -> Unit,
+    onResetPlan: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    SwPickerSheet(title = stringResource(R.string.plan_action_sheet_title), onDismiss = onDismiss) {
+        ActionRow(Icons.Outlined.MonetizationOn,
+            stringResource(R.string.plan_action_set_income),
+            stringResource(R.string.plan_action_set_income_sub), onClick = onSetIncome)
+        ActionRow(Icons.Outlined.AutoAwesome,
+            stringResource(R.string.plan_action_apply_starter),
+            stringResource(R.string.plan_action_apply_starter_sub), onClick = onApplyStarter)
+        ActionRow(Icons.Outlined.Tune,
+            stringResource(R.string.plan_action_edit_allocations),
+            stringResource(R.string.plan_action_edit_allocations_sub),
+            onClick = onEditAllocations)
+        ActionRow(Icons.Outlined.CalendarToday,
+            stringResource(R.string.plan_action_regen_next),
+            stringResource(R.string.plan_action_regen_next_sub),
+            onClick = onRegenerateNext)
+        ActionRow(Icons.Outlined.MonetizationOn,
+            stringResource(R.string.plan_action_regen_incomes),
+            stringResource(R.string.plan_action_regen_incomes_sub),
+            onClick = onRegenerateIncomes)
+        ActionRow(Icons.Outlined.RestartAlt,
+            stringResource(R.string.plan_action_reset),
+            stringResource(R.string.plan_action_reset_sub),
+            danger = true, onClick = onResetPlan)
+    }
+}
+
+@Composable
+private fun ActionRow(
+    icon: ImageVector, title: String, subtitle: String,
+    danger: Boolean = false, onClick: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    val tint = if (danger) sw.danger else sw.ink
+    val bgTint = if (danger) sw.dangerSoft else sw.primaryContainer
+    val fgTint = if (danger) sw.danger else sw.onPrimaryContainer
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp, horizontal = 4.dp),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(bgTint),
+        ) { Icon(icon, null, tint = fgTint, modifier = Modifier.size(20.dp)) }
+        Spacer(Modifier.size(width = 12.dp, height = 1.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, color = tint,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
+            Text(subtitle, color = sw.inkMuted,
+                style = SwType.LabelSmall.copy(fontSize = 11.sp))
+        }
+    }
+}
+
+@Composable
+private fun EditPlanItemSheet(
+    existing: PlanItem?,
+    onSave: (PlanItem?, String, Long, Recurrence) -> Unit,
+    onDelete: ((PlanItem) -> Unit)?,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    var name by remember { mutableStateOf(existing?.name ?: "") }
+    var amount by remember { mutableStateOf(existing?.plannedAmount?.toString() ?: "") }
+    var rec by remember { mutableStateOf(existing?.recurrence ?: Recurrence.Monthly) }
+
+    SwPickerSheet(
+        title = stringResource(
+            if (existing == null) R.string.plan_item_add_title
+            else R.string.plan_item_edit_title,
+        ),
+        onDismiss = onDismiss,
+    ) {
+        SwField(value = name, onValueChange = { name = it },
+            label = stringResource(R.string.plan_item_name_label),
+            placeholder = stringResource(R.string.plan_item_name_placeholder))
+        SwField(
+            value = amount,
+            onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
+            label = stringResource(R.string.plan_item_amount_label),
+            prefix = "Rp", placeholder = "0",
+            keyboardType = KeyboardType.Number,
+        )
+        Text(stringResource(R.string.plan_item_recurrence_label), color = sw.inkMuted,
+            style = SwType.Caption.copy(fontSize = 12.sp))
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(Recurrence.OneOff, Recurrence.Monthly, Recurrence.Quarterly, Recurrence.Yearly)
+                .forEach { r ->
+                    val active = rec == r
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (active) sw.primary else sw.surface)
+                            .border(1.dp, if (active) sw.primary else sw.border, RoundedCornerShape(10.dp))
+                            .clickable { rec = r },
+                    ) {
+                        Text(
+                            stringResource(when (r) {
+                                Recurrence.OneOff -> R.string.recurrence_oneoff
+                                Recurrence.Monthly -> R.string.recurrence_monthly
+                                Recurrence.Quarterly -> R.string.recurrence_quarterly
+                                Recurrence.Yearly -> R.string.recurrence_yearly
+                            }),
+                            color = if (active) sw.onPrimary else sw.ink,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold),
+                        )
+                    }
+                }
+        }
+        Spacer(Modifier.height(16.dp))
+        SwButton(
+            text = "Simpan",
+            onClick = { onSave(existing, name, amount.toLongOrNull() ?: 0L, rec) },
+            enabled = name.isNotBlank() && amount.isNotBlank(),
+        )
+        // Reminder schedule controls — visible only for saved items with a
+        // recurring schedule. Tap schedules the periodic worker; "Batalkan"
+        // cancels by tag. We don't store the on/off state in DB — calling
+        // schedule again is idempotent at the WorkManager layer.
+        if (existing != null && rec != Recurrence.OneOff) {
+            val ctx = androidx.compose.ui.platform.LocalContext.current
+            val requestNotif = com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester { granted ->
+                if (granted) {
+                    com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.scheduleMonthly(
+                        ctx, existing.id,
+                        title = ctx.getString(R.string.reminder_notif_title),
+                        body = ctx.getString(R.string.reminder_notif_body_format, existing.name),
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SwButton(
+                    text = stringResource(R.string.plan_item_schedule_reminder),
+                    onClick = { requestNotif() },
+                    variant = SwButtonVariant.Outline,
+                    modifier = Modifier.weight(1f),
+                )
+                SwButton(
+                    text = stringResource(R.string.plan_item_cancel_reminder),
+                    onClick = {
+                        com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.cancelFor(ctx, existing.id)
+                    },
+                    variant = SwButtonVariant.Ghost,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        if (existing != null && onDelete != null) {
+            Spacer(Modifier.height(8.dp))
+            SwButton(
+                text = "Hapus item",
+                onClick = { onDelete(existing) },
+                variant = SwButtonVariant.Danger,
+                leading = { Icon(Icons.Outlined.Delete, null, tint = Color.White, modifier = Modifier.size(16.dp)) },
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+@Composable
+private fun EditExpectedIncomeSheet(
+    current: Long,
+    onSave: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    var amount by remember { mutableStateOf(if (current == 0L) "" else current.toString()) }
+    SwPickerSheet(title = "Pemasukan Diharapkan", onDismiss = onDismiss) {
+        Text(
+            "Total pemasukan yang kamu ekspektasikan di periode ini. " +
+                "Dipakai sebagai baseline progress bar plan.",
+            color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
+        )
+        Spacer(Modifier.height(12.dp))
+        SwField(
+            value = amount,
+            onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
+            label = "Pemasukan diharapkan",
+            prefix = "Rp", placeholder = "0",
+            keyboardType = KeyboardType.Number,
+        )
+        Spacer(Modifier.height(16.dp))
+        SwButton(
+            text = "Simpan",
+            onClick = { onSave(amount.toLongOrNull() ?: 0L) },
+            enabled = amount.isNotBlank(),
+        )
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+@Composable
+private fun ConfirmResetSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    val sw = SwTheme.colors
+    SwPickerSheet(title = "Reset Plan?", onDismiss = onDismiss) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(vertical = 12.dp)
+                .size(64.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(sw.dangerSoft),
+        ) { Icon(Icons.Outlined.RestartAlt, null, tint = sw.danger, modifier = Modifier.size(32.dp)) }
+        Text(
+            "Semua kategori dan plan item di periode ini akan dihapus.\n\n" +
+                "Transaksi yang sudah dicatat tidak terhapus, tapi hilang link-nya ke plan item lama.",
+            color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
+        )
+        Spacer(Modifier.height(4.dp))
+        Text("Tindakan ini tidak bisa dibatalkan.",
+            color = sw.danger,
+            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+        Spacer(Modifier.height(16.dp))
+        SwButton(text = "Ya, reset plan", onClick = onConfirm, variant = SwButtonVariant.Danger)
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+/**
+ * Per-plan allocation editor (PRD §7.3) — distinct from the default in Settings.
+ *
+ * Users adjust the 3 allocation percentages independently of the Settings default;
+ * the change applies only to the current plan period. A sum != 100 is allowed
+ * to save (the dashboard math is rebased to the actual sum), but a warning hint
+ * surfaces so it's intentional.
+ */
+@Composable
+private fun PerPlanAllocationEditorSheet(
+    allocations: List<com.gustiadhitya.sakuwise.core.domain.model.Allocation>,
+    onSave: (Map<String, Int>) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    val initial = remember(allocations) { allocations.associate { it.id to it.targetPct } }
+    val edits = remember(allocations) {
+        mutableStateMapOf<String, Int>().apply { putAll(initial) }
+    }
+    val sum = edits.values.sum()
+    com.gustiadhitya.sakuwise.feature.transaction.ui.SwPickerSheet(
+        title = stringResource(R.string.plan_alloc_editor_title),
+        onDismiss = onDismiss,
+    ) {
+        Text(
+            stringResource(R.string.plan_alloc_editor_intro),
+            color = sw.inkMuted,
+            style = SwType.Body.copy(fontSize = 13.sp),
+        )
+        Spacer(Modifier.height(14.dp))
+        allocations.forEach { alloc ->
+            val current = edits[alloc.id] ?: alloc.targetPct
+            val allocLabel = com.gustiadhitya.sakuwise.core.domain.model.AllocationId
+                .fromName(alloc.name).displayName()
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(allocLabel, color = sw.ink,
+                        style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.weight(1f))
+                    // Number stepper — −/value/+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(sw.surface)
+                                .border(1.dp, sw.border, CircleShape)
+                                .clickable { edits[alloc.id] = (current - 5).coerceAtLeast(0) },
+                        ) { Text("−", color = sw.ink, style = SwType.LabelStrong) }
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(width = 56.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(sw.primaryContainer),
+                        ) {
+                            Text("$current%", color = sw.onPrimaryContainer,
+                                style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold))
+                        }
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(sw.surface)
+                                .border(1.dp, sw.border, CircleShape)
+                                .clickable { edits[alloc.id] = (current + 5).coerceAtMost(100) },
+                        ) { Text("+", color = sw.ink, style = SwType.LabelStrong) }
+                    }
+                }
+                // Track bar
+                Spacer(Modifier.height(6.dp))
+                Box(modifier = Modifier.fillMaxWidth().height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(sw.track)) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth(current / 100f)
+                        .height(6.dp)
+                        .background(sw.primary))
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        // Sum hint
+        val ok = sum == 100
+        Text(
+            stringResource(
+                if (ok) R.string.plan_alloc_sum_ok_format
+                else R.string.plan_alloc_sum_warn_format,
+                sum,
+            ),
+            color = if (ok) sw.success else sw.warning,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+        )
+        Spacer(Modifier.height(14.dp))
+        SwButton(
+            text = stringResource(R.string.action_save),
+            onClick = {
+                onSave(edits.toMap())
+            },
+        )
+    }
+}

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sakuwise Capture</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; font-family: 'Figtree', system-ui, sans-serif; background: #ECE6D5; }
+  * { box-sizing: border-box; }
+  .sw-press { transition: transform 100ms ease, opacity 120ms ease; }
+  @keyframes sw-fill { from { width: 0; } }
+  .sw-fill { animation: sw-fill 600ms cubic-bezier(.2,.7,.3,1); }
+  @keyframes sw-slide-in  { from { transform: translateX(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes sw-fade-up   { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes sw-sheet-in  { from { transform: translateY(100%); } to { transform: none; } }
+  @keyframes sw-sheet-bg  { from { opacity: 0; } to { opacity: 1; } }
+  .frame { width: 390px; height: 800px; background: #F5F1E8; border-radius: 0; overflow: hidden; position: relative; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="brand/tokens.jsx"></script>
+<script type="text/babel" src="brand/logos.jsx"></script>
+<script type="text/babel" src="proto/icons.jsx"></script>
+<script type="text/babel" src="proto/data.jsx"></script>
+<script type="text/babel" src="proto/components.jsx"></script>
+<script type="text/babel" src="proto/screens-addtxn.jsx"></script>
+<script type="text/babel" src="proto/screens-dashboard.jsx"></script>
+<script type="text/babel" src="proto/screens-onboarding.jsx"></script>
+<script type="text/babel">
+  // Read ?s=<scene> from URL — splash | l1 | l2 | l3 | l4 | dash
+  const scene = new URLSearchParams(location.search).get('s') || 'dash';
+  const c = SW_LIGHT;
+  let view;
+  if (scene === 'splash') {
+    view = <SplashScreen c={c} onDone={() => {}} />;
+  } else if (scene === 'l1') {
+    view = <Onb_Language c={c} lang="id" setLang={() => {}} onNext={() => {}} />;
+  } else if (scene === 'l2') {
+    view = <Onb_Identity c={c} nickname="Gusti" setNickname={() => {}} biometric={true} setBiometric={() => {}} pin="······" setPin={() => {}} onNext={() => {}} />;
+  } else if (scene === 'l3') {
+    view = <Onb_Privacy c={c} onNext={() => {}} />;
+  } else if (scene === 'l4') {
+    const acct = { name: 'Tunai', type: 'Tunai', icon: 'cash', balance: 0 };
+    view = <Onb_FirstAccount c={c} account={acct} setAccount={() => {}} onDone={() => {}} />;
+  } else {
+    view = <DashboardScreen c={c} onNav={() => {}} />;
+  }
+  ReactDOM.createRoot(document.getElementById('root'))
+    .render(<div className="frame">{view}</div>);
+</script>
+</body>
+</html>
