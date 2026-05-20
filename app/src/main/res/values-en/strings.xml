@@ -332,6 +332,8 @@
     <!-- Assets hub -->
     <string name="assets_title">Assets &amp; Wealth</string>
     <string name="assets_total_wealth">TOTAL WEALTH</string>
+    <string name="assets_total_show">Show total wealth</string>
+    <string name="assets_total_hide">Hide total wealth</string>
     <string name="assets_class_section">Asset Classes</string>
     <string name="assets_class_accounts">Accounts</string>
     <string name="assets_class_gold">Gold</string>

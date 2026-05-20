@@ -332,6 +332,8 @@
     <!-- Assets hub -->
     <string name="assets_title">Aset &amp; Kekayaan</string>
     <string name="assets_total_wealth">TOTAL KEKAYAAN</string>
+    <string name="assets_total_show">Tampilkan total kekayaan</string>
+    <string name="assets_total_hide">Sembunyikan total kekayaan</string>
     <string name="assets_class_section">Kelas Aset</string>
     <string name="assets_class_accounts">Akun</string>
     <string name="assets_class_gold">Emas</string>

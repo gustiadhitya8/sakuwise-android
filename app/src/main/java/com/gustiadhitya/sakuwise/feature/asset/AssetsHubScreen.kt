@@ -125,7 +125,9 @@ fun AssetsHubScreen(
                         Icon(
                             if (hideTotal) androidx.compose.material.icons.Icons.Outlined.VisibilityOff
                             else androidx.compose.material.icons.Icons.Outlined.Visibility,
-                            null,
+                            contentDescription = if (hideTotal)
+                                stringResource(R.string.assets_total_show)
+                            else stringResource(R.string.assets_total_hide),
                             tint = sw.onPrimaryHero,
                             modifier = Modifier.size(16.dp),
                         )
