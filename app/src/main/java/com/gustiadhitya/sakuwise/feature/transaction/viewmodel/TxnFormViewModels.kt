@@ -157,6 +157,16 @@ class TxnFormViewModel @Inject constructor(
         _state.value = s.copy(accountId = s.destAccountId, destAccountId = s.accountId)
     }
 
+    /**
+     * Reset the shared form state. MUST be called whenever an overlay closes —
+     * otherwise `saved=true` from a previous submit auto-closes the next form,
+     * and OCR-prefill leftover state confuses unrelated openings. Keeps the
+     * accounts/planItems flows intact (they're upstream).
+     */
+    fun resetForNewEntry() {
+        _state.value = TxnFormState(accounts = _state.value.accounts)
+    }
+
     fun submitExpense() {
         val s = _state.value
         if (s.amount <= 0 || s.accountId == null || s.planItemId == null) return

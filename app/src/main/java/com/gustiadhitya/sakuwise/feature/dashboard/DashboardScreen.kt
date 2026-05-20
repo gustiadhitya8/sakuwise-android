@@ -81,7 +81,9 @@ fun DashboardScreen(
     onNavigateToPlan: () -> Unit = {},
     onNavigateToAssets: () -> Unit = {},
     onNavigateToMe: () -> Unit = {},
-    onBackupTap: () -> Unit = {},
+    // Default routes the Backup banner CTA to the Me tab. Callers can override
+    // to deep-link directly into Backup settings (preferred).
+    onBackupTap: () -> Unit = onNavigateToMe,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -115,7 +117,8 @@ private fun DashboardContent(
             .padding(bottom = SwSpace.bottomBarClear),
     ) {
         DashboardHeader(initial = initial, onAvatarClick = onNavigateToMe)
-        DashboardGreeting(name = nickname, period = state.period)
+        DashboardGreeting(name = nickname, period = state.period,
+            onPeriodTap = onNavigateToPlan)
         Spacer(Modifier.height(8.dp))
         DashboardHero(
             income = state.incomeMonth,
@@ -179,7 +182,7 @@ private fun DashboardHeader(initial: String, onAvatarClick: () -> Unit) {
 }
 
 @Composable
-private fun DashboardGreeting(name: String, period: PlanPeriod?) {
+private fun DashboardGreeting(name: String, period: PlanPeriod?, onPeriodTap: () -> Unit = {}) {
     val sw = SwTheme.colors
     val hour = LocalTime.now().hour
     val greet = stringResource(when {
@@ -200,28 +203,9 @@ private fun DashboardGreeting(name: String, period: PlanPeriod?) {
                 Text(name, color = sw.ink,
                     style = SwType.H1.copy(fontSize = 24.sp, fontWeight = FontWeight.Bold))
             }
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(sw.surface)
-                    .border(1.dp, sw.border, RoundedCornerShape(14.dp))
-                    .clickable {},
-            ) {
-                Icon(Icons.Outlined.NotificationsNone,
-                    stringResource(R.string.dashboard_notifications),
-                    tint = sw.ink, modifier = Modifier.size(20.dp))
-                Box(
-                    Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = (-10).dp, y = 10.dp)
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(sw.danger)
-                        .border(2.dp, sw.surface, CircleShape),
-                )
-            }
+            // Notifications surface deferred to V1.2 — until then we don't
+            // render the bell at all (was dead-click + lying unread dot).
+            // Restore when notification history is shipped.
         }
         Spacer(Modifier.height(8.dp))
         Row(
@@ -230,6 +214,7 @@ private fun DashboardGreeting(name: String, period: PlanPeriod?) {
             modifier = Modifier
                 .clip(RoundedCornerShape(99.dp))
                 .background(sw.primaryContainer)
+                .clickable(onClick = onPeriodTap) // tap → Plan tab → user picks/creates other months
                 .padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
             Icon(Icons.Outlined.CalendarToday, null,

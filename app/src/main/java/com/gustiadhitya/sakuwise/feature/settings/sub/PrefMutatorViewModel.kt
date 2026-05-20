@@ -24,6 +24,9 @@ class PrefMutatorViewModel @Inject constructor(
     }
     fun setBiometric(enabled: Boolean) = fire { repo.setBiometricEnabled(enabled) }
     fun setUsePassphrase(enabled: Boolean) = fire { repo.setUsePassphrase(enabled) }
+    fun setCurrentCredentialIsPassphrase(isPassphrase: Boolean) =
+        fire { repo.setCurrentCredentialIsPassphrase(isPassphrase) }
+    fun setThemeMode(mode: String) = fire { repo.setThemeMode(mode) }
     fun setAutoLock(minutes: Int) = fire { repo.setAutoLockMinutes(minutes) }
     fun setPeriodStart(day: Int) = fire { repo.setPlanPeriodStartDay(day) }
     fun setNickname(name: String) = fire { repo.setNickname(name) }

@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -67,7 +69,20 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver)
         setContent {
-            SakuwiseTheme {
+            // Resolve themeMode pref → darkTheme flag. "system" follows device,
+            // "light"/"dark" force a specific mode.
+            val deps = EntryPointAccessors.fromApplication(
+                applicationContext, SakuwiseApplication.PrefsEntryPoint::class.java,
+            )
+            val prefs by deps.prefsRepo().prefs
+                .collectAsState(initial = com.gustiadhitya.sakuwise.core.datastore.UserPreferences.DEFAULTS)
+            val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
+            val darkTheme = when (prefs.themeMode) {
+                "dark" -> true
+                "light" -> false
+                else -> systemDark
+            }
+            SakuwiseTheme(darkTheme = darkTheme) {
                 SakuwiseApp()
             }
         }

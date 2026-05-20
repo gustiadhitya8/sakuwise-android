@@ -100,6 +100,15 @@
     <string name="export_pdf_retry">Coba lagi</string>
     <string name="export_pdf_footnote">File PDF disimpan di cache aplikasi dan bisa dihapus otomatis oleh sistem kapan saja. Jika kamu butuh menyimpannya permanen, gunakan tombol Bagikan dan simpan ke Files / Drive.</string>
     <string name="settings_language">Bahasa</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_title">Tema Aplikasi</string>
+    <string name="theme_intro">Pilih tampilan terang atau gelap, atau biarkan mengikuti pengaturan sistem.</string>
+    <string name="theme_opt_system">Ikuti Sistem</string>
+    <string name="theme_opt_system_sub">Otomatis mengikuti tema HP kamu</string>
+    <string name="theme_opt_light">Terang</string>
+    <string name="theme_opt_light_sub">Selalu pakai tema terang</string>
+    <string name="theme_opt_dark">Gelap</string>
+    <string name="theme_opt_dark_sub">Selalu pakai tema gelap</string>
     <string name="settings_replay_onboarding">Lihat Onboarding Lagi</string>
     <string name="settings_replay_onboarding_sub">Tampilkan tur pembuka &amp; atur ulang preferensi awal</string>
     <string name="settings_donate">Donasi</string>
@@ -563,6 +572,7 @@
     <string name="pin_settings_change_btn">Ubah</string>
     <string name="pin_settings_set_btn">Set</string>
     <string name="pin_settings_info">PIN device dipakai untuk buka aplikasi sehari-hari. PIN backup terpisah dipakai cuma saat export file backup — di set lazily saat pertama kali kamu tap Backup.</string>
+    <string name="pin_settings_lock_now">Kunci Sekarang</string>
     <string name="pin_sheet_verify_title">Verifikasi PIN saat ini</string>
     <string name="pin_sheet_new_title">PIN baru</string>
     <string name="pin_sheet_confirm_title">Ulangi PIN baru</string>

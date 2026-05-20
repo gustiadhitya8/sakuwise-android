@@ -24,6 +24,13 @@ data class UserPreferences(
     val language: String,
     val biometricEnabled: Boolean,
     val usePassphrase: Boolean,
+    /** "light", "dark", or "system" — drives SakuwiseTheme(darkTheme=). Default "system". */
+    val themeMode: String,
+    // Format the CURRENT credential is stored in. Independent of usePassphrase
+    // because the toggle changes target format for NEW credentials, while the
+    // verify step in ChangePinSheet still needs to render the right input for
+    // the existing credential (PIN field if old was PIN, even if new is passphrase).
+    val currentCredentialIsPassphrase: Boolean,
     val autoLockMinutes: Int,
     val planPeriodStartDay: Int,
     val needsPct: Int,
@@ -39,6 +46,8 @@ data class UserPreferences(
             language = "id",
             biometricEnabled = true,
             usePassphrase = false,
+            themeMode = "system",
+            currentCredentialIsPassphrase = false,
             autoLockMinutes = 5,
             planPeriodStartDay = 1,
             needsPct = 50,
@@ -61,6 +70,8 @@ interface UserPreferencesRepository {
     suspend fun setLanguage(language: String)
     suspend fun setBiometricEnabled(enabled: Boolean)
     suspend fun setUsePassphrase(enabled: Boolean)
+    suspend fun setThemeMode(mode: String)
+    suspend fun setCurrentCredentialIsPassphrase(isPassphrase: Boolean)
     suspend fun setAutoLockMinutes(minutes: Int)
     suspend fun setPlanPeriodStartDay(day: Int)
     suspend fun setAllocationPercentages(needs: Int, wants: Int, invest: Int)
@@ -76,6 +87,8 @@ internal object PrefKeys {
     val LANGUAGE = stringPreferencesKey("language")
     val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
     val USE_PASSPHRASE = booleanPreferencesKey("use_passphrase")
+    val THEME_MODE = stringPreferencesKey("theme_mode")
+    val CURRENT_CREDENTIAL_IS_PASSPHRASE = booleanPreferencesKey("current_credential_is_passphrase")
     val AUTO_LOCK_MINUTES = intPreferencesKey("auto_lock_minutes")
     val PLAN_PERIOD_START_DAY = intPreferencesKey("plan_period_start_day")
     val ALLOC_NEEDS_PCT = intPreferencesKey("alloc_needs_pct")
@@ -97,6 +110,9 @@ class UserPreferencesRepositoryImpl(
             language = p[PrefKeys.LANGUAGE] ?: d.language,
             biometricEnabled = p[PrefKeys.BIOMETRIC_ENABLED] ?: d.biometricEnabled,
             usePassphrase = p[PrefKeys.USE_PASSPHRASE] ?: d.usePassphrase,
+            themeMode = p[PrefKeys.THEME_MODE] ?: d.themeMode,
+            currentCredentialIsPassphrase = p[PrefKeys.CURRENT_CREDENTIAL_IS_PASSPHRASE]
+                ?: d.currentCredentialIsPassphrase,
             autoLockMinutes = p[PrefKeys.AUTO_LOCK_MINUTES] ?: d.autoLockMinutes,
             planPeriodStartDay = p[PrefKeys.PLAN_PERIOD_START_DAY] ?: d.planPeriodStartDay,
             needsPct = p[PrefKeys.ALLOC_NEEDS_PCT] ?: d.needsPct,
@@ -134,6 +150,15 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun setUsePassphrase(enabled: Boolean) {
         dataStore.edit { it[PrefKeys.USE_PASSPHRASE] = enabled }
+    }
+
+    override suspend fun setCurrentCredentialIsPassphrase(isPassphrase: Boolean) {
+        dataStore.edit { it[PrefKeys.CURRENT_CREDENTIAL_IS_PASSPHRASE] = isPassphrase }
+    }
+
+    override suspend fun setThemeMode(mode: String) {
+        require(mode in setOf("light", "dark", "system")) { "themeMode must be light/dark/system" }
+        dataStore.edit { it[PrefKeys.THEME_MODE] = mode }
     }
 
     override suspend fun setAutoLockMinutes(minutes: Int) {

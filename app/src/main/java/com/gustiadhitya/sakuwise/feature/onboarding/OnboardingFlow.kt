@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,6 +61,15 @@ fun OnboardingFlow(
         }
     }
     val finish = { viewModel.finish() }
+
+    // System back during onboarding: step back to the previous step instead of
+    // silently killing the activity. On step 0 (splash) back is a no-op since
+    // the splash auto-advances. On step 1 (first interactive step) we still
+    // no-op rather than quit — user must finish onboarding or kill the app
+    // via the OS task switcher.
+    BackHandler(enabled = step > 1) {
+        step -= 1
+    }
 
     AnimatedContent(
         targetState = step,

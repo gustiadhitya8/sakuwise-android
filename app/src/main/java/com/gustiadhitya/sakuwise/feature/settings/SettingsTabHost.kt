@@ -20,7 +20,7 @@ import com.gustiadhitya.sakuwise.feature.settings.sub.ProfileSettingsScreen
 import com.gustiadhitya.sakuwise.feature.settings.sub.ResetAppScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 
-internal sealed interface SettingsRoute {
+sealed interface SettingsRoute {
     data object Hub : SettingsRoute
     data object Profile : SettingsRoute
     data object Language : SettingsRoute
@@ -35,14 +35,18 @@ internal sealed interface SettingsRoute {
     data object Donate : SettingsRoute
     data object Reset : SettingsRoute
     data object ExportPdf : SettingsRoute
+    data object Theme : SettingsRoute
     data object PrivacyPolicy : SettingsRoute
     data object Licenses : SettingsRoute
     data object Contact : SettingsRoute
 }
 
 @Composable
-fun SettingsTabHost() {
-    var route by remember { mutableStateOf<SettingsRoute>(SettingsRoute.Hub) }
+fun SettingsTabHost(
+    /** Deep-link target on first compose. Used by Dashboard's Backup banner. */
+    initialRoute: SettingsRoute = SettingsRoute.Hub,
+) {
+    var route by remember { mutableStateOf<SettingsRoute>(initialRoute) }
     val pop = { route = SettingsRoute.Hub }
     val prefMutator: PrefMutatorViewModel = hiltViewModel()
 
@@ -71,6 +75,7 @@ fun SettingsTabHost() {
             onNavigateToDonate = { route = SettingsRoute.Donate },
             onNavigateToReset = { route = SettingsRoute.Reset },
             onNavigateToExport = { route = SettingsRoute.ExportPdf },
+            onNavigateToTheme = { route = SettingsRoute.Theme },
             onReplayOnboarding = { prefMutator.replayOnboarding() },
         )
         SettingsRoute.Profile -> ProfileSettingsScreen(onBack = pop)
@@ -105,5 +110,7 @@ fun SettingsTabHost() {
         )
         SettingsRoute.ExportPdf ->
             com.gustiadhitya.sakuwise.feature.settings.export.ExportPdfScreen(onBack = pop)
+        SettingsRoute.Theme ->
+            com.gustiadhitya.sakuwise.feature.settings.sub.ThemeSettingsScreen(onBack = pop)
     }
 }

@@ -100,6 +100,15 @@
     <string name="export_pdf_retry">Try again</string>
     <string name="export_pdf_footnote">The PDF lives in the app cache and may be cleared by the system at any time. If you need to keep it, use Share to save it to Files / Drive.</string>
     <string name="settings_language">Language</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_title">App Theme</string>
+    <string name="theme_intro">Choose light or dark mode, or follow the device setting.</string>
+    <string name="theme_opt_system">Follow System</string>
+    <string name="theme_opt_system_sub">Match your device theme automatically</string>
+    <string name="theme_opt_light">Light</string>
+    <string name="theme_opt_light_sub">Always use light theme</string>
+    <string name="theme_opt_dark">Dark</string>
+    <string name="theme_opt_dark_sub">Always use dark theme</string>
     <string name="settings_replay_onboarding">Replay Onboarding</string>
     <string name="settings_replay_onboarding_sub">Show the intro tour &amp; reset initial preferences</string>
     <string name="settings_donate">Donate</string>
@@ -563,6 +572,7 @@
     <string name="pin_settings_change_btn">Change</string>
     <string name="pin_settings_set_btn">Set</string>
     <string name="pin_settings_info">The device PIN unlocks the app day-to-day. The separate backup PIN is only used when exporting a backup file — set lazily the first time you tap Backup.</string>
+    <string name="pin_settings_lock_now">Lock Now</string>
     <string name="pin_sheet_verify_title">Verify current PIN</string>
     <string name="pin_sheet_new_title">New PIN</string>
     <string name="pin_sheet_confirm_title">Repeat new PIN</string>

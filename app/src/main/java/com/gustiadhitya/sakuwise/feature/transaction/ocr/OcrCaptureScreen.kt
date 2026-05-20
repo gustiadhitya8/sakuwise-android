@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -132,15 +133,13 @@ fun OcrCaptureScreen(
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(sw.surface)
+                    .clickable(onClick = onClose)
                     .padding(2.dp),
             ) {
                 Icon(
                     Icons.AutoMirrored.Outlined.ArrowBack, "Kembali",
                     tint = sw.ink,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(sw.surface),
+                    modifier = Modifier.size(28.dp),
                 )
             }
             Text("Scan Struk", color = sw.ink,

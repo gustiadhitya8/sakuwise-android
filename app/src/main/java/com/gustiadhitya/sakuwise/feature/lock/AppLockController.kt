@@ -45,12 +45,23 @@ class AppLockController @Inject constructor(
 
     fun onAppBackgrounded() {
         lastBackgroundedAt = System.currentTimeMillis()
+        // For "Langsung" (0 min) we lock the moment the app goes to background
+        // so the lock is already up the instant the user returns. Without this,
+        // user has to wait for onForegrounded → prefs.first() → recompose,
+        // briefly seeing the unlocked dashboard before the lock paints.
+        scope.launch {
+            if (prefsRepo.prefs.first().autoLockMinutes <= 0) {
+                _locked.value = true
+            }
+        }
     }
 
     fun onAppForegrounded() {
         scope.launch {
             val autoLockMin = prefsRepo.prefs.first().autoLockMinutes
             val elapsedMin = (System.currentTimeMillis() - lastBackgroundedAt) / 60_000
+            // Note `elapsedMin >= autoLockMin` works for the 0-min case too,
+            // but we already locked on background — kept here for safety.
             if (lastBackgroundedAt > 0 && elapsedMin >= autoLockMin) {
                 _locked.value = true
             }

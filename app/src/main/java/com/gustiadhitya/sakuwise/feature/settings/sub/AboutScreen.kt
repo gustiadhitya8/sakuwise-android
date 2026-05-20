@@ -1,8 +1,10 @@
 package com.gustiadhitya.sakuwise.feature.settings.sub
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -68,7 +70,11 @@ private fun AboutRow(label: String, onClick: () -> Unit) {
     val sw = SwTheme.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp) // A11Y-004 tap target
+            .clickable(onClick = onClick) // BUG FIX: row was missing onClick — links were dead
+            .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
         Text(label, color = sw.ink,
             style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),

@@ -83,35 +83,8 @@ fun DonateScreen(onBack: () -> Unit) {
                     stringResource(R.string.donate_platform_trakteer_url), onClick = {})
             }
         }
-        Spacer(Modifier.height(16.dp))
-
-        Text(stringResource(R.string.donate_section_qris), color = sw.inkSubtle,
-            style = SwType.SectionLabel.copy(fontSize = 11.sp),
-            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
-        SwCard {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
-                        .padding(12.dp),
-                ) {
-                    // QRIS placeholder pattern
-                    Box(
-                        modifier = Modifier
-                            .size(176.dp)
-                            .background(Color(0xFF000000)),
-                    )
-                }
-                Spacer(Modifier.height(10.dp))
-                Text(stringResource(R.string.donate_qris_sub),
-                    color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                Text(stringResource(R.string.donate_nmid), color = sw.inkSubtle,
-                    style = SwType.LabelSmall.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"))
-            }
-        }
         Spacer(Modifier.height(12.dp))
+        // QRIS section removed per user request — only Saweria + Trakteer.
         Text(
             stringResource(R.string.donate_footnote),
             color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 11.sp),

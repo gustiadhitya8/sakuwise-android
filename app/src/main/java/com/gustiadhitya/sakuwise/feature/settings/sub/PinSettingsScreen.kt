@@ -124,6 +124,14 @@ fun PinSettingsScreen(
             }
         }
         Spacer(Modifier.height(16.dp))
+        // "Lock now" — instant test for users who can't tell whether auto-lock
+        // is working (the policy is timed, so they'd have to wait minutes).
+        SwButton(
+            text = stringResource(R.string.pin_settings_lock_now),
+            onClick = { lockVm.lockNow() },
+            variant = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant.Outline,
+        )
+        Spacer(Modifier.height(16.dp))
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
@@ -141,9 +149,18 @@ fun PinSettingsScreen(
     if (changePinSheet) {
         ChangePinSheet(
             requireCurrent = hasPin,
-            usePassphrase = prefs.usePassphrase,
+            // Verify step renders in the CURRENT credential's format.
+            currentIsPassphrase = prefs.currentCredentialIsPassphrase,
+            // New step renders in the TARGET format (user's toggle choice).
+            newIsPassphrase = prefs.usePassphrase,
             verifyCurrent = { lockVm.verifyPin(it) },
-            onSave = { newPin -> lockVm.setPin(newPin); changePinSheet = false },
+            onSave = { newPin ->
+                lockVm.setPin(newPin)
+                // Record the format of the credential we just saved so the
+                // next ChangePinSheet open knows how to render the verify step.
+                mutator.setCurrentCredentialIsPassphrase(prefs.usePassphrase)
+                changePinSheet = false
+            },
             onDismiss = { changePinSheet = false },
         )
     }
@@ -152,7 +169,8 @@ fun PinSettingsScreen(
 @Composable
 private fun ChangePinSheet(
     requireCurrent: Boolean,
-    usePassphrase: Boolean,
+    currentIsPassphrase: Boolean,
+    newIsPassphrase: Boolean,
     verifyCurrent: (String) -> Boolean,
     onSave: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -166,8 +184,11 @@ private fun ChangePinSheet(
     var confirm by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
 
-    val minLen = if (usePassphrase) 8 else 6
-    fun valueOk(v: String) = if (usePassphrase) v.length >= minLen else v.length == 6
+    // Each step uses the format relevant to that step: verify renders the
+    // CURRENT credential's format; new/confirm render the TARGET format.
+    val newMinLen = if (newIsPassphrase) 8 else 6
+    fun currentOk(v: String) = if (currentIsPassphrase) v.length >= 8 else v.length == 6
+    fun newOk(v: String) = if (newIsPassphrase) v.length >= newMinLen else v.length == 6
     val errWrong = stringResource(R.string.pin_sheet_err_wrong)
     val errMismatch = stringResource(R.string.pin_sheet_err_mismatch)
     SwPickerSheet(
@@ -180,40 +201,46 @@ private fun ChangePinSheet(
     ) {
         when (step) {
             PinStep.Current -> {
-                SecretField(usePassphrase, current) { current = if (usePassphrase) it else it.take(6) }
+                SecretField(currentIsPassphrase, current) {
+                    current = if (currentIsPassphrase) it else it.take(6)
+                }
                 if (error != null) {
                     Spacer(Modifier.height(6.dp))
                     Text(error!!, color = sw.danger,
                         style = SwType.LabelSmall.copy(fontSize = 12.sp))
                 }
                 Spacer(Modifier.height(12.dp))
-                SwButton(stringResource(R.string.pin_sheet_next), enabled = valueOk(current), onClick = {
+                SwButton(stringResource(R.string.pin_sheet_next), enabled = currentOk(current), onClick = {
                     if (verifyCurrent(current)) { step = PinStep.New; error = null }
                     else error = errWrong
                 })
             }
             PinStep.New -> {
-                SecretField(usePassphrase, newPin) { newPin = if (usePassphrase) it else it.take(6) }
-                if (usePassphrase && newPin.isNotEmpty() && newPin.length < minLen) {
+                SecretField(newIsPassphrase, newPin) {
+                    newPin = if (newIsPassphrase) it else it.take(6)
+                }
+                if (newIsPassphrase && newPin.isNotEmpty() && newPin.length < newMinLen) {
                     Spacer(Modifier.height(6.dp))
-                    Text(stringResource(R.string.passphrase_min_hint_format, minLen),
+                    Text(stringResource(R.string.passphrase_min_hint_format, newMinLen),
                         color = sw.inkSubtle,
                         style = SwType.LabelSmall.copy(fontSize = 11.sp))
                 }
                 Spacer(Modifier.height(12.dp))
-                SwButton(stringResource(R.string.pin_sheet_next), enabled = valueOk(newPin), onClick = {
+                SwButton(stringResource(R.string.pin_sheet_next), enabled = newOk(newPin), onClick = {
                     step = PinStep.Confirm; error = null
                 })
             }
             PinStep.Confirm -> {
-                SecretField(usePassphrase, confirm) { confirm = if (usePassphrase) it else it.take(6) }
+                SecretField(newIsPassphrase, confirm) {
+                    confirm = if (newIsPassphrase) it else it.take(6)
+                }
                 if (error != null) {
                     Spacer(Modifier.height(6.dp))
                     Text(error!!, color = sw.danger,
                         style = SwType.LabelSmall.copy(fontSize = 12.sp))
                 }
                 Spacer(Modifier.height(12.dp))
-                SwButton(stringResource(R.string.pin_sheet_save), enabled = valueOk(confirm), onClick = {
+                SwButton(stringResource(R.string.pin_sheet_save), enabled = newOk(confirm), onClick = {
                     if (confirm == newPin) onSave(newPin)
                     else error = errMismatch
                 })

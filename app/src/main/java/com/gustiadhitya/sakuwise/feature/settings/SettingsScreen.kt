@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Favorite
@@ -69,6 +70,7 @@ fun SettingsScreen(
     onNavigateToDonate: () -> Unit = {},
     onNavigateToReset: () -> Unit = {},
     onNavigateToExport: () -> Unit = {},
+    onNavigateToTheme: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
     mainVm: MainViewModel = hiltViewModel(),
 ) {
@@ -178,6 +180,16 @@ fun SettingsScreen(
                 danger = true, onClick = onNavigateToReset)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_app)) {
+            SettingsRow(stringResource(R.string.settings_theme),
+                stringResource(
+                    when (prefs.themeMode) {
+                        "dark" -> R.string.theme_opt_dark
+                        "light" -> R.string.theme_opt_light
+                        else -> R.string.theme_opt_system
+                    },
+                ),
+                icon = Icons.Outlined.DarkMode,
+                onClick = onNavigateToTheme)
             SettingsRow(stringResource(R.string.settings_language),
                 if (prefs.language == "id") "Bahasa Indonesia" else "English",
                 icon = Icons.Outlined.Language,

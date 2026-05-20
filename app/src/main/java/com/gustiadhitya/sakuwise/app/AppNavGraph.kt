@@ -113,6 +113,13 @@ private fun MainShell() {
     var pickerOpen by remember { mutableStateOf(false) }
     var overlay by remember { mutableStateOf<FullScreenOverlay?>(null) }
     var exitConfirm by remember { mutableStateOf(false) }
+    // Deep-link target for the Me tab on next switch. Consumed once and reset
+    // back to Hub on subsequent re-entries.
+    var meInitialRoute by remember {
+        mutableStateOf<com.gustiadhitya.sakuwise.feature.settings.SettingsRoute>(
+            com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Hub,
+        )
+    }
     // Shared TxnFormViewModel so OCR overlay can prefill before Expense overlay opens.
     val txnFormVm: TxnFormViewModel = hiltViewModel()
 
@@ -147,10 +154,23 @@ private fun MainShell() {
                         onNavigateToPlan = { active = SwTab.Plan },
                         onNavigateToAssets = { active = SwTab.Assets },
                         onNavigateToMe = { active = SwTab.Me },
+                        onBackupTap = {
+                            meInitialRoute = com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Backup
+                            active = SwTab.Me
+                        },
                     )
                     SwTab.Plan -> PlanScreen()
                     SwTab.Assets -> AssetTabHost()
-                    SwTab.Me -> SettingsTabHost()
+                    SwTab.Me -> {
+                        val initial = meInitialRoute
+                        SettingsTabHost(initialRoute = initial)
+                        // Reset deep-link so next direct Me tap lands on Hub.
+                        androidx.compose.runtime.LaunchedEffect(initial) {
+                            if (initial != com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Hub) {
+                                meInitialRoute = com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Hub
+                            }
+                        }
+                    }
                 }
             }
             SwTabBar(
@@ -195,6 +215,11 @@ private fun MainShell() {
                 onDismiss = { pickerOpen = false },
                 onPick = { kind ->
                     pickerOpen = false
+                    // Reset the shared TxnFormViewModel state on every new
+                    // entry — otherwise leftover `saved=true` from a previous
+                    // submit auto-closes the next form, and OCR-prefilled note
+                    // bleeds into unrelated openings.
+                    txnFormVm.resetForNewEntry()
                     overlay = when (kind) {
                         AddTxnKind.Expense -> FullScreenOverlay.Expense
                         AddTxnKind.Income -> FullScreenOverlay.Income
