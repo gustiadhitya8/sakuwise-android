@@ -61,12 +61,11 @@ fun LanguageSettingsScreen(
                 label = pair.first,
                 sub = pair.second,
                 onClick = {
+                    // mutator.setLanguage calls AppCompatDelegate.setApplicationLocales
+                    // which triggers a config-change recreate on AppCompatActivity
+                    // — no manual recreate needed (and the manual recreate raced the
+                    // async DataStore write, reading the OLD pref on rebuild).
                     mutator.setLanguage(code)
-                    // AppCompatDelegate.setApplicationLocales fires a config change,
-                    // but the Activity's attachBaseContext doesn't re-run unless we
-                    // explicitly recreate. Without this, the new locale is saved
-                    // but the visible UI stays in the old language until cold-restart.
-                    (ctx as? Activity)?.recreate()
                 },
             )
             Spacer(Modifier.height(8.dp))

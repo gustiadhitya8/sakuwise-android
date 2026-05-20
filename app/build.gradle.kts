@@ -85,6 +85,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.appcompat)
+    // Required for Theme.MaterialComponents.*.Bridge — the activity theme must
+    // be an AppCompat descendant since MainActivity extends AppCompatActivity
+    // (so AppCompatDelegate.setApplicationLocales actually flips the locale).
+    implementation(libs.material)
     implementation(libs.kotlinx.coroutines.android)
 
     // Hilt

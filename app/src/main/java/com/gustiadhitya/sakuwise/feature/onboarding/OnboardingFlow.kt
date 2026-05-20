@@ -39,7 +39,6 @@ fun OnboardingFlow(
     )
     val ctx = LocalContext.current
     val onChange: (OnboardingUi) -> Unit = { next ->
-        val langChanged = next.lang != state.lang
         viewModel.update {
             it.copy(
                 lang = next.lang,
@@ -51,13 +50,13 @@ fun OnboardingFlow(
                 accountBalance = next.accountBalance,
             )
         }
-        if (langChanged) {
-            // Apply the locale immediately so the rest of onboarding renders
-            // in the user's chosen language. Without this, the user picks
-            // English on step 1 but steps 2-4 + lock + dashboard stay in ID
-            // until the saved pref is read on next cold-start.
+        // Always apply the picked locale — DON'T gate on langChanged. On cold
+        // start the displayed locale may be the system locale even though
+        // DataStore says "id", so user's "tap to confirm" must still write
+        // through to AppCompatDelegate. Idempotent at the AppCompat layer.
+        val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        if (current != next.lang) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(next.lang))
-            (ctx as? Activity)?.recreate()
         }
     }
     val finish = { viewModel.finish() }
