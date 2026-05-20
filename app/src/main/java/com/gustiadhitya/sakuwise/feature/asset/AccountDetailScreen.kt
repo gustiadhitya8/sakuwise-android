@@ -103,25 +103,25 @@ fun AccountDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(sw.primary)
+                    .background(sw.primaryHero)
                     .padding(start = 22.dp, end = 22.dp, top = 18.dp, bottom = 18.dp),
             ) {
                 Column {
                     Text(
                         stringResource(R.string.account_detail_balance_prefix,
                             state.account?.type?.name?.uppercase() ?: ""),
-                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                     )
                     Spacer(Modifier.height(6.dp))
-                    RupiahText(value = state.balance, color = sw.onPrimary, style = SwType.AmountXL)
+                    RupiahText(value = state.balance, color = sw.onPrimaryHero, style = SwType.AmountXL)
                     Spacer(Modifier.height(6.dp))
                     val lastSnap = state.snapshots.firstOrNull()
                     Text(
                         if (lastSnap != null)
                             stringResource(R.string.account_detail_last_recon_format, lastSnap.date.toAbsoluteId())
                         else stringResource(R.string.account_detail_no_recon),
-                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.LabelSmall.copy(fontSize = 12.sp),
                     )
                 }

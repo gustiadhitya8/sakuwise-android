@@ -103,15 +103,15 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = SwSpace.pageH)
                 .clip(RoundedCornerShape(20.dp))
-                .background(sw.primary)
+                .background(sw.primaryHero)
                 .clickable(onClick = onNavigateToProfile),
         ) {
             Box(modifier = Modifier.align(Alignment.BottomEnd).offset(x = 24.dp, y = 24.dp)) {
                 LogoDaun(
                     sizeDp = 120,
-                    bg = sw.onPrimary.copy(alpha = 0.12f),
-                    leaf = sw.primary.copy(alpha = 0.12f),
-                    vein = sw.onPrimary.copy(alpha = 0.12f),
+                    bg = sw.onPrimaryHero.copy(alpha = 0.12f),
+                    leaf = sw.primaryHero.copy(alpha = 0.12f),
+                    vein = sw.onPrimaryHero.copy(alpha = 0.12f),
                 )
             }
             Row(
@@ -125,23 +125,23 @@ fun SettingsScreen(
                         .clip(CircleShape)
                         .background(Color.White.copy(alpha = 0.18f)),
                 ) {
-                    Text(initial, color = sw.onPrimary,
+                    Text(initial, color = sw.onPrimaryHero,
                         fontSize = 22.sp, lineHeight = 22.sp,
                         fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.size(width = 14.dp, height = 1.dp))
                 Column(Modifier.weight(1f)) {
                     Text(prefs.userNickname.ifBlank { "Teman" },
-                        color = sw.onPrimary,
+                        color = sw.onPrimaryHero,
                         style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     Text(
                         "${if (prefs.language == "id") "Bahasa Indonesia" else "English"} · " +
                             if (prefs.biometricEnabled) "Biometrik aktif" else "PIN saja",
-                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.LabelSmall.copy(fontSize = 12.sp),
                     )
                 }
-                Icon(Icons.Outlined.ChevronRight, null, tint = sw.onPrimary, modifier = Modifier.size(20.dp))
+                Icon(Icons.Outlined.ChevronRight, null, tint = sw.onPrimaryHero, modifier = Modifier.size(20.dp))
             }
         }
         Spacer(Modifier.height(16.dp))

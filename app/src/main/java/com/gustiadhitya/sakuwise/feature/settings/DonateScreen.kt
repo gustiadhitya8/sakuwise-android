@@ -43,7 +43,7 @@ fun DonateScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(18.dp))
-                .background(sw.primary)
+                .background(sw.primaryHero)
                 .padding(20.dp),
         ) {
             Box(
@@ -53,16 +53,15 @@ fun DonateScreen(onBack: () -> Unit) {
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = 0.18f)),
             ) {
-                // White on primary per proto — accent tint was too dim against the green hero.
-                Icon(Icons.Outlined.AutoAwesome, null, tint = sw.onPrimary, modifier = Modifier.size(22.dp))
+                Icon(Icons.Outlined.AutoAwesome, null, tint = sw.onPrimaryHero, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.size(width = 14.dp, height = 1.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.donate_hero_title), color = sw.onPrimary,
+                Text(stringResource(R.string.donate_hero_title), color = sw.onPrimaryHero,
                     style = SwType.H2.copy(fontSize = 17.sp, fontWeight = FontWeight.Bold))
                 Text(
                     stringResource(R.string.donate_hero_body),
-                    color = sw.onPrimary.copy(alpha = 0.85f),
+                    color = sw.onPrimaryHero.copy(alpha = 0.85f),
                     style = SwType.Body.copy(fontSize = 13.sp),
                 )
             }

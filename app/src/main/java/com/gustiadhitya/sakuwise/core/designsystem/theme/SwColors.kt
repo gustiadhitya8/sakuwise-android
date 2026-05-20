@@ -25,6 +25,14 @@ data class SwColors(
     val onPrimary: Color,
     val primaryContainer: Color,
     val onPrimaryContainer: Color,
+    /**
+     * Filled-card background for big "hero" surfaces (Dashboard SISA ANGGARAN,
+     * Aset TOTAL KEKAYAAN, Account-detail balance). Stays deep green in BOTH
+     * light and dark mode so heroes don't suddenly look like a light card
+     * stamped on a dark page. Pair with [onPrimaryHero] for text.
+     */
+    val primaryHero: Color,
+    val onPrimaryHero: Color,
     val accent: Color,
     val accentSoft: Color,
     val success: Color,
@@ -46,6 +54,8 @@ val LightSwColors = SwColors(
     border = Border, borderStrong = BorderStrong,
     primary = Primary, primaryHover = PrimaryHover, onPrimary = OnPrimary,
     primaryContainer = PrimaryContainer, onPrimaryContainer = OnPrimaryContainer,
+    // In light mode the hero IS the brand primary (deep forest #0F4C3A).
+    primaryHero = Primary, onPrimaryHero = OnPrimary,
     accent = Accent, accentSoft = AccentSoft,
     success = Success, successSoft = SuccessSoft,
     warning = Warning, warningSoft = WarningSoft,
@@ -62,6 +72,10 @@ val DarkSwColors = SwColors(
     border = BorderDark, borderStrong = BorderStrongDark,
     primary = PrimaryDark, primaryHover = PrimaryHoverDark, onPrimary = OnPrimaryDark,
     primaryContainer = PrimaryContainerDark, onPrimaryContainer = OnPrimaryContainerDark,
+    // In dark mode the hero is a DEEP green container (NOT the bright mint
+    // PrimaryDark used for accents) so it doesn't look like a light card
+    // pasted on the dark page. Text on it is light mint for contrast.
+    primaryHero = PrimaryContainerDark, onPrimaryHero = OnPrimaryContainerDark,
     accent = AccentDark, accentSoft = AccentSoftDark,
     success = SuccessDark, successSoft = SuccessSoftDark,
     warning = WarningDark, warningSoft = WarningSoftDark,

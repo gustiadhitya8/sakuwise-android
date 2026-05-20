@@ -95,14 +95,14 @@ fun AssetsHubScreen(
                 .fillMaxWidth()
                 .padding(horizontal = SwSpace.pageH)
                 .clip(RoundedCornerShape(22.dp))
-                .background(sw.primary),
+                .background(sw.primaryHero),
         ) {
             Box(modifier = Modifier.align(Alignment.BottomEnd).offset(x = 30.dp, y = 30.dp)) {
                 LogoDaun(
                     sizeDp = 160,
-                    bg = sw.onPrimary.copy(alpha = 0.10f),
-                    leaf = sw.primary.copy(alpha = 0.10f),
-                    vein = sw.onPrimary.copy(alpha = 0.10f),
+                    bg = sw.onPrimaryHero.copy(alpha = 0.10f),
+                    leaf = sw.primaryHero.copy(alpha = 0.10f),
+                    vein = sw.onPrimaryHero.copy(alpha = 0.10f),
                 )
             }
             // Local mask state per prototype eye toggle.
@@ -110,7 +110,7 @@ fun AssetsHubScreen(
             Column(modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.assets_total_wealth),
-                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                         modifier = Modifier.weight(1f))
                     // Eye toggle mirrors the dashboard "hide saldo" affordance.
@@ -126,7 +126,7 @@ fun AssetsHubScreen(
                             if (hideTotal) androidx.compose.material.icons.Icons.Outlined.VisibilityOff
                             else androidx.compose.material.icons.Icons.Outlined.Visibility,
                             null,
-                            tint = sw.onPrimary,
+                            tint = sw.onPrimaryHero,
                             modifier = Modifier.size(16.dp),
                         )
                     }
@@ -135,10 +135,10 @@ fun AssetsHubScreen(
                 Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (hideTotal) {
                         Text("Rp ••••••",
-                            color = sw.onPrimary,
+                            color = sw.onPrimaryHero,
                             style = SwType.AmountXL)
                     } else {
-                        RupiahText(value = nw.total, color = sw.onPrimary, style = SwType.AmountXL)
+                        RupiahText(value = nw.total, color = sw.onPrimaryHero, style = SwType.AmountXL)
                     }
                     // YTD delta pill per screens-dashboard.jsx:220 — only render when we
                     // have enough trend history to compute a meaningful first vs last.
@@ -453,7 +453,7 @@ private fun LegendDot(color: androidx.compose.ui.graphics.Color, label: String) 
         horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
         Text(label,
-            color = sw.onPrimary.copy(alpha = 0.85f),
+            color = sw.onPrimaryHero.copy(alpha = 0.85f),
             style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium))
     }
 }

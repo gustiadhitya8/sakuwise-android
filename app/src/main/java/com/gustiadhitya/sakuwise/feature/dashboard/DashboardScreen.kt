@@ -377,14 +377,16 @@ private fun DashboardHero(
             .fillMaxWidth()
             .padding(horizontal = SwSpace.pageH, vertical = 14.dp)
             .clip(RoundedCornerShape(22.dp))
-            .background(sw.primary),
+            // primaryHero stays deep green in BOTH light and dark mode so the
+            // hero doesn't look like a light card pasted onto the dark page.
+            .background(sw.primaryHero),
     ) {
         Box(modifier = Modifier.align(Alignment.BottomEnd).offset(x = 36.dp, y = 36.dp)) {
             LogoDaun(
                 sizeDp = 180,
-                bg = sw.onPrimary.copy(alpha = 0.10f),
-                leaf = sw.primary.copy(alpha = 0.10f),
-                vein = sw.onPrimary.copy(alpha = 0.10f),
+                bg = sw.onPrimaryHero.copy(alpha = 0.10f),
+                leaf = sw.primaryHero.copy(alpha = 0.10f),
+                vein = sw.onPrimaryHero.copy(alpha = 0.10f),
             )
         }
         Column(modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 18.dp)) {
@@ -392,14 +394,14 @@ private fun DashboardHero(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "SISA ANGGARAN",
-                        color = sw.onPrimary.copy(alpha = 0.78f),
+                        color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                     )
                     Spacer(Modifier.height(2.dp))
                     if (hide) {
-                        Text("••••••••", color = sw.onPrimary.copy(alpha = 0.85f), style = SwType.AmountXL)
+                        Text("••••••••", color = sw.onPrimaryHero.copy(alpha = 0.85f), style = SwType.AmountXL)
                     } else {
-                        RupiahText(value = remaining, color = sw.onPrimary, style = SwType.AmountXL)
+                        RupiahText(value = remaining, color = sw.onPrimaryHero, style = SwType.AmountXL)
                     }
                 }
                 Box(
@@ -413,7 +415,7 @@ private fun DashboardHero(
                     Icon(
                         if (hide) Icons.Outlined.VisibilityOff else Icons.Outlined.RemoveRedEye,
                         contentDescription = if (hide) "Tampilkan saldo" else "Sembunyikan saldo",
-                        tint = sw.onPrimary, modifier = Modifier.size(18.dp),
+                        tint = sw.onPrimaryHero, modifier = Modifier.size(18.dp),
                     )
                 }
             }
@@ -432,18 +434,18 @@ private fun DashboardHero(
                         .size(36.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color.White.copy(alpha = 0.15f)),
-                ) { Icon(Icons.Outlined.AutoAwesome, null, tint = sw.accent, modifier = Modifier.size(20.dp)) }
+                ) { Icon(Icons.Outlined.AutoAwesome, null, tint = sw.onPrimaryHero, modifier = Modifier.size(20.dp)) }
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Anggaran harian", color = sw.onPrimary.copy(alpha = 0.78f),
+                    Text("Anggaran harian", color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.Caption.copy(fontSize = 12.sp))
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             if (hide) "•••••" else dailyLeft.toRupiah(),
-                            color = sw.onPrimary,
+                            color = sw.onPrimaryHero,
                             style = SwType.AmountL.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                         )
-                        Text(" / hari", color = sw.onPrimary.copy(alpha = 0.6f),
+                        Text(" / hari", color = sw.onPrimaryHero.copy(alpha = 0.6f),
                             style = SwType.Body.copy(fontSize = 14.sp))
                     }
                 }
@@ -453,9 +455,9 @@ private fun DashboardHero(
                 Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.15f)),
             )
             Row(modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
-                HeroMetric("Pemasukan", income, "+", sw.accent, hide, Modifier.weight(1f))
+                HeroMetric("Pemasukan", income, "+", sw.success, hide, Modifier.weight(1f))
                 Box(Modifier.width(1.dp).height(40.dp).background(Color.White.copy(alpha = 0.18f)))
-                HeroMetric("Pengeluaran", expense, "−", sw.onPrimary, hide, Modifier.weight(1f))
+                HeroMetric("Pengeluaran", expense, "−", sw.onPrimaryHero, hide, Modifier.weight(1f))
             }
         }
     }
@@ -465,7 +467,7 @@ private fun DashboardHero(
 private fun HeroMetric(label: String, value: Long, sign: String, tint: Color, hide: Boolean, modifier: Modifier = Modifier) {
     val sw = SwTheme.colors
     Column(modifier = modifier.padding(horizontal = 4.dp)) {
-        Text(label, color = sw.onPrimary.copy(alpha = 0.7f),
+        Text(label, color = sw.onPrimaryHero.copy(alpha = 0.7f),
             style = SwType.Caption.copy(fontSize = 11.sp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(sign, color = tint.copy(alpha = 0.7f),
