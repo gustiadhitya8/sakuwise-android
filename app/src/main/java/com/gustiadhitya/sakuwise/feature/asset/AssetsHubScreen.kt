@@ -66,14 +66,15 @@ import com.gustiadhitya.sakuwise.core.ui.RupiahText
 import com.gustiadhitya.sakuwise.feature.asset.viewmodel.AssetsHubViewModel
 
 /**
- * Lavender accent reserved for the Akun (accounts) class on the Aset hero
- * breakdown. The other three classes already own brand colours — warning
- * (gold), info (land), accent/mint (deposit) — so Akun needs a fourth
- * distinct hue. Lavender pops on the deep-green hero in both light and
- * dark mode (hero stays primaryHero / PrimaryContainerDark) and reads
- * cleanly next to the orange / blue / mint siblings.
+ * Light spring-green accent reserved for the Akun (accounts) class on the
+ * Aset hero breakdown. Stays in the brand green family but is several stops
+ * lighter than the deep-forest hero (primaryHero / PrimaryContainerDark),
+ * so it pops with high contrast in both light and dark mode. It's also
+ * clearly distinguishable from the Deposito mint (sw.accent) which is a
+ * more pastel mint — these two greens read as different hues, not
+ * "two shades of the same green."
  */
-private val AccountsAccent = Color(0xFFB5A4F0)
+private val AccountsAccent = Color(0xFF86EFAC)
 
 @Composable
 fun AssetsHubScreen(
