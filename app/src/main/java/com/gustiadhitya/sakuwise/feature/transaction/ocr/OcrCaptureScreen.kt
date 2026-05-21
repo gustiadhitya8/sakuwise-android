@@ -128,6 +128,8 @@ fun OcrCaptureScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize().background(sw.bg)) {
+        // Top bar — per proto OCR review screen: back + title + primary
+        // Lanjut pill on the right (only visible when a draft is Ready).
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -139,19 +141,36 @@ fun OcrCaptureScreen(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(sw.surface)
-                    .clickable(onClick = onClose)
-                    .padding(2.dp),
+                    .clickable(onClick = onClose),
             ) {
                 Icon(
                     Icons.AutoMirrored.Outlined.ArrowBack, "Kembali",
                     tint = sw.ink,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(24.dp),
                 )
             }
-            Text("Scan Struk", color = sw.ink,
-                style = SwType.H1.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(start = 8.dp).weight(1f))
+            Text(
+                if (stage is OcrStage.Ready) "Review Struk" else "Scan Struk",
+                color = sw.ink,
+                style = SwType.H1.copy(fontSize = 19.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+            if (stage is OcrStage.Ready) {
+                val s = stage as OcrStage.Ready
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(sw.primary)
+                        .clickable { onComplete(s.draft) }
+                        .padding(horizontal = 16.dp),
+                ) {
+                    Text("Lanjut", color = sw.onPrimary,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold))
+                }
+            }
         }
         Column(
             modifier = Modifier
@@ -161,14 +180,7 @@ fun OcrCaptureScreen(
             when (val s = stage) {
                 is OcrStage.Idle -> IdleHero(sw.primaryContainer, sw.onPrimaryContainer)
                 is OcrStage.Processing -> ProcessingHero()
-                is OcrStage.Ready -> ReadyBody(
-                    draft = s.draft,
-                    onUse = { onComplete(s.draft) },
-                    onRetake = {
-                        viewModel.reset()
-                        cameraLauncher.launch(null)
-                    },
-                )
+                is OcrStage.Ready -> ReadyBody(draft = s.draft)
                 is OcrStage.Failure -> FailureBody(
                     message = s.message,
                     onRetake = {
@@ -177,8 +189,6 @@ fun OcrCaptureScreen(
                     },
                 )
             }
-            Spacer(Modifier.height(16.dp))
-            SwButton(text = "Tutup", variant = SwButtonVariant.Ghost, onClick = onClose)
         }
     }
 }
@@ -221,45 +231,119 @@ private fun ProcessingHero() {
     }
 }
 
+/**
+ * Review-Struk panel per design/sakuwise-screens/light/47-ocr-review.png.
+ * Renders a success banner, then a card-per-field with the parsed value
+ * and a confidence chip (tinggi/sedang/rendah), and an info banner with the
+ * next-step copy. The header's "Lanjut" pill is the primary CTA — no in-body
+ * buttons (proto has none, only the top-right pill drives navigation).
+ */
 @Composable
-private fun ReadyBody(
-    draft: ReceiptDraft,
-    onUse: () -> Unit,
-    onRetake: () -> Unit,
-) {
+private fun ReadyBody(draft: ReceiptDraft) {
     val sw = SwTheme.colors
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(sw.successSoft)
-            .padding(20.dp),
-    ) {
+    val detected = listOf(draft.merchant != null,
+        draft.totalAmount != null, draft.date != null).count { it }
+    // Success banner — green chip + "Berhasil dibaca" + "N field terdeteksi".
+    SwCard(padding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.Check, null, tint = sw.success, modifier = Modifier.size(28.dp))
-            Spacer(Modifier.size(10.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
+                    .background(sw.successSoft),
+            ) {
+                Icon(Icons.Outlined.Check, null, tint = sw.success,
+                    modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.size(width = 12.dp, height = 1.dp))
             Column {
-                Text("Struk berhasil dibaca", color = sw.success,
-                    style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold))
-                Text("Confidence: ${draft.confidence.name}",
-                    color = sw.ink,
-                    style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                Text("Berhasil dibaca", color = sw.ink,
+                    style = SwType.LabelStrong.copy(fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold))
+                Text("$detected field terdeteksi · cek sebelum simpan",
+                    color = sw.inkMuted,
+                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
             }
         }
     }
-    Spacer(Modifier.height(14.dp))
-    SwCard(padding = PaddingValues(0.dp)) {
+    Spacer(Modifier.height(12.dp))
+    val perFieldHigh = draft.confidence == OcrConfidence.High
+    val perFieldMed = draft.confidence == OcrConfidence.Medium
+    OcrDraftFieldCard(
+        label = "Merchant",
+        value = draft.merchant ?: "—",
+        present = draft.merchant != null,
+        confidence = if (perFieldHigh) "tinggi" else if (perFieldMed) "sedang" else "rendah",
+    )
+    Spacer(Modifier.height(10.dp))
+    OcrDraftFieldCard(
+        label = "Nominal",
+        value = draft.totalAmount?.let { "Rp ${it.toRupiahShort(prefix = "")}" } ?: "—",
+        present = draft.totalAmount != null,
+        confidence = if (perFieldHigh) "tinggi" else if (perFieldMed) "sedang" else "rendah",
+    )
+    Spacer(Modifier.height(10.dp))
+    OcrDraftFieldCard(
+        label = "Tanggal",
+        value = draft.date?.toString() ?: "—",
+        present = draft.date != null,
+        // Date is the weakest signal in IndonesianReceiptParser — bias one
+        // notch down from the overall confidence per practical experience.
+        confidence = if (perFieldHigh) "sedang" else if (perFieldMed) "sedang" else "rendah",
+    )
+    Spacer(Modifier.height(16.dp))
+    // Info banner — infoSoft tinted card with the next-step hint.
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(sw.infoSoft)
+            .padding(14.dp),
+    ) {
+        Text(
+            "Tap Lanjut untuk buka form pengeluaran. Field yang terdeteksi sudah di-prefill. Foto struk otomatis di-attach (terkompresi ~200 KB).",
+            color = sw.ink,
+            style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
+        )
+    }
+}
+
+@Composable
+private fun OcrDraftFieldCard(
+    label: String, value: String, present: Boolean, confidence: String,
+) {
+    val sw = SwTheme.colors
+    val (chipBg, chipFg) = when (confidence) {
+        "tinggi" -> sw.successSoft to sw.success
+        "sedang" -> sw.warningSoft to sw.warning
+        else -> sw.dangerSoft to sw.danger
+    }
+    SwCard(padding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)) {
         Column {
-            DraftRow("Merchant", draft.merchant ?: "—")
-            DraftRow("Tanggal", draft.date?.toString() ?: "—")
-            DraftRow("Total",
-                draft.totalAmount?.let { "Rp ${it.toRupiahShort(prefix = "")}" } ?: "—")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(label.uppercase(), color = sw.inkSubtle,
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold),
+                    modifier = Modifier.weight(1f))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(chipBg)
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                ) {
+                    Text(confidence, color = chipFg,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold))
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                value, color = if (present) sw.ink else sw.inkMuted,
+                style = SwType.LabelStrong.copy(fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
+            )
         }
     }
-    Spacer(Modifier.height(16.dp))
-    SwButton(text = "Isi ke Form Pengeluaran", onClick = onUse)
-    Spacer(Modifier.height(8.dp))
-    SwButton(text = "Foto Ulang", variant = SwButtonVariant.Outline, onClick = onRetake)
 }
 
 @Composable
@@ -286,17 +370,3 @@ private fun FailureBody(message: String, onRetake: () -> Unit) {
     SwButton(text = "Foto Ulang", onClick = onRetake)
 }
 
-@Composable
-private fun DraftRow(label: String, value: String) {
-    val sw = SwTheme.colors
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        Text(label, color = sw.inkMuted,
-            style = SwType.LabelSmall.copy(fontSize = 12.sp),
-            modifier = Modifier.weight(1f))
-        Text(value, color = sw.ink,
-            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
-    }
-}
