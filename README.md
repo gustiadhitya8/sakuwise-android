@@ -58,6 +58,23 @@ Sakuwise is **local-first** by design:
 
 A full feature spec lives in [`design/uploads/Sakuwise PRD v1.3 (ID).md`](design/uploads/Sakuwise%20PRD%20v1.3%20(ID).md).
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01-home.png" alt="Home / Dashboard" width="22%">
+  <img src="docs/screenshots/02-plan.png" alt="Plan tree" width="22%">
+  <img src="docs/screenshots/03-assets.png" alt="Assets & net worth" width="22%">
+  <img src="docs/screenshots/05-me.png" alt="Settings" width="22%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/04-add-transaction.png" alt="Add transaction sheet" width="22%">
+</p>
+
+From left to right: **Home** (remaining budget hero + allocation bars + top expenses) · **Plan** (period chip + expected-income progress + needs/wants/investment chips + starter-template tree) · **Assets** (total wealth + wealth-trend chart + four asset classes) · **Me** (profile + plan/security/backup settings). Below: the FAB-launched **Add Transaction** sheet that fans out into Expense / Income / Transfer / Scan Receipt.
+
+Screenshots are captured in English locale; the Indonesian locale shows the same screens with localized labels (Beranda · Plan · Aset · Saya, SISA ANGGARAN, etc.).
+
 ## Technical Architecture
 
 - **Platform:** Android 8.0+ (API 26), single-activity, Kotlin.
