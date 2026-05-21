@@ -180,24 +180,29 @@ fun DepositListScreen(
             .background(sw.accent).padding(18.dp)) {
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 20.dp, y = 20.dp)) {
-                Icon(Icons.Outlined.Savings, null,
-                    tint = sw.fixedDarkOnMint.copy(alpha = 0.18f),
-                    modifier = Modifier.size(140.dp))
+                .offset(x = 20.dp, y = 30.dp)) {
+                Icon(
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
+                    contentDescription = null,
+                    tint = sw.fixedDarkOnMint.copy(alpha = 0.20f),
+                    modifier = Modifier.size(140.dp),
+                )
             }
             Column {
                 Text(stringResource(R.string.deposit_hero_label),
-                    color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
+                    color = sw.fixedDarkOnMint.copy(alpha = 0.78f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        lineHeight = 14.sp,
                         fontWeight = FontWeight.Bold))
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(4.dp))
                 RupiahText(value = total, color = sw.fixedDarkOnMint,
                     style = SwType.AmountXL.copy(fontSize = 30.sp,
+                        lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
-                    color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
-                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                    color = sw.fixedDarkOnMint.copy(alpha = 0.75f),
+                    style = SwType.LabelSmall.copy(fontSize = 12.sp, lineHeight = 14.sp))
             }
         }
         Spacer(Modifier.height(14.dp))
