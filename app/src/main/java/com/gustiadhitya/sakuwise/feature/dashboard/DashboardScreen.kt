@@ -424,7 +424,11 @@ private fun DashboardGreeting(name: String, period: PlanPeriod?, onPeriodTap: ()
             Icon(Icons.Outlined.CalendarToday, null,
                 tint = sw.onPrimaryContainer, modifier = Modifier.size(14.dp))
             val label = period?.let {
-                stringResource(R.string.dashboard_period_format, it.label, it.daysLeft)
+                stringResource(
+                    R.string.dashboard_period_format,
+                    com.gustiadhitya.sakuwise.core.common.planPeriodLabel(it.end),
+                    it.daysLeft,
+                )
             } ?: stringResource(R.string.dashboard_no_plan)
             Text(label, color = sw.onPrimaryContainer,
                 style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))

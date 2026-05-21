@@ -131,7 +131,8 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
             Icon(Icons.Outlined.CalendarToday, null,
                 tint = sw.onPrimaryContainer, modifier = Modifier.size(14.dp))
             Text(
-                state.plan?.label ?: stringResource(R.string.plan_no_plan),
+                state.plan?.let { com.gustiadhitya.sakuwise.core.common.planPeriodLabel(it.end) }
+                    ?: stringResource(R.string.plan_no_plan),
                 color = sw.onPrimaryContainer,
                 style = SwType.Caption.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold),
             )
@@ -582,7 +583,7 @@ private fun MonthPickerSheet(
                         modifier = Modifier.size(16.dp))
                     Spacer(Modifier.size(width = 10.dp, height = 1.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(plan.label,
+                        Text(com.gustiadhitya.sakuwise.core.common.planPeriodLabel(plan.end),
                             color = if (active) sw.onPrimaryContainer else sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
                         Text("${plan.start} → ${plan.end}",
