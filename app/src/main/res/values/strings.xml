@@ -607,7 +607,7 @@
     <string name="gold_edit_date_label">Tanggal beli</string>
     <string name="land_edit_date_label">Tanggal beli</string>
     <string name="gold_edit_serial_label">Nomor seri (opsional)</string>
-    <string name="gold_edit_serial_placeholder">Mis. ANTAM-12345</string>
+    <string name="gold_edit_serial_placeholder">Mis. G75228242</string>
     <string name="gold_edit_note_label">Catatan (opsional)</string>
     <string name="gold_dash">—</string>
 

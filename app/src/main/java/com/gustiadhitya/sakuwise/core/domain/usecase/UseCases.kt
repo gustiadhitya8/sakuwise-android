@@ -748,11 +748,32 @@ class ComputeNetWorthTrendUseCase @Inject constructor(
     private val txnRepo: TransactionRepository,
     private val accountRepo: AccountRepository,
     private val computeNetWorth: ComputeNetWorthUseCase,
+    private val snapshotDao: com.gustiadhitya.sakuwise.core.database.dao.NetWorthSnapshotDao,
+    private val snapshotToday: SnapshotNetWorthTodayUseCase,
 ) {
     suspend operator fun invoke(
         monthsBack: Int = 11,
         today: LocalDate = LocalDate.now(),
     ): List<Pair<LocalDate, Long>> {
+        // Refresh today's row first so the trend always ends at the real
+        // current net worth (the daily worker writes once/day, but a user
+        // who opens the app multiple times wants the chart to reflect any
+        // changes they made *today*).
+        snapshotToday(today)
+
+        // Prefer the snapshot table — it captures real day-to-day changes
+        // including asset value updates (gold price, deposito snapshots,
+        // land revaluation) which the txn-replay fallback can't see.
+        val snapshots = snapshotDao.observeAll().first()
+        if (snapshots.size >= 2) {
+            return snapshots.map { LocalDate.ofEpochDay(it.epochDay) to it.total }
+        }
+
+        // Fallback for fresh installs: synthesise a series from accounts'
+        // initial balance + transaction history + current asset offset.
+        // Produces a flat line when no txns exist — but at least the line
+        // sits at the real current value so users can confirm setup before
+        // the snapshot table accumulates.
         val nw = computeNetWorth().first()
         val staticOffset = nw.goldTotal + nw.landTotal + nw.depositTotal - nw.debtsTotal
         val accounts = accountRepo.observeActive().first()
@@ -761,7 +782,6 @@ class ComputeNetWorthTrendUseCase @Inject constructor(
 
         return (monthsBack downTo 0).map { m ->
             val anchor = today.minusMonths(m.toLong())
-            // End-of-month, capped at today so the latest point reflects current state.
             val endOfMonth = anchor.withDayOfMonth(1).plusMonths(1).minusDays(1)
                 .let { if (it.isAfter(today)) today else it }
             val accountDelta = txns

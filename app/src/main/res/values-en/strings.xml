@@ -607,7 +607,7 @@
     <string name="gold_edit_date_label">Purchase date</string>
     <string name="land_edit_date_label">Purchase date</string>
     <string name="gold_edit_serial_label">Serial number (optional)</string>
-    <string name="gold_edit_serial_placeholder">E.g. ANTAM-12345</string>
+    <string name="gold_edit_serial_placeholder">E.g. G75228242</string>
     <string name="gold_edit_note_label">Note (optional)</string>
     <string name="gold_dash">—</string>
 
