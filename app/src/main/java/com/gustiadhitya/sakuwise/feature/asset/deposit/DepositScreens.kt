@@ -81,7 +81,12 @@ import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 
-data class DepositListRow(val deposit: DepositAsset, val latestBalance: Long, val snapshotCount: Int)
+data class DepositListRow(
+    val deposit: DepositAsset,
+    val latestBalance: Long,
+    val firstBalance: Long,
+    val snapshotCount: Int,
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -92,7 +97,14 @@ class DepositListViewModel @Inject constructor(private val repo: DepositReposito
                 combine(
                     repo.observeLatestSnapshot(d.id),
                     repo.observeSnapshots(d.id),
-                ) { latest, snaps -> DepositListRow(d, latest?.balance ?: 0L, snaps.size) }
+                ) { latest, snaps ->
+                    DepositListRow(
+                        deposit = d,
+                        latestBalance = latest?.balance ?: 0L,
+                        firstBalance = snaps.minByOrNull { it.date }?.balance ?: 0L,
+                        snapshotCount = snaps.size,
+                    )
+                }
             },
         ) { it.toList() }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -164,6 +176,13 @@ fun DepositListScreen(
     val sw = SwTheme.colors
     val items by viewModel.items.collectAsState()
     val total = items.sumOf { it.latestBalance }
+    // Aggregate growth = (current total − baseline total) / baseline total,
+    // where baseline is the first snapshot per item summed. Renders a +%
+    // chip in the hero, matching the prototype's growth-pill pattern.
+    val baseline = items.sumOf { it.firstBalance }
+    val depGrowthPct: Float? =
+        if (baseline > 0L && baseline != total) ((total - baseline).toFloat() / baseline.toFloat()) * 100f
+        else null
     SimpleSettingsScreen(
         title = stringResource(R.string.deposit_title), onBack = onBack,
         actions = {
@@ -208,6 +227,26 @@ fun DepositListScreen(
                     style = SwType.AmountXL.copy(fontSize = 30.sp,
                         lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
+                if (depGrowthPct != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(sw.fixedDarkOnMint.copy(alpha = 0.16f))
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            (if (depGrowthPct >= 0f) "+" else "−") +
+                                "%.1f".format(kotlin.math.abs(depGrowthPct)) + "%",
+                            color = sw.fixedDarkOnMint,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                lineHeight = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                        )
+                    }
+                }
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.75f),

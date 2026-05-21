@@ -158,38 +158,44 @@ fun AssetsHubScreen(
                 }
                 // Growth pill — per screens-assets.jsx, sits BELOW the total
                 // with marginTop:8 + bg = rgba(255,255,255,0.16). Inline-flex.
+                // Always renders so the layout matches the prototype; falls
+                // back to "+0,0% sejak hari ini" when the snapshot table
+                // doesn't yet have ≥ 2 distinct days of data.
+                Spacer(Modifier.height(8.dp))
                 val series = state.netWorthTrend
-                if (series.size >= 2) {
-                    val first = series.first().second
-                    val last = series.last().second
-                    if (first != 0L) {
-                        val deltaPct = (last - first) * 100.0 / first
-                        val sign = if (deltaPct >= 0) "+" else "−"
-                        val firstMonth = series.first().first.format(
-                            java.time.format.DateTimeFormatter.ofPattern("MMM", java.util.Locale.getDefault()),
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.16f))
-                                .padding(horizontal = 10.dp, vertical = 4.dp),
-                        ) {
-                            Icon(
-                                Icons.Outlined.TrendingUp, null,
-                                tint = sw.onPrimaryHero,
-                                modifier = Modifier.size(11.dp),
-                            )
-                            Text(
-                                stringResource(R.string.assets_hub_since_month_format, sign, "%.1f".format(kotlin.math.abs(deltaPct)), firstMonth),
-                                color = sw.onPrimaryHero,
-                                style = SwType.LabelSmall.copy(fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
-                            )
-                        }
-                    }
+                val first = series.firstOrNull()?.second ?: 0L
+                val last = series.lastOrNull()?.second ?: 0L
+                val deltaPct =
+                    if (first != 0L && series.size >= 2) (last - first) * 100.0 / first
+                    else 0.0
+                val sign = if (deltaPct >= 0) "+" else "−"
+                val sinceLabel = if (series.size >= 2) {
+                    series.first().first.format(
+                        java.time.format.DateTimeFormatter.ofPattern("MMM", java.util.Locale.getDefault()),
+                    )
+                } else {
+                    stringResource(R.string.assets_hub_since_today)
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.16f))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                ) {
+                    Icon(
+                        Icons.Outlined.TrendingUp, null,
+                        tint = sw.onPrimaryHero,
+                        modifier = Modifier.size(11.dp),
+                    )
+                    Text(
+                        stringResource(R.string.assets_hub_since_month_format, sign,
+                            "%.1f".format(kotlin.math.abs(deltaPct)), sinceLabel),
+                        color = sw.onPrimaryHero,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
+                    )
                 }
                 Spacer(Modifier.height(16.dp))
                 val totalPos = (nw.accountsTotal + nw.goldTotal + nw.landTotal + nw.depositTotal)

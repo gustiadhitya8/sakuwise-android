@@ -168,8 +168,13 @@ fun LandListScreen(
 ) {
     val sw = SwTheme.colors
     val items by viewModel.items.collectAsState()
-    val total = items.filter { it.status == AssetStatus.Held }
-        .sumOf { it.currentValue ?: it.buyPrice }
+    val held = items.filter { it.status == AssetStatus.Held }
+    val total = held.sumOf { it.currentValue ?: it.buyPrice }
+    val totalBuy = held.sumOf { it.buyPrice }
+    val landProfit = total - totalBuy
+    val landGrowthPct: Float? =
+        if (totalBuy > 0L && landProfit != 0L) (landProfit.toFloat() / totalBuy.toFloat()) * 100f
+        else null
     SimpleSettingsScreen(
         title = stringResource(R.string.land_title), onBack = onBack,
         actions = {
@@ -206,6 +211,26 @@ fun LandListScreen(
                     style = SwType.AmountXL.copy(fontSize = 30.sp,
                         lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
+                if (landGrowthPct != null) {
+                    Spacer(Modifier.height(8.dp))
+                    val sign = if (landProfit >= 0L) "+" else "−"
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.18f))
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            "$sign ${kotlin.math.abs(landProfit).toRupiahShort(prefix = "")} · " +
+                                "$sign${"%.1f".format(kotlin.math.abs(landGrowthPct))}%",
+                            color = Color.White,
+                            style = SwType.LabelStrong.copy(fontSize = 11.sp, lineHeight = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                        )
+                    }
+                }
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.land_hero_sub_format, items.size),
                     color = Color.White.copy(alpha = 0.75f),

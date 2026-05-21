@@ -231,17 +231,25 @@ fun GoldListScreen(
                     Spacer(Modifier.height(8.dp))
                     val pct = (profit.toFloat() / totalBuy.toFloat()) * 100f
                     val sign = if (profit >= 0L) "+" else "−"
-                    Text(
-                        stringResource(
-                            R.string.gold_hero_profit_format,
-                            sign, kotlin.math.abs(profit).toRupiahShort(prefix = ""),
-                            sign, "%.1f".format(kotlin.math.abs(pct)),
-                        ),
-                        color = Color.White,
-                        style = SwType.LabelStrong.copy(fontSize = 12.sp, lineHeight = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFeatureSettings = "tnum"),
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.18f))
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            stringResource(
+                                R.string.gold_hero_profit_format,
+                                sign, kotlin.math.abs(profit).toRupiahShort(prefix = ""),
+                                sign, "%.1f".format(kotlin.math.abs(pct)),
+                            ),
+                            color = Color.White,
+                            style = SwType.LabelStrong.copy(fontSize = 11.sp, lineHeight = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                        )
+                    }
                 }
             }
         }

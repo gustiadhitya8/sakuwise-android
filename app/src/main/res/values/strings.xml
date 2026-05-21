@@ -132,6 +132,7 @@
     <string name="export_pdf_income_vs_expense">Pemasukan vs Pengeluaran</string>
     <string name="export_pdf_no_transactions">Belum ada transaksi.</string>
     <string name="assets_hub_since_month_format">%1$s%2$s%% sejak %3$s</string>
+    <string name="assets_hub_since_today">hari ini</string>
     <string name="land_since_purchase_format">%1$s · %2$s%3$s%% sejak beli</string>
     <string name="expense_pick_debt_placeholder">Pilih hutang…</string>
     <string name="ocr_pick_from_gallery">Pilih dari Galeri</string>

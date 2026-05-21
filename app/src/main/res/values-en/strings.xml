@@ -132,6 +132,7 @@
     <string name="export_pdf_income_vs_expense">Income vs Expense</string>
     <string name="export_pdf_no_transactions">No transactions.</string>
     <string name="assets_hub_since_month_format">%1$s%2$s%% since %3$s</string>
+    <string name="assets_hub_since_today">today</string>
     <string name="land_since_purchase_format">%1$s · %2$s%3$s%% since buy</string>
     <string name="expense_pick_debt_placeholder">Pick a debt…</string>
     <string name="ocr_pick_from_gallery">Pick from Gallery</string>
