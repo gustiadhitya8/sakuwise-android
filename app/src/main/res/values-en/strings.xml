@@ -457,7 +457,7 @@
     <string name="land_field_buy_price">Purchase price</string>
     <string name="land_field_current_value">Current value</string>
     <string name="land_section_tax">Tax Payments (PBB)</string>
-    <string name="land_tax_add">+ Add</string>
+    <string name="land_tax_add">Add</string>
     <string name="land_tax_empty">No PBB payments recorded.</string>
     <string name="land_tax_default_note">PBB</string>
     <string name="land_delete">Delete property</string>
@@ -536,7 +536,7 @@
     <string name="deposit_field_type">Type</string>
     <string name="deposit_field_institution">Institution</string>
     <string name="deposit_section_snapshot">Snapshots</string>
-    <string name="deposit_snapshot_add">+ Add</string>
+    <string name="deposit_snapshot_add">New snapshot</string>
     <string name="deposit_snapshot_empty">No snapshots yet.</string>
     <string name="deposit_delete">Delete deposit</string>
     <string name="deposit_snapshot_sheet_title">New Snapshot</string>
@@ -572,7 +572,7 @@
     <string name="debt_section_payments">Payments</string>
     <string name="debt_chart_label">OUTSTANDING BALANCE</string>
     <string name="debt_chart_payments_count_format">%1$d payments</string>
-    <string name="debt_payment_add">+ Add</string>
+    <string name="debt_payment_add">Add</string>
     <string name="debt_payments_empty">No payments yet.</string>
     <string name="debt_mark_paid">Mark Paid</string>
     <string name="debt_payment_sheet_title">Add Payment</string>

@@ -457,7 +457,7 @@
     <string name="land_field_buy_price">Harga beli</string>
     <string name="land_field_current_value">Nilai saat ini</string>
     <string name="land_section_tax">Pembayaran Pajak (PBB)</string>
-    <string name="land_tax_add">+ Tambah</string>
+    <string name="land_tax_add">Tambah</string>
     <string name="land_tax_empty">Belum ada pembayaran PBB.</string>
     <string name="land_tax_default_note">PBB</string>
     <string name="land_delete">Hapus properti</string>
@@ -536,7 +536,7 @@
     <string name="deposit_field_type">Tipe</string>
     <string name="deposit_field_institution">Institusi</string>
     <string name="deposit_section_snapshot">Snapshot</string>
-    <string name="deposit_snapshot_add">+ Tambah</string>
+    <string name="deposit_snapshot_add">Snapshot baru</string>
     <string name="deposit_snapshot_empty">Belum ada snapshot.</string>
     <string name="deposit_delete">Hapus deposito</string>
     <string name="deposit_snapshot_sheet_title">Snapshot Baru</string>
@@ -572,7 +572,7 @@
     <string name="debt_section_payments">Pembayaran</string>
     <string name="debt_chart_label">SISA HUTANG</string>
     <string name="debt_chart_payments_count_format">%1$d pembayaran</string>
-    <string name="debt_payment_add">+ Tambah</string>
+    <string name="debt_payment_add">Tambah</string>
     <string name="debt_payments_empty">Belum ada pembayaran.</string>
     <string name="debt_mark_paid">Tandai Lunas</string>
     <string name="debt_payment_sheet_title">Tambah Pembayaran</string>
