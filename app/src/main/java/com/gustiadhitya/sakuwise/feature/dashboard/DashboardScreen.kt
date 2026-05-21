@@ -135,7 +135,15 @@ private fun DashboardContent(
             .verticalScroll(rememberScrollState())
             .padding(bottom = SwSpace.bottomBarClear),
     ) {
-        DashboardHeader(initial = initial, onAvatarClick = onNavigateToMe)
+        // Notification dot lights up when backup is overdue >30 days OR
+        // never taken — the only push-able signal the app currently tracks.
+        val notifCount = if (state.backupOverdueDays > 30) 1 else 0
+        DashboardHeader(
+            initial = initial,
+            onAvatarClick = onNavigateToMe,
+            notificationCount = notifCount,
+            onBellClick = onBackupTap,
+        )
         DashboardGreeting(name = nickname, period = state.period,
             onPeriodTap = onNavigateToPlan)
         Spacer(Modifier.height(8.dp))
@@ -289,7 +297,12 @@ private fun DashboardOverspendBanner(onTap: () -> Unit) {
 }
 
 @Composable
-private fun DashboardHeader(initial: String, onAvatarClick: () -> Unit) {
+private fun DashboardHeader(
+    initial: String,
+    onAvatarClick: () -> Unit,
+    notificationCount: Int = 0,
+    onBellClick: () -> Unit = onAvatarClick,
+) {
     val sw = SwTheme.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -299,20 +312,54 @@ private fun DashboardHeader(initial: String, onAvatarClick: () -> Unit) {
             .padding(start = SwSpace.pageH, end = SwSpace.pageH, top = 8.dp, bottom = 12.dp),
     ) {
         Lockup(sizeSp = 22)
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(sw.primaryContainer)
-                .clickable(onClick = onAvatarClick),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
-                initial,
-                color = sw.onPrimaryContainer,
-                fontSize = 14.sp, lineHeight = 14.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            // Notification bell — proto 06-dashboard.png has it between brand
+            // and avatar with a tiny red dot when there's something to flag.
+            // Tap currently routes to the same target as the avatar (Saya
+            // tab) since a dedicated notification center is V1.1+.
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(sw.surface)
+                    .border(1.dp, sw.border, CircleShape)
+                    .clickable(onClick = onBellClick),
+            ) {
+                Icon(
+                    androidx.compose.material.icons.Icons.Outlined.NotificationsNone,
+                    contentDescription = stringResource(R.string.dashboard_notifications),
+                    tint = sw.ink, modifier = Modifier.size(20.dp),
+                )
+                if (notificationCount > 0) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 8.dp, end = 8.dp)
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(sw.danger),
+                    )
+                }
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(sw.primaryContainer)
+                    .clickable(onClick = onAvatarClick),
+            ) {
+                Text(
+                    initial,
+                    color = sw.onPrimaryContainer,
+                    fontSize = 14.sp, lineHeight = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.gustiadhitya.sakuwise.core.ui
 
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
+import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +34,12 @@ fun RupiahText(
     short: Boolean = false,
     prefixOpacity: Float = 0.78f,
 ) {
-    val resolved = color.takeOrElse(LocalContentColor.current)
+    // Default to the brand's primary ink so unspecified callers get
+    // high-contrast text in BOTH light and dark mode. Material3's
+    // LocalContentColor on a Surface in dark mode resolves to onSurface
+    // (#E6E1E5 muted grey), which combined with the 0.78 prefix opacity
+    // rendered "Rp 0" amounts almost invisible on dark cards.
+    val resolved = color.takeOrElse(SwTheme.colors.ink)
     val display = if (short) value.toRupiahShort() else value.toRupiah()
     val spoken = (if (sign == RupiahSign.Negative) "minus " else "") + value.toRupiahSpoken()
 
