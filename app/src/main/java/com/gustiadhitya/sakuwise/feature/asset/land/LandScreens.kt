@@ -365,7 +365,9 @@ fun LandDetailScreen(
                 DetailRow(stringResource(R.string.land_field_size),
                     stringResource(R.string.land_field_size_value_format, l.sizeM2))
                 DetailRow(stringResource(R.string.land_field_certificate), l.sertifikatId)
-                DetailRow(stringResource(R.string.land_field_buy_price), l.buyPrice.toRupiah(),
+                DetailRow(stringResource(R.string.land_field_buy_price), l.buyPrice.toRupiah())
+                DetailRow(stringResource(R.string.land_edit_date_label),
+                    l.purchaseDate.toAbsoluteId(),
                     last = l.currentValue == null)
                 if (l.currentValue != null) {
                     DetailRow(stringResource(R.string.land_field_current_value),
