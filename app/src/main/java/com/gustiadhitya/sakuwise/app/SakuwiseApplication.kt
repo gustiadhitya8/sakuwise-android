@@ -19,11 +19,19 @@ class SakuwiseApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Sync AppCompatDelegate's per-app locale with the DataStore-saved
-        // language pref on cold start. AppCompatDelegate persists its own
-        // locale (API 33+) but for the FIRST cold launch after pref change —
-        // or any case where DataStore disagrees with system locale — this
-        // ensures the displayed UI matches what the user picked. Idempotent.
+        // Reconcile per-app locale with the DataStore-saved language pref.
+        //
+        // Two directions, depending on which side has "newer" truth:
+        //   1. If AppCompatDelegate has a non-empty per-app locale (set by the
+        //      user via Android system settings, a `cmd locale set-app-locales`
+        //      adb call, or a prior in-app pick), THAT wins — copy it back into
+        //      prefs so the Settings → Language row + profile sub-label stay
+        //      in sync with what the UI is actually rendering.
+        //   2. If AppCompatDelegate is empty (e.g. cold first launch where
+        //      onboarding has already written prefs.language but the system
+        //      side hasn't been touched yet), push prefs → AppCompatDelegate.
+        //
+        // Either way, post-reconcile both sides match. Idempotent.
         try {
             val deps = dagger.hilt.android.EntryPointAccessors.fromApplication(
                 this, PrefsEntryPoint::class.java,
@@ -31,12 +39,34 @@ class SakuwiseApplication : Application() {
             val saved = kotlinx.coroutines.runBlocking {
                 deps.prefsRepo().prefs.first().language
             }
-            val current = androidx.appcompat.app.AppCompatDelegate
+            // Read from BOTH sources and prefer whichever is non-empty.
+            //  • AppCompatDelegate: in-app writes from this app's Settings flow.
+            //  • LocaleManager (API 33+): system-level per-app locale, set via
+            //    OS Settings → App info → Language, or `adb cmd locale
+            //    set-app-locales`. AppCompatDelegate does NOT see this.
+            val fromAppCompat = androidx.appcompat.app.AppCompatDelegate
                 .getApplicationLocales().toLanguageTags()
-            if (current != saved) {
-                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                    androidx.core.os.LocaleListCompat.forLanguageTags(saved),
-                )
+            val fromLocaleManager = if (android.os.Build.VERSION.SDK_INT >= 33) {
+                getSystemService(android.app.LocaleManager::class.java)
+                    ?.applicationLocales?.toLanguageTags().orEmpty()
+            } else ""
+            val system = when {
+                fromAppCompat.isNotEmpty() -> fromAppCompat
+                else -> fromLocaleManager
+            }
+            when {
+                system.isNotEmpty() && system != saved -> {
+                    // System wins — write back to prefs so UI labels match.
+                    kotlinx.coroutines.runBlocking {
+                        deps.prefsRepo().setLanguage(system)
+                    }
+                }
+                system.isEmpty() && saved.isNotEmpty() -> {
+                    // Prefs wins — push to AppCompatDelegate.
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                        androidx.core.os.LocaleListCompat.forLanguageTags(saved),
+                    )
+                }
             }
         } catch (_: Throwable) {
             // Swallow — if the read fails (first run before DataStore init),
