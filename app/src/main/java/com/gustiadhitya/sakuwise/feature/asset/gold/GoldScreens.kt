@@ -118,7 +118,8 @@ class GoldEditViewModel @Inject constructor(private val repo: GoldRepository) : 
             val g = repo.observeById(id).first()
             _state.value = if (g == null) GoldEditState(loaded = true)
             else GoldEditState(
-                id = g.id, weight = g.weightGram.toString(),
+                id = g.id,
+                weight = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram),
                 buyPrice = g.buyPrice.toString(), serial = g.serial.orEmpty(),
                 date = g.purchaseDate, note = g.note.orEmpty(), loaded = true,
             )
@@ -136,7 +137,7 @@ class GoldEditViewModel @Inject constructor(private val repo: GoldRepository) : 
                 GoldAsset(
                     id = s.id ?: UUID.randomUUID().toString(),
                     purchaseDate = s.date,
-                    weightGram = s.weight.toIntOrNull() ?: 0,
+                    weightMilliGram = com.gustiadhitya.sakuwise.core.common.parseGramsToMilliGrams(s.weight),
                     serial = s.serial.ifBlank { null },
                     buyPrice = s.buyPrice.toLongOrNull() ?: 0L,
                     note = s.note.ifBlank { null },
@@ -174,8 +175,9 @@ fun GoldListScreen(
     val prefs by main.prefs.collectAsState()
     val pricePerGram = prefs.goldPriceGlobal
     var showPriceSheet by remember { mutableStateOf(false) }
-    val totalWeight = items.filter { it.status == AssetStatus.Held }.sumOf { it.weightGram }
-    val totalValue = totalWeight * pricePerGram
+    val totalWeightMg = items.filter { it.status == AssetStatus.Held }.sumOf { it.weightMilliGram }
+    val totalWeightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(totalWeightMg)
+    val totalValue = totalWeightMg * pricePerGram / 1000L
     val totalBuy = items.filter { it.status == AssetStatus.Held }.sumOf { it.buyPrice }
     val profit = totalValue - totalBuy
 
@@ -208,19 +210,25 @@ fun GoldListScreen(
                     .offset(x = 20.dp, y = 20.dp),
             ) {
                 Icon(
-                    Icons.Outlined.Diamond, null,
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
+                    contentDescription = null,
                     tint = Color.White.copy(alpha = 0.18f),
                     modifier = Modifier.size(140.dp),
                 )
             }
             Column {
-                Text(stringResource(R.string.gold_hero_label_format, totalWeight),
+                Text(stringResource(R.string.gold_hero_label_format, totalWeightLabel),
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        lineHeight = 14.sp,
                         fontWeight = FontWeight.Bold))
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(4.dp))
+                // lineHeight = fontSize mirrors the prototype's `lineHeight: 1`
+                // on SW_Amount so the card doesn't get visual padding from
+                // Compose's default font-metric line spacing.
                 RupiahText(value = totalValue, color = Color.White,
                     style = SwType.AmountXL.copy(fontSize = 30.sp,
+                        lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
                 if (totalBuy > 0L) {
                     Spacer(Modifier.height(8.dp))
@@ -295,7 +303,8 @@ fun GoldListScreen(
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
                     items.forEachIndexed { i, g ->
-                        val perValue = g.weightGram * pricePerGram
+                        val perValue = g.valueAt(pricePerGram)
+                        val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
                         val growth = if (g.buyPrice > 0L)
                             ((perValue - g.buyPrice).toFloat() / g.buyPrice.toFloat()) * 100f
                         else 0f
@@ -314,15 +323,18 @@ fun GoldListScreen(
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(sw.warningSoft),
                             ) {
-                                Icon(Icons.Outlined.Diamond, null,
-                                    tint = sw.warning, modifier = Modifier.size(26.dp))
+                                Icon(
+                                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
+                                    contentDescription = null,
+                                    tint = sw.warning, modifier = Modifier.size(26.dp),
+                                )
                             }
                             Spacer(Modifier.size(width = 12.dp, height = 1.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     if (g.serial != null)
-                                        stringResource(R.string.gold_item_title_with_serial_format, g.weightGram, g.serial)
-                                    else stringResource(R.string.gold_item_title_format, g.weightGram),
+                                        stringResource(R.string.gold_item_title_with_serial_format, weightLabel, g.serial)
+                                    else stringResource(R.string.gold_item_title_format, weightLabel),
                                     color = sw.ink,
                                     style = SwType.LabelStrong.copy(fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold))
@@ -431,7 +443,10 @@ fun GoldDetailScreen(
 
     SimpleSettingsScreen(
         title = if (g == null) stringResource(R.string.gold_detail_default_title)
-        else stringResource(R.string.gold_item_title_format, g.weightGram),
+        else stringResource(
+            R.string.gold_item_title_format,
+            com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram),
+        ),
         onBack = onBack,
         actions = {
             // Proto screens-assets.jsx:466 — transparent 40×40 r12 with a
@@ -451,8 +466,9 @@ fun GoldDetailScreen(
             Text(stringResource(R.string.loading), color = sw.inkMuted, style = SwType.Body)
             return@SimpleSettingsScreen
         }
-        val currentValue = g.weightGram * prefs.goldPriceGlobal
+        val currentValue = g.valueAt(prefs.goldPriceGlobal)
         val profit = currentValue - g.buyPrice
+        val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
         // Hero — see GoldListScreen hero for the proto compliance notes. White-
         // on-warning with a translucent-white profit chip so the gain/loss
         // text doesn't blend into the warning background.
@@ -469,12 +485,13 @@ fun GoldDetailScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(x = 20.dp, y = 30.dp),
+                    .offset(x = 20.dp, y = 20.dp),
             ) {
                 Icon(
-                    Icons.Outlined.Diamond, null,
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
+                    contentDescription = null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(160.dp),
+                    modifier = Modifier.size(140.dp),
                 )
             }
             Column {
@@ -499,13 +516,14 @@ fun GoldDetailScreen(
         Spacer(Modifier.height(4.dp))
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
-                val pricePerGram = if (g.weightGram > 0) g.buyPrice / g.weightGram else 0L
+                val pricePerGram =
+                    if (g.weightMilliGram > 0L) g.buyPrice * 1000L / g.weightMilliGram else 0L
                 DetailRow(stringResource(R.string.gold_field_weight),
-                    stringResource(R.string.gold_field_weight_value_format, g.weightGram))
+                    stringResource(R.string.gold_field_weight_value_format, weightLabel))
                 DetailRow(stringResource(R.string.gold_field_buy_date), g.purchaseDate.toAbsoluteId())
                 DetailRow(stringResource(R.string.gold_field_buy_price), g.buyPrice.toRupiah())
                 DetailRow(stringResource(R.string.gold_field_price_per_gram),
-                    if (g.weightGram > 0) pricePerGram.toRupiah() else stringResource(R.string.gold_dash))
+                    if (g.weightMilliGram > 0L) pricePerGram.toRupiah() else stringResource(R.string.gold_dash))
                 DetailRow(stringResource(R.string.gold_field_serial),
                     g.serial ?: stringResource(R.string.gold_dash), last = true)
             }

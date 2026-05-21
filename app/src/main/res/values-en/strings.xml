@@ -566,14 +566,14 @@
     <!-- Gold -->
     <string name="gold_title">Gold</string>
     <string name="gold_add_cd">Add gold</string>
-    <string name="gold_hero_label_format">CURRENT VALUE · %1$d grams</string>
+    <string name="gold_hero_label_format">CURRENT VALUE · %1$s grams</string>
     <string name="gold_hero_value_label">CURRENT VALUE</string>
     <string name="gold_profit_format">Profit %1$sRp %2$d</string>
     <string name="gold_price_card_title">Global Gold Sell Price</string>
     <string name="gold_price_card_sub_format">Rp %1$s / gram · manual update</string>
     <string name="gold_empty">No gold batches yet. Tap + to add your first purchase.</string>
-    <string name="gold_item_title_format">%1$d grams</string>
-    <string name="gold_item_title_with_serial_format">%1$d grams · %2$s</string>
+    <string name="gold_item_title_format">%1$s grams</string>
+    <string name="gold_item_title_with_serial_format">%1$s grams · %2$s</string>
     <string name="gold_item_buy_date_format">Bought %1$s</string>
     <string name="gold_price_sheet_title">Global Gold Price</string>
     <string name="gold_price_sheet_intro">Update manually based on today\'s gold sell price (Antam, Pegadaian, etc.). Auto-fetch is coming in V2.</string>
@@ -581,7 +581,7 @@
     <string name="gold_price_tip">Tip: Monthly updates are enough. Gold prices don\'t fluctuate wildly day-to-day, and Sakuwise stores this as a snapshot — recallable anytime.</string>
     <string name="gold_detail_default_title">Gold Detail</string>
     <string name="gold_field_weight">Weight</string>
-    <string name="gold_field_weight_value_format">%1$d grams</string>
+    <string name="gold_field_weight_value_format">%1$s grams</string>
     <string name="gold_field_buy_date">Purchase date</string>
     <string name="gold_field_buy_price">Purchase price</string>
     <string name="gold_field_price_per_gram">Price / gram at purchase</string>

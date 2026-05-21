@@ -44,7 +44,7 @@ object DatabaseModule {
             return Room.databaseBuilder(ctx, SakuwiseDatabase::class.java, "sakuwise.db")
                 .openHelperFactory(factory)
                 .addCallback(seedCallback())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 // Keep destructive fallback as a safety net for any other
                 // schema drift not yet covered by a Migration. Real launches
                 // should remove this once we trust the migration chain.
@@ -89,6 +89,49 @@ object DatabaseModule {
             db.execSQL(
                 "ALTER TABLE asset_land ADD COLUMN purchaseEpochDay INTEGER NOT NULL DEFAULT 0",
             )
+        }
+    }
+
+    /**
+     * v3 → v4 — `asset_gold.weightGram` (INTEGER, grams) renamed and rescaled
+     * to `weightMilliGram` (INTEGER, milligrams). Old rows like "10 gram"
+     * become 10_000; storing in milligrams lets users save fractional weights
+     * like 0.5g (= 500) without floating-point rounding errors when summing
+     * holdings. SQLite ≤ 3.34 (Android < 12) can't DROP COLUMN, so the
+     * canonical recreate-table-and-rename pattern is used.
+     */
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE asset_gold_new (
+                    id TEXT NOT NULL PRIMARY KEY,
+                    purchaseEpochDay INTEGER NOT NULL,
+                    weightMilliGram INTEGER NOT NULL,
+                    serial TEXT,
+                    buyPrice INTEGER NOT NULL,
+                    note TEXT,
+                    photoBlob BLOB,
+                    status TEXT NOT NULL,
+                    soldEpochDay INTEGER,
+                    soldPrice INTEGER
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                INSERT INTO asset_gold_new (
+                    id, purchaseEpochDay, weightMilliGram, serial, buyPrice,
+                    note, photoBlob, status, soldEpochDay, soldPrice
+                )
+                SELECT
+                    id, purchaseEpochDay, weightGram * 1000, serial, buyPrice,
+                    note, photoBlob, status, soldEpochDay, soldPrice
+                FROM asset_gold
+                """.trimIndent(),
+            )
+            db.execSQL("DROP TABLE asset_gold")
+            db.execSQL("ALTER TABLE asset_gold_new RENAME TO asset_gold")
         }
     }
 

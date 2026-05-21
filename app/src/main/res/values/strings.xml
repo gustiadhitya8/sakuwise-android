@@ -566,14 +566,14 @@
     <!-- Gold -->
     <string name="gold_title">Emas</string>
     <string name="gold_add_cd">Tambah emas</string>
-    <string name="gold_hero_label_format">NILAI SAAT INI · %1$d gram</string>
+    <string name="gold_hero_label_format">NILAI SAAT INI · %1$s gram</string>
     <string name="gold_hero_value_label">NILAI SAAT INI</string>
     <string name="gold_profit_format">Profit %1$sRp %2$d</string>
     <string name="gold_price_card_title">Harga Jual Emas Global</string>
     <string name="gold_price_card_sub_format">Rp %1$s / gram · update manual</string>
     <string name="gold_empty">Belum ada batch emas. Tap + untuk tambah pembelian pertama.</string>
-    <string name="gold_item_title_format">%1$d gram</string>
-    <string name="gold_item_title_with_serial_format">%1$d gram · %2$s</string>
+    <string name="gold_item_title_format">%1$s gram</string>
+    <string name="gold_item_title_with_serial_format">%1$s gram · %2$s</string>
     <string name="gold_item_buy_date_format">Beli %1$s</string>
     <string name="gold_price_sheet_title">Harga Emas Global</string>
     <string name="gold_price_sheet_intro">Update manual sesuai harga jual emas hari ini (Antam, Pegadaian, dll). Auto-fetch akan tersedia di V2.</string>
@@ -581,7 +581,7 @@
     <string name="gold_price_tip">Tip: Update bulanan saja sudah cukup. Harga emas tidak fluktuasi liar harian, dan Sakuwise menyimpan harga ini sebagai snapshot — bisa di-recall kapan saja.</string>
     <string name="gold_detail_default_title">Detail Emas</string>
     <string name="gold_field_weight">Berat</string>
-    <string name="gold_field_weight_value_format">%1$d gram</string>
+    <string name="gold_field_weight_value_format">%1$s gram</string>
     <string name="gold_field_buy_date">Tanggal beli</string>
     <string name="gold_field_buy_price">Harga beli</string>
     <string name="gold_field_price_per_gram">Harga / gram saat beli</string>

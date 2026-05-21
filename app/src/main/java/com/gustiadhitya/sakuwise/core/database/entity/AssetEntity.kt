@@ -7,7 +7,11 @@ import androidx.room.PrimaryKey
 data class AssetGoldEntity(
     @PrimaryKey val id: String,
     val purchaseEpochDay: Long,
-    val weightGram: Int,
+    /** Weight in milligrams (gram × 1000). Long so 0.5g = 500, 10g = 10_000.
+     *  Stored as integer to avoid floating-point rounding when summing
+     *  totals across many pieces. Convert to grams with weightMilliGram / 1000.0
+     *  only at display time. */
+    val weightMilliGram: Long,
     val serial: String?,
     val buyPrice: Long,
     val note: String?,

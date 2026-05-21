@@ -542,7 +542,7 @@ class MarkGoldSoldUseCase @Inject constructor(
                     sourceAccountId = accountId, destAccountId = null,
                     transferFee = null, debtId = null,
                     photoBlob = null, incomeCategoryId = null,
-                    note = note ?: "Penjualan emas ${current.weightGram}g",
+                    note = note ?: "Penjualan emas ${com.gustiadhitya.sakuwise.core.common.formatMilliGrams(current.weightMilliGram)}g",
                     createdAt = System.currentTimeMillis(),
                 ),
             )
@@ -679,7 +679,7 @@ class ComputeNetWorthUseCase @Inject constructor(
         combine(base, prefsRepo.prefs) { tuple, prefs ->
             val accountsTotal = tuple.b // already Room-tracked via observeTotalBalance subqueries
             val goldTotal = tuple.c.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
-                .sumOf { it.weightGram * prefs.goldPriceGlobal }
+                .sumOf { it.valueAt(prefs.goldPriceGlobal) }
             val landTotal = tuple.d.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
                 .sumOf { it.currentValue ?: it.buyPrice }
             val depositTotal = tuple.e.fold(0L) { sum, d ->

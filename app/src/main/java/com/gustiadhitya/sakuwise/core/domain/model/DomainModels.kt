@@ -143,14 +143,23 @@ enum class AssetStatus { Held, Sold;
 data class GoldAsset(
     val id: String,
     val purchaseDate: LocalDate,
-    val weightGram: Int,
+    /** Weight in milligrams (gram × 1000). Use [weightInGrams] for display
+     *  and arithmetic that needs grams. */
+    val weightMilliGram: Long,
     val serial: String?,
     val buyPrice: Long,
     val note: String?,
     val status: AssetStatus,
     val soldDate: LocalDate?,
     val soldPrice: Long?,
-)
+) {
+    /** Convenience for display: milligrams as a Double-precision gram value. */
+    val weightInGrams: Double get() = weightMilliGram / 1000.0
+
+    /** Value at the given Rupiah-per-gram price, exact in whole Rupiah.
+     *  Computed via Long math (mg × Rp/g ÷ 1000) so no FP rounding. */
+    fun valueAt(pricePerGram: Long): Long = weightMilliGram * pricePerGram / 1000L
+}
 
 data class LandAsset(
     val id: String,

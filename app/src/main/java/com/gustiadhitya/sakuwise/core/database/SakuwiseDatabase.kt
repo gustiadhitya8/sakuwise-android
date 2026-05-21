@@ -48,7 +48,7 @@ import com.gustiadhitya.sakuwise.core.database.entity.TransactionEntity
         DebtPaymentEntity::class,
         NetWorthSnapshotEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
