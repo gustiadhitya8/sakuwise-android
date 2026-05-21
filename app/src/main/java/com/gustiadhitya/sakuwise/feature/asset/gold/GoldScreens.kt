@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -204,16 +205,15 @@ fun GoldListScreen(
                 .background(sw.warning)
                 .padding(18.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 20.dp, y = 20.dp),
-            ) {
+            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(140.dp),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 20.dp)
+                        .size(140.dp),
                 )
             }
             Column {
@@ -475,23 +475,21 @@ fun GoldDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
+                .clip(RoundedCornerShape(20.dp))
                 .background(sw.warning)
-                .padding(horizontal = 22.dp, vertical = 20.dp),
+                .padding(18.dp),
         ) {
-            // Diamond watermark per proto screens-assets.jsx:478-480 — icon
-            // sized 160 with 0.18 alpha, anchored bottom-right with negative
-            // offsets so it spills out of the card edge.
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 20.dp, y = 20.dp),
-            ) {
+            // Diamond watermark on its own matchParentSize+clipToBounds layer
+            // so the 140dp icon doesn't push the card taller than its content.
+            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(140.dp),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 20.dp)
+                        .size(140.dp),
                 )
             }
             Column {

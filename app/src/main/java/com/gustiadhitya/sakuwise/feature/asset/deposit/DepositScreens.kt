@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -178,14 +179,19 @@ fun DepositListScreen(
         // watermark at -20/-30.
         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
             .background(sw.accent).padding(18.dp)) {
-            Box(modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = 20.dp, y = 30.dp)) {
+            // Watermark on its own matchParentSize+clipToBounds layer so the
+            // 140dp icon doesn't inflate the card height — it draws into
+            // whatever space the visible Column needs, clipped by the card
+            // edges. Mirrors the prototype's `position: absolute` behaviour.
+            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
                     contentDescription = null,
                     tint = sw.fixedDarkOnMint.copy(alpha = 0.20f),
-                    modifier = Modifier.size(140.dp),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 30.dp)
+                        .size(140.dp),
                 )
             }
             Column {
@@ -231,8 +237,11 @@ fun DepositListScreen(
                             Box(contentAlignment = Alignment.Center,
                                 modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
                                     .background(sw.accent.copy(alpha = 0.18f))) {
-                                Icon(Icons.Outlined.Savings, null,
-                                    tint = sw.accent, modifier = Modifier.size(26.dp))
+                                Icon(
+                                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
+                                    contentDescription = null,
+                                    tint = sw.accent, modifier = Modifier.size(26.dp),
+                                )
                             }
                             Spacer(Modifier.size(width = 12.dp, height = 1.dp))
                             Column(Modifier.weight(1f)) {
