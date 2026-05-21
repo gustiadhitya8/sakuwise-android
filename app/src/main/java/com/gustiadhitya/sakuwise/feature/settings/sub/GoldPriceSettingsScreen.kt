@@ -56,9 +56,6 @@ fun GoldPriceSettingsScreen(
         if (raw == "0" || raw.isBlank()) raw = prefs.goldPriceGlobal.toString()
     }
 
-    val formatter = remember { NumberFormat.getInstance(Locale("id", "ID")) }
-    val displayValue = raw.toLongOrNull()?.let { formatter.format(it) } ?: ""
-
     SimpleSettingsScreen(title = stringResource(R.string.gold_price_settings_title), onBack = onBack) {
         // Intro
         Text(
@@ -68,7 +65,7 @@ fun GoldPriceSettingsScreen(
         )
         Spacer(Modifier.height(16.dp))
         SwField(
-            value = displayValue,
+            value = if (raw == "0") "" else raw,
             onValueChange = { v -> raw = v.filter { it.isDigit() } },
             label = stringResource(R.string.gold_price_field_label),
             prefix = "Rp", rupiah = true,

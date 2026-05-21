@@ -115,7 +115,7 @@ fun AccountEditScreen(
         }
         Spacer(Modifier.height(14.dp))
         SwField(
-            value = if (state.initialBalance == 0L) "" else state.initialBalance.toRupiah(prefix = ""),
+            value = if (state.initialBalance == 0L) "" else state.initialBalance.toString(),
             onValueChange = { raw ->
                 viewModel.setBalance(raw.filter { it.isDigit() }.toLongOrNull() ?: 0L)
             },

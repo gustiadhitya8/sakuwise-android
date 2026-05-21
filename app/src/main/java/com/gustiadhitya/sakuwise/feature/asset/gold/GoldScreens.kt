@@ -379,9 +379,6 @@ private fun GoldPriceInlineSheet(
 ) {
     val sw = SwTheme.colors
     var raw by remember { mutableStateOf(currentPrice.toString()) }
-    val formatted = raw.toLongOrNull()?.let {
-        java.text.NumberFormat.getInstance(java.util.Locale("id","ID")).format(it)
-    } ?: ""
     SwPickerSheet(title = stringResource(R.string.gold_price_sheet_title), onDismiss = onDismiss) {
         Text(
             stringResource(R.string.gold_price_sheet_intro),
@@ -389,7 +386,7 @@ private fun GoldPriceInlineSheet(
         )
         Spacer(Modifier.height(12.dp))
         SwField(
-            value = formatted,
+            value = if (raw == "0") "" else raw,
             onValueChange = { raw = it.filter { c -> c.isDigit() } },
             label = stringResource(R.string.gold_price_field_label),
             prefix = "Rp", rupiah = true, suffix = "/ gram",

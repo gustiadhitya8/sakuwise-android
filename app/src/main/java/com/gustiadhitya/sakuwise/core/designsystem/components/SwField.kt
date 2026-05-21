@@ -99,8 +99,16 @@ fun SwField(
                     modifier = Modifier.weight(1f),
                 )
             } else {
+                // RupiahVisualTransformation expects the underlying BTF text to
+                // be raw digits — its OffsetMapping is computed by stripping
+                // non-digits from the original text. Some callers pass a
+                // pre-formatted string (e.g. `123L.toRupiah()` -> "123") whose
+                // dots break the mapping and shuffle digits as the user types.
+                // Strip defensively here so SwField stays robust regardless of
+                // what the caller stores.
+                val btfValue = if (rupiah) value.filter { it.isDigit() } else value
                 BasicTextField(
-                    value = value,
+                    value = btfValue,
                     onValueChange = onValueChange,
                     singleLine = true,
                     textStyle = textStyle,
@@ -151,7 +159,7 @@ fun SwField(
  * transformed offset by +1. The reverse mapping subtracts the number of
  * dots to the left of the transformed cursor.
  */
-private val RupiahVisualTransformation = object : androidx.compose.ui.text.input.VisualTransformation {
+internal val RupiahVisualTransformation = object : androidx.compose.ui.text.input.VisualTransformation {
     override fun filter(text: androidx.compose.ui.text.AnnotatedString):
         androidx.compose.ui.text.input.TransformedText {
         val digits = text.text.filter { it.isDigit() }

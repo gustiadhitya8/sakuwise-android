@@ -414,7 +414,7 @@ fun OnbFirstAccountScreen(
         }
         Spacer(Modifier.height(14.dp))
         SwField(
-            value = if (state.accountBalance == 0L) "" else state.accountBalance.toRupiah(prefix = ""),
+            value = if (state.accountBalance == 0L) "" else state.accountBalance.toString(),
             onValueChange = {
                 val parsed = it.filter { ch -> ch.isDigit() }.toLongOrNull() ?: 0L
                 onChange(state.copy(accountBalance = parsed))

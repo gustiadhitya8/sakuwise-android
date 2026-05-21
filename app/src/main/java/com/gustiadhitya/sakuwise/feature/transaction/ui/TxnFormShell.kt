@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import com.gustiadhitya.sakuwise.core.designsystem.components.RupiahVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gustiadhitya.sakuwise.core.common.toRupiah
@@ -160,8 +161,7 @@ fun TxnFormShell(
                             fontWeight = FontWeight.SemiBold,
                         )
                         BasicTextField(
-                            value = if (amount == 0L) "" else java.text.NumberFormat
-                                .getInstance(java.util.Locale("id", "ID")).format(amount),
+                            value = if (amount == 0L) "" else amount.toString(),
                             onValueChange = { raw ->
                                 val digits = raw.filter { it.isDigit() }.toLongOrNull() ?: 0L
                                 onAmountChange(digits)
@@ -176,6 +176,7 @@ fun TxnFormShell(
                                 fontFeatureSettings = "tnum",
                             ),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            visualTransformation = RupiahVisualTransformation,
                             decorationBox = { inner ->
                                 if (amount == 0L) {
                                     Text(
