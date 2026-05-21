@@ -244,24 +244,40 @@ fun AssetsHubScreen(
                 stringResource(R.string.assets_class_active_format, state.accounts.size),
                 state.accountsTotal, sw.primary, Icons.Outlined.AccountBalanceWallet,
                 Modifier.weight(1f), onClick = onNavigateToAccounts)
+            val goldBuy = state.gold.sumOf { it.buyPrice }
+            val goldGrowth = if (goldBuy > 0L)
+                ((nw.goldTotal - goldBuy).toFloat() / goldBuy.toFloat()) * 100f
+            else null
             AssetClassCard(stringResource(R.string.assets_class_gold),
                 stringResource(R.string.assets_class_count_format, state.gold.size),
                 nw.goldTotal, sw.warning, Icons.Outlined.Diamond,
-                Modifier.weight(1f), onClick = onNavigateToGold)
+                Modifier.weight(1f),
+                growthPct = goldGrowth,
+                onClick = onNavigateToGold)
         }
         Spacer(Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = SwSpace.pageH),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            val landBuy = state.land.sumOf { it.buyPrice }
+            val landGrowth = if (landBuy > 0L)
+                ((nw.landTotal - landBuy).toFloat() / landBuy.toFloat()) * 100f
+            else null
             AssetClassCard(stringResource(R.string.assets_class_land),
                 stringResource(R.string.assets_class_count_format, state.land.size),
                 nw.landTotal, sw.info, Icons.Outlined.Landscape,
-                Modifier.weight(1f), onClick = onNavigateToLand)
+                Modifier.weight(1f),
+                growthPct = landGrowth,
+                onClick = onNavigateToLand)
             AssetClassCard(stringResource(R.string.assets_class_deposit),
                 stringResource(R.string.assets_class_count_format, state.deposits.size),
                 nw.depositTotal, sw.accent, Icons.Outlined.Savings,
-                Modifier.weight(1f), onClick = onNavigateToDeposit)
+                Modifier.weight(1f),
+                // Deposit growth needs first vs last snapshot per asset, not
+                // exposed in HubState today. Hide chip until VM supplies it.
+                growthPct = null,
+                onClick = onNavigateToDeposit)
         }
         Spacer(Modifier.height(16.dp))
 
@@ -448,13 +464,12 @@ private fun AssetClassCard(
     tint: Color,
     icon: ImageVector,
     modifier: Modifier = Modifier,
+    growthPct: Float? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val sw = SwTheme.colors
     SwCard(modifier = modifier, padding = PaddingValues(0.dp), onClick = onClick) {
         Box {
-            // Watermark icon in the bottom-right corner of each asset class
-            // card — per prototype screens-assets.jsx. Subtle, tinted, oversized.
             Icon(
                 icon,
                 contentDescription = null,
@@ -478,9 +493,25 @@ private fun AssetClassCard(
                 Text(sub, color = sw.inkMuted,
                     style = SwType.LabelSmall.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(8.dp))
-                RupiahText(value = value, short = true,
-                    style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                    color = sw.ink)
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()) {
+                    RupiahText(value = value, short = true,
+                        style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                        color = sw.ink)
+                    if (growthPct != null && growthPct != 0f) {
+                        Spacer(Modifier.weight(1f))
+                        // Green/red growth pct chip per proto 14-assets-hub.png.
+                        val pos = growthPct >= 0f
+                        Text(
+                            (if (pos) "+" else "−") +
+                                "%.1f".format(kotlin.math.abs(growthPct)) + "%",
+                            color = if (pos) sw.success else sw.danger,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                        )
+                    }
+                }
             }
         }
     }

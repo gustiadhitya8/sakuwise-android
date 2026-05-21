@@ -128,7 +128,7 @@
     <string name="lock_pin_wrong">PIN salah.</string>
 
     <!-- AddTxn picker -->
-    <string name="addtxn_question">Apa yang mau dicatat?</string>
+    <string name="addtxn_question">Tambah Transaksi</string>
     <string name="addtxn_expense">Pengeluaran</string>
     <string name="addtxn_expense_sub">Catat uang yang keluar — wajib terhubung ke plan item</string>
     <string name="addtxn_income">Pemasukan</string>
@@ -406,6 +406,8 @@
     <string name="reminder_when_hour_label">Jam</string>
     <string name="reminder_when_confirm">Atur pengingat</string>
     <string name="txn_field_account_balance_format">Saldo: %1$s</string>
+    <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · Tanpa telemetry</string>
+    <string name="settings_footer_line2">Made in Indonesia 🌱</string>
     <string name="reminder_notif_title">Tagihan Sakuwise jatuh tempo</string>
     <string name="reminder_notif_body_format">Jangan lupa bayar: %1$s</string>
     <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>

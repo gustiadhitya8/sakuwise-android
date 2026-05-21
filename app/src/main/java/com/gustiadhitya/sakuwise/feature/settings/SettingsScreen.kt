@@ -20,19 +20,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -149,7 +150,7 @@ fun SettingsScreen(
         SettingsGroup(label = stringResource(R.string.settings_group_plan)) {
             SettingsRow(stringResource(R.string.settings_default_alloc),
                 "${prefs.needsPct} · ${prefs.wantsPct} · ${prefs.investPct}",
-                icon = Icons.Outlined.PieChart,
+                icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
                 onClick = onNavigateToAllocation)
             SettingsRow(stringResource(R.string.settings_period_start),
                 "Tanggal ${prefs.planPeriodStartDay}",
@@ -158,8 +159,9 @@ fun SettingsScreen(
         }
         SettingsGroup(label = stringResource(R.string.settings_group_security)) {
             SettingsRow(stringResource(R.string.settings_pin_bio),
-                if (prefs.biometricEnabled) activeStr else inactiveStr,
+                value = "",
                 icon = Icons.Outlined.Shield,
+                badge = if (prefs.biometricEnabled) activeStr else null,
                 onClick = onNavigateToPin)
             SettingsRow(stringResource(R.string.settings_autolock),
                 minutesStr,
@@ -167,8 +169,12 @@ fun SettingsScreen(
                 onClick = onNavigateToAutoLock)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_backup)) {
+            // Backup row uses warning tile + warning sub when there's a real
+            // last-backup timestamp; "Belum pernah" stays neutral.
+            val backupWarn = prefs.lastBackupTimestamp != 0L
             SettingsRow(stringResource(R.string.settings_backup_restore), lastBackupLabel,
                 icon = Icons.Outlined.CloudUpload,
+                tone = if (backupWarn) RowTone.Warning else RowTone.Neutral,
                 onClick = onNavigateToBackup)
             SettingsRow(stringResource(R.string.settings_export_pdf),
                 stringResource(R.string.settings_export_pdf_sub),
@@ -176,10 +182,14 @@ fun SettingsScreen(
                 onClick = onNavigateToExport)
             SettingsRow(stringResource(R.string.settings_export_reset),
                 stringResource(R.string.settings_export_reset_sub),
-                icon = Icons.Outlined.DeleteForever,
-                danger = true, onClick = onNavigateToReset)
+                icon = Icons.Outlined.Delete,
+                tone = RowTone.Danger, onClick = onNavigateToReset)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_app)) {
+            SettingsRow(stringResource(R.string.settings_language),
+                if (prefs.language == "id") "Bahasa Indonesia" else "English",
+                icon = Icons.Outlined.Language,
+                onClick = onNavigateToLanguage)
             SettingsRow(stringResource(R.string.settings_theme),
                 stringResource(
                     when (prefs.themeMode) {
@@ -190,24 +200,37 @@ fun SettingsScreen(
                 ),
                 icon = Icons.Outlined.DarkMode,
                 onClick = onNavigateToTheme)
-            SettingsRow(stringResource(R.string.settings_language),
-                if (prefs.language == "id") "Bahasa Indonesia" else "English",
-                icon = Icons.Outlined.Language,
-                onClick = onNavigateToLanguage)
             SettingsRow(stringResource(R.string.settings_replay_onboarding),
                 stringResource(R.string.settings_replay_onboarding_sub),
                 icon = Icons.Outlined.Replay,
                 onClick = onReplayOnboarding)
             SettingsRow(stringResource(R.string.settings_donate),
                 stringResource(R.string.settings_donate_sub),
-                icon = Icons.Outlined.Favorite,
+                icon = Icons.Outlined.AutoAwesome,
                 onClick = onNavigateToDonate)
             SettingsRow(stringResource(R.string.settings_about), "v1.0",
                 icon = Icons.Outlined.Info,
                 onClick = onNavigateToAbout)
         }
+        // Footer per proto 51-settings-hub.png — version + tagline.
+        Spacer(Modifier.height(20.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = SwSpace.pageH),
+        ) {
+            Text(stringResource(R.string.settings_footer_line1),
+                color = sw.inkSubtle,
+                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+            Spacer(Modifier.height(4.dp))
+            Text(stringResource(R.string.settings_footer_line2),
+                color = sw.inkSubtle,
+                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+        }
+        Spacer(Modifier.height(20.dp))
     }
 }
+
+private enum class RowTone { Neutral, Warning, Danger }
 
 @Composable
 private fun SettingsGroup(label: String, content: @Composable () -> Unit) {
@@ -229,30 +252,26 @@ private fun SettingsRow(
     danger: Boolean = false,
     warning: Boolean = false,
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    tone: RowTone = if (danger) RowTone.Danger else if (warning) RowTone.Warning else RowTone.Neutral,
+    badge: String? = null,
     onClick: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    val labelColor = when {
-        danger -> sw.danger
-        warning -> sw.warning
-        else -> sw.ink
+    val (tileBg, tileFg, valueColor) = when (tone) {
+        RowTone.Danger -> Triple(sw.dangerSoft, sw.danger, sw.danger)
+        RowTone.Warning -> Triple(sw.warningSoft, sw.warning, sw.warning)
+        RowTone.Neutral -> Triple(sw.primaryContainer, sw.onPrimaryContainer, sw.inkMuted)
     }
+    val labelColor = if (tone == RowTone.Danger) sw.danger else sw.ink
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            // A11Y-004 minimum tap target; padding already brings 2-line rows
-            // to ~62dp but 1-line variants would drop to ~48dp without this.
             .heightIn(min = 48.dp)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
-        // Leading 40dp icon tile per prototype screens-settings.jsx — every
-        // settings row carries a category glyph in a primaryContainer-bg
-        // squircle. Danger rows tint the tile danger soft + danger fg.
         if (icon != null) {
-            val tileBg = if (danger) sw.dangerSoft else sw.primaryContainer
-            val tileFg = if (danger) sw.danger else sw.onPrimaryContainer
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -265,8 +284,27 @@ private fun SettingsRow(
         Column(Modifier.weight(1f)) {
             Text(label, color = labelColor,
                 style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-            Text(value, color = sw.inkMuted,
-                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+            if (value.isNotEmpty()) {
+                Text(value, color = valueColor,
+                    style = SwType.LabelSmall.copy(fontSize = 12.sp,
+                        fontWeight = if (tone != RowTone.Neutral) FontWeight.SemiBold
+                        else FontWeight.Normal))
+            }
+        }
+        if (badge != null) {
+            // Soft green badge per proto "Aktif" pill (51-settings-hub.png).
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(sw.successSoft)
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                Text(badge, color = sw.success,
+                    style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold))
+            }
+            Spacer(Modifier.size(width = 6.dp, height = 1.dp))
         }
         Icon(Icons.Outlined.ChevronRight, null, tint = sw.inkSubtle, modifier = Modifier.size(18.dp))
     }

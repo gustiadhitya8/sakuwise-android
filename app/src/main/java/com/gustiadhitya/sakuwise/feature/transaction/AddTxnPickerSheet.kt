@@ -13,11 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleDown
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.RemoveCircle
-import androidx.compose.material.icons.outlined.SwapHoriz
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -65,14 +66,28 @@ fun AddTxnPickerSheet(
         },
     ) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 32.dp)) {
-            Text(
-                stringResource(R.string.addtxn_question),
-                color = sw.ink,
-                style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-            )
+            // Title + X close per proto 32-add-txn-picker.png.
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.addtxn_question),
+                    color = sw.ink,
+                    style = SwType.H2.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.weight(1f),
+                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable(onClick = onDismiss),
+                ) {
+                    Icon(Icons.Outlined.Close, "Tutup",
+                        tint = sw.inkMuted, modifier = Modifier.size(22.dp))
+                }
+            }
             Spacer(Modifier.height(16.dp))
             PickerRow(
-                icon = Icons.Outlined.TrendingDown,
+                icon = Icons.Outlined.ArrowCircleDown,
                 title = stringResource(R.string.addtxn_expense),
                 subtitle = stringResource(R.string.addtxn_expense_sub),
                 bg = sw.dangerSoft,
@@ -81,7 +96,7 @@ fun AddTxnPickerSheet(
             )
             Spacer(Modifier.height(10.dp))
             PickerRow(
-                icon = Icons.Outlined.TrendingUp,
+                icon = Icons.Outlined.ArrowCircleUp,
                 title = stringResource(R.string.addtxn_income),
                 subtitle = stringResource(R.string.addtxn_income_sub),
                 bg = sw.successSoft,
@@ -90,7 +105,7 @@ fun AddTxnPickerSheet(
             )
             Spacer(Modifier.height(10.dp))
             PickerRow(
-                icon = Icons.Outlined.SwapHoriz,
+                icon = Icons.Outlined.SyncAlt,
                 title = stringResource(R.string.addtxn_transfer),
                 subtitle = stringResource(R.string.addtxn_transfer_sub),
                 bg = sw.infoSoft,
@@ -126,29 +141,33 @@ private fun PickerRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .background(sw.bg)
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 14.dp, vertical = 14.dp),
     ) {
+        // 56×56 r16 colored chip per proto 32-add-txn-picker.png.
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(14.dp))
+                .size(56.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(bg),
         ) {
-            Icon(icon, null, tint = fg, modifier = Modifier.size(24.dp))
+            Icon(icon, null, tint = fg, modifier = Modifier.size(28.dp))
         }
         Spacer(Modifier.size(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 title, color = sw.ink,
-                style = SwType.LabelStrong.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                style = SwType.LabelStrong.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
             )
             Text(
                 subtitle, color = sw.inkMuted,
-                style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                style = SwType.LabelSmall.copy(fontSize = 12.sp, lineHeight = 16.sp),
             )
         }
+        Icon(Icons.Outlined.ChevronRight, null,
+            tint = sw.inkSubtle, modifier = Modifier.size(20.dp))
     }
 }

@@ -128,7 +128,7 @@
     <string name="lock_pin_wrong">Incorrect PIN.</string>
 
     <!-- AddTxn picker -->
-    <string name="addtxn_question">What do you want to log?</string>
+    <string name="addtxn_question">Add Transaction</string>
     <string name="addtxn_expense">Expense</string>
     <string name="addtxn_expense_sub">Track outgoing money — must be tied to a plan item</string>
     <string name="addtxn_income">Income</string>
@@ -406,6 +406,8 @@
     <string name="reminder_when_hour_label">Hour</string>
     <string name="reminder_when_confirm">Set reminder</string>
     <string name="txn_field_account_balance_format">Balance: %1$s</string>
+    <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · No telemetry</string>
+    <string name="settings_footer_line2">Made in Indonesia 🌱</string>
     <string name="reminder_notif_title">Sakuwise bill due</string>
     <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
