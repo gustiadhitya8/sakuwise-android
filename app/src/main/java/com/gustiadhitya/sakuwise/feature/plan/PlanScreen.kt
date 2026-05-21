@@ -248,17 +248,36 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                     AllocationId.Invest -> sw.info
                 }
                 val allocLabel = allocId.displayName()
-                // Allocation header — visually distinct as TOP-level grouping
+                val allocUsed = row.categories.sumOf { it.used }
+                val allocPlan = row.categories.sumOf { it.plan }
+                // Allocation header per screens-plan.jsx:86-95: dot + name +
+                // pct% on the left, used / plan on the right (tnum, used bolded
+                // ink). Was missing the right-side totals before.
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(top = 18.dp, bottom = 10.dp, start = 4.dp),
+                    modifier = Modifier.padding(top = 18.dp, bottom = 10.dp,
+                        start = 4.dp, end = 4.dp),
                 ) {
-                    Box(Modifier.size(10.dp).clip(CircleShape).background(allocColor))
+                    Box(Modifier.size(8.dp).clip(CircleShape).background(allocColor))
                     Text(allocLabel, color = sw.ink,
-                        style = SwType.H3.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
+                        style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold))
                     Text("${a.targetPct}%", color = sw.inkSubtle,
                         style = SwType.LabelSmall.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"))
+                    Spacer(Modifier.weight(1f))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RupiahText(value = allocUsed, short = true,
+                            style = SwType.Amount.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
+                            color = sw.ink)
+                        Text(" / ", color = sw.inkMuted,
+                            style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                        RupiahText(value = allocPlan, short = true,
+                            style = SwType.Amount.copy(fontSize = 12.sp,
+                                fontFeatureSettings = "tnum"),
+                            color = sw.inkMuted)
+                    }
                 }
                 row.categories.forEach { cat ->
                     val isOpen = expanded[cat.category.id] != false
