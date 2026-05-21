@@ -42,6 +42,10 @@ data class UserPreferences(
     val driveBackupEnabled: Boolean,
     val driveAccountEmail: String?,
     val lastDriveBackupTimestamp: Long,
+    /** Epoch ms when the user last opened the notification center. Used to
+     *  clear the unread badge on the dashboard bell — any notification whose
+     *  source timestamp is < this value is considered "read". */
+    val notificationsLastSeenAt: Long,
 ) {
     companion object {
         val DEFAULTS = UserPreferences(
@@ -62,6 +66,7 @@ data class UserPreferences(
             driveBackupEnabled = false,
             driveAccountEmail = null,
             lastDriveBackupTimestamp = 0L,
+            notificationsLastSeenAt = 0L,
         )
     }
 }
@@ -87,6 +92,7 @@ interface UserPreferencesRepository {
     suspend fun setDriveBackupEnabled(enabled: Boolean)
     suspend fun setDriveAccountEmail(email: String?)
     suspend fun markDriveBackupNow(epochMs: Long)
+    suspend fun markNotificationsSeenNow(epochMs: Long)
     suspend fun setOnboardingIncomplete()
     suspend fun resetAll()
 }
@@ -109,6 +115,7 @@ internal object PrefKeys {
     val DRIVE_BACKUP_ENABLED = booleanPreferencesKey("drive_backup_enabled")
     val DRIVE_ACCOUNT_EMAIL = stringPreferencesKey("drive_account_email")
     val LAST_DRIVE_BACKUP_TIMESTAMP = longPreferencesKey("last_drive_backup_timestamp")
+    val NOTIFICATIONS_LAST_SEEN_AT = longPreferencesKey("notifications_last_seen_at")
 }
 
 class UserPreferencesRepositoryImpl(
@@ -136,6 +143,7 @@ class UserPreferencesRepositoryImpl(
             driveBackupEnabled = p[PrefKeys.DRIVE_BACKUP_ENABLED] ?: d.driveBackupEnabled,
             driveAccountEmail = p[PrefKeys.DRIVE_ACCOUNT_EMAIL] ?: d.driveAccountEmail,
             lastDriveBackupTimestamp = p[PrefKeys.LAST_DRIVE_BACKUP_TIMESTAMP] ?: d.lastDriveBackupTimestamp,
+            notificationsLastSeenAt = p[PrefKeys.NOTIFICATIONS_LAST_SEEN_AT] ?: d.notificationsLastSeenAt,
         )
     }
 
@@ -216,6 +224,10 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun markDriveBackupNow(epochMs: Long) {
         dataStore.edit { it[PrefKeys.LAST_DRIVE_BACKUP_TIMESTAMP] = epochMs }
+    }
+
+    override suspend fun markNotificationsSeenNow(epochMs: Long) {
+        dataStore.edit { it[PrefKeys.NOTIFICATIONS_LAST_SEEN_AT] = epochMs }
     }
 
     override suspend fun setOnboardingIncomplete() {

@@ -31,6 +31,15 @@
     <string name="dashboard_no_plan">Belum ada plan bulan ini</string>
     <string name="dashboard_period_format">%1$s · sisa %2$d hari</string>
     <string name="dashboard_notifications">Notifikasi</string>
+    <string name="notifications_title">Notifikasi</string>
+    <string name="notifications_clear">Tandai sudah dibaca</string>
+    <string name="notifications_empty_title">Belum ada notifikasi</string>
+    <string name="notifications_empty_body">Pengingat &amp; status backup akan muncul di sini.</string>
+    <string name="notif_backup_overdue_title">Backup terakhir sudah lama</string>
+    <string name="notif_backup_overdue_body_format">Sudah %1$d hari sejak backup terakhir. Datamu tidak terlindungi kalau HP hilang.</string>
+    <string name="notif_backup_never_title">Belum pernah backup</string>
+    <string name="notif_backup_never_body">Kamu belum pernah backup. Tap untuk simpan file backup terenkripsi.</string>
+    <string name="action_close">Tutup</string>
     <string name="dashboard_add_txn">Tambah transaksi</string>
 
     <!-- Plan -->

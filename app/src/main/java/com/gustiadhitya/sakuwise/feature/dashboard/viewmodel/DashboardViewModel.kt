@@ -2,6 +2,7 @@ package com.gustiadhitya.sakuwise.feature.dashboard.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import com.gustiadhitya.sakuwise.core.domain.model.Account
 import com.gustiadhitya.sakuwise.core.domain.model.Allocation
@@ -48,6 +49,11 @@ data class DashboardUiState(
     val allocations: List<AllocationProgress> = emptyList(),
     val topCategories: List<TopCategorySpend> = emptyList(),
     val backupOverdueDays: Int = 0,
+    /** Epoch ms when user last opened the notification center. The bell's
+     *  red dot only lights up when there's a notification whose source
+     *  timestamp is newer than this value — opening the sheet sets it to
+     *  now() so the dot disappears. */
+    val notificationsLastSeenAt: Long = 0L,
     val loading: Boolean = true,
 )
 
@@ -137,6 +143,7 @@ class DashboardViewModel @Inject constructor(
             allocations = allocs,
             topCategories = tops.map { TopCategorySpend(name = it.name, amount = it.total) },
             backupOverdueDays = computeOverdueDays(prefs.lastBackupTimestamp),
+            notificationsLastSeenAt = prefs.notificationsLastSeenAt,
             loading = false,
         )
     }.stateIn(
@@ -149,5 +156,13 @@ class DashboardViewModel @Inject constructor(
         if (lastBackupMs == 0L) return Int.MAX_VALUE
         val diffMs = System.currentTimeMillis() - lastBackupMs
         return (diffMs / (1000L * 60 * 60 * 24)).toInt().coerceAtLeast(0)
+    }
+
+    /** Persist the "seen" timestamp so the bell badge clears. Called when
+     *  the user opens the notification center sheet. */
+    fun markNotificationsSeen() {
+        viewModelScope.launch {
+            prefsRepo.markNotificationsSeenNow(System.currentTimeMillis())
+        }
     }
 }

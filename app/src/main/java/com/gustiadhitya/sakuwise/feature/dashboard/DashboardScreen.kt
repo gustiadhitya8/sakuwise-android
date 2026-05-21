@@ -96,6 +96,7 @@ fun DashboardScreen(
         onNavigateToAssets = onNavigateToAssets,
         onNavigateToMe = onNavigateToMe,
         onBackupTap = onBackupTap,
+        onMarkNotificationsSeen = viewModel::markNotificationsSeen,
     )
 }
 
@@ -106,6 +107,7 @@ private fun DashboardContent(
     onNavigateToAssets: () -> Unit,
     onNavigateToMe: () -> Unit,
     onBackupTap: () -> Unit,
+    onMarkNotificationsSeen: () -> Unit = {},
 ) {
     val sw = SwTheme.colors
     var hide by remember { mutableStateOf(false) }
@@ -135,15 +137,34 @@ private fun DashboardContent(
             .verticalScroll(rememberScrollState())
             .padding(bottom = SwSpace.bottomBarClear),
     ) {
-        // Notification dot lights up when backup is overdue >30 days OR
-        // never taken — the only push-able signal the app currently tracks.
-        val notifCount = if (state.backupOverdueDays > 30) 1 else 0
+        // Bell badge lights up when there's at least one notification whose
+        // "source timestamp" is newer than the last time the user opened the
+        // notification center. Backup-overdue uses lastBackupTimestamp = 0
+        // (never) or the actual timestamp; either way, comparing to
+        // notificationsLastSeenAt collapses to "user hasn't seen this state."
+        val items = com.gustiadhitya.sakuwise.feature.notification
+            .rememberDefaultNotifications(
+                backupOverdueDays = state.backupOverdueDays,
+                onOpenBackup = onBackupTap,
+            )
+        // Unread = there's a notification AND we haven't acknowledged it yet.
+        // For the backup signal the "event time" is functionally "now" until
+        // the user backs up, so the badge persists until they tap the bell.
+        val unread = items.isNotEmpty() && state.notificationsLastSeenAt < System.currentTimeMillis() - 60_000L
+        var showNotifSheet by remember { mutableStateOf(false) }
         DashboardHeader(
             initial = initial,
             onAvatarClick = onNavigateToMe,
-            notificationCount = notifCount,
-            onBellClick = onBackupTap,
+            notificationCount = if (unread) items.size else 0,
+            onBellClick = { showNotifSheet = true },
         )
+        if (showNotifSheet) {
+            com.gustiadhitya.sakuwise.feature.notification.NotificationCenterSheet(
+                items = items,
+                onDismiss = { showNotifSheet = false },
+                onMarkAllRead = onMarkNotificationsSeen,
+            )
+        }
         DashboardGreeting(name = nickname, period = state.period,
             onPeriodTap = onNavigateToPlan)
         Spacer(Modifier.height(8.dp))

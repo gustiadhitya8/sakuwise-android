@@ -31,6 +31,15 @@
     <string name="dashboard_no_plan">No plan for this month yet</string>
     <string name="dashboard_period_format">%1$s · %2$d days left</string>
     <string name="dashboard_notifications">Notifications</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_clear">Mark all as read</string>
+    <string name="notifications_empty_title">No notifications</string>
+    <string name="notifications_empty_body">Reminders &amp; backup status will appear here.</string>
+    <string name="notif_backup_overdue_title">Backup is out of date</string>
+    <string name="notif_backup_overdue_body_format">%1$d days since the last backup. Your data isn\'t protected if you lose the phone.</string>
+    <string name="notif_backup_never_title">No backup yet</string>
+    <string name="notif_backup_never_body">You haven\'t backed up yet. Tap to save an encrypted backup file.</string>
+    <string name="action_close">Close</string>
     <string name="dashboard_add_txn">Add transaction</string>
 
     <!-- Plan -->
