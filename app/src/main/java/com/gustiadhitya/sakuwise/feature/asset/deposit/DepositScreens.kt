@@ -185,14 +185,16 @@ fun DepositListScreen(
                 .background(sw.accent).padding(18.dp),
         ) {
             Box(modifier = Modifier.matchParentSize()) {
+                // Bottom-right watermark, fully inside the card (no overflow,
+                // no clipping). Size kept under the card's natural content
+                // height so the whole icon stays visible.
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
                     contentDescription = null,
-                    tint = sw.fixedDarkOnMint.copy(alpha = 0.20f),
+                    tint = sw.fixedDarkOnMint.copy(alpha = 0.22f),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 30.dp)
-                        .size(140.dp),
+                        .size(72.dp),
                 )
             }
             Column {

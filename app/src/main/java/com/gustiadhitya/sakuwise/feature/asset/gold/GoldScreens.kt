@@ -210,11 +210,10 @@ fun GoldListScreen(
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.18f),
+                    tint = Color.White.copy(alpha = 0.22f),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 20.dp)
-                        .size(140.dp),
+                        .size(72.dp),
                 )
             }
             Column {
@@ -481,11 +480,10 @@ fun GoldDetailScreen(
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.18f),
+                    tint = Color.White.copy(alpha = 0.22f),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 20.dp)
-                        .size(140.dp),
+                        .size(72.dp),
                 )
             }
             Column {
