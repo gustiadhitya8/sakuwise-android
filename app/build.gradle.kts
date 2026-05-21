@@ -33,7 +33,9 @@ android {
     // properties; the same key must sign every future update.
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keystore/sakuwise-release.jks")
+            storeFile = (project.findProperty("SAKUWISE_KEYSTORE_PATH") as String?)
+                ?.let { file(it) }
+                ?: rootProject.file("keystore/sakuwise-release.jks")
             storePassword = (project.findProperty("SAKUWISE_STORE_PASSWORD") as String?)
                 ?: "sakuwise-release-2026"
             keyAlias = (project.findProperty("SAKUWISE_KEY_ALIAS") as String?) ?: "sakuwise"
