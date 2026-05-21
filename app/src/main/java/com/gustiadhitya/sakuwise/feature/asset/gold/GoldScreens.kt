@@ -195,43 +195,35 @@ fun GoldListScreen(
             ) { Icon(Icons.Outlined.Add, stringResource(R.string.gold_add_cd), tint = Color.White, modifier = Modifier.size(20.dp)) }
         },
     ) {
-        // Hero per proto 20-assets-emas-list.png — saffron bg with the
-        // "NILAI SAAT INI · {N} GRAM" label, large 32sp amount, profit line,
-        // and the diamond watermark at the bottom-right (negative offset).
-        Box(
+        // Hero: icon left (vertically centered, fully visible), text right.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
                 .background(sw.warning)
                 .padding(18.dp),
         ) {
-            Box(modifier = Modifier.matchParentSize()) {
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 20.dp)
-                        .size(140.dp),
-                )
-            }
-            Column {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(56.dp),
+            )
+            Spacer(Modifier.size(width = 14.dp, height = 1.dp))
+            Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.gold_hero_label_format, totalWeightLabel),
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
                         lineHeight = 14.sp,
                         fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
-                // lineHeight = fontSize mirrors the prototype's `lineHeight: 1`
-                // on SW_Amount so the card doesn't get visual padding from
-                // Compose's default font-metric line spacing.
                 RupiahText(value = totalValue, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 30.sp,
-                        lineHeight = 30.sp,
+                    style = SwType.AmountXL.copy(fontSize = 28.sp,
+                        lineHeight = 28.sp,
                         fontWeight = FontWeight.ExtraBold))
                 if (totalBuy > 0L) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     val pct = (profit.toFloat() / totalBuy.toFloat()) * 100f
                     val sign = if (profit >= 0L) "+" else "−"
                     Text(
@@ -241,7 +233,7 @@ fun GoldListScreen(
                             sign, "%.1f".format(kotlin.math.abs(pct)),
                         ),
                         color = Color.White,
-                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                        style = SwType.LabelStrong.copy(fontSize = 12.sp, lineHeight = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             fontFeatureSettings = "tnum"),
                     )
@@ -469,38 +461,32 @@ fun GoldDetailScreen(
         val currentValue = g.valueAt(prefs.goldPriceGlobal)
         val profit = currentValue - g.buyPrice
         val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
-        // Hero — see GoldListScreen hero for the proto compliance notes. White-
-        // on-warning with a translucent-white profit chip so the gain/loss
-        // text doesn't blend into the warning background.
-        Box(
+        // Hero: icon left (vertically centered, fully visible), text right.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
                 .background(sw.warning)
                 .padding(18.dp),
         ) {
-            // Diamond watermark on its own matchParentSize+clipToBounds layer
-            // so the 140dp icon doesn't push the card taller than its content.
-            Box(modifier = Modifier.matchParentSize()) {
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 20.dp)
-                        .size(140.dp),
-                )
-            }
-            Column {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(56.dp),
+            )
+            Spacer(Modifier.size(width = 14.dp, height = 1.dp))
+            Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.gold_hero_value_label),
                     color = Color.White.copy(alpha = 0.85f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp, lineHeight = 14.sp,
                         letterSpacing = androidx.compose.ui.unit.TextUnit.Unspecified))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = currentValue, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 34.sp, fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(10.dp))
+                    style = SwType.AmountXL.copy(fontSize = 28.sp, lineHeight = 28.sp,
+                        fontWeight = FontWeight.ExtraBold))
+                Spacer(Modifier.height(8.dp))
                 GoldProfitChip(profit = profit, buyPrice = g.buyPrice.coerceAtLeast(1L))
             }
         }
