@@ -40,6 +40,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRupiah
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwBar
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
@@ -299,9 +300,14 @@ fun DebtDetailScreen(
                 Spacer(Modifier.height(10.dp))
                 SwBar(used = paid, plan = d.principal.coerceAtLeast(1L), color = Color.White)
                 Spacer(Modifier.height(4.dp))
-                Text(stringResource(R.string.debt_progress_format, paid, pct, d.principal),
+                Text(
+                    stringResource(
+                        R.string.debt_progress_format,
+                        paid.toRupiah(), pct, d.principal.toRupiah(),
+                    ),
                     color = Color.White.copy(alpha = 0.85f),
-                    style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                    style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                )
             }
         }
         Spacer(Modifier.height(14.dp))
@@ -319,7 +325,7 @@ fun DebtDetailScreen(
                 DetailRow(stringResource(R.string.debt_direction_label),
                     if (negative) stringResource(R.string.debt_direction_i_owe)
                     else stringResource(R.string.debt_direction_owed_to_me_long))
-                DetailRow(stringResource(R.string.debt_field_principal), d.principal.toString())
+                DetailRow(stringResource(R.string.debt_field_principal), d.principal.toRupiah())
                 DetailRow(stringResource(R.string.debt_field_start), d.startDate.toAbsoluteId())
                 DetailRow(stringResource(R.string.debt_field_due), d.dueDate?.toAbsoluteId() ?: stringResource(R.string.gold_dash))
                 DetailRow(stringResource(R.string.debt_field_status),
