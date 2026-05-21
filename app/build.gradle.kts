@@ -26,6 +26,22 @@ android {
         }
     }
 
+    // Release signing — keystore lives at <repo>/keystore/sakuwise-release.jks
+    // and is gitignored. Credentials can come from gradle properties (set in
+    // ~/.gradle/gradle.properties or via -P flags) or fall back to the local
+    // dev defaults below. Production releases should override via gradle
+    // properties; the same key must sign every future update.
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file("keystore/sakuwise-release.jks")
+            storePassword = (project.findProperty("SAKUWISE_STORE_PASSWORD") as String?)
+                ?: "sakuwise-release-2026"
+            keyAlias = (project.findProperty("SAKUWISE_KEY_ALIAS") as String?) ?: "sakuwise"
+            keyPassword = (project.findProperty("SAKUWISE_KEY_PASSWORD") as String?)
+                ?: "sakuwise-release-2026"
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -37,6 +53,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     buildFeatures {
