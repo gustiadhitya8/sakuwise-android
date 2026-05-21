@@ -221,18 +221,20 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                 .padding(horizontal = SwSpace.pageH)
                 .horizontalScroll(rememberScrollState()),
         ) {
+            // Active chip is always primary per proto SW_Chip (components.jsx:302).
+            // The allocation color shows up on the body of each section anyway.
             FilterChip(label = stringResource(R.string.plan_filter_all),
                 selected = filter == null,
-                accent = sw.ink, onClick = { filter = null })
+                accent = sw.primary, onClick = { filter = null })
             FilterChip(label = stringResource(R.string.plan_filter_needs),
                 selected = filter == AllocationId.Needs,
                 accent = sw.primary, onClick = { filter = AllocationId.Needs })
             FilterChip(label = stringResource(R.string.plan_filter_wants),
                 selected = filter == AllocationId.Wants,
-                accent = sw.accent, onClick = { filter = AllocationId.Wants })
+                accent = sw.primary, onClick = { filter = AllocationId.Wants })
             FilterChip(label = stringResource(R.string.plan_filter_invest),
                 selected = filter == AllocationId.Invest,
-                accent = sw.info, onClick = { filter = AllocationId.Invest })
+                accent = sw.primary, onClick = { filter = AllocationId.Invest })
         }
         Spacer(Modifier.height(14.dp))
 
