@@ -175,21 +175,27 @@ fun DepositListScreen(
             }
         },
     ) {
-        // Hero: icon on the left (vertically centered, fully visible — no
-        // overflow / cropping), text content on the right.
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        // Hero per proto screens-assets-detail.jsx:188-201 — mint background
+        // (radius 20, padding 18) with the deposit watermark anchored bottom-
+        // right at offset(-20, -30) and size 140 so it intentionally bleeds
+        // past the card edge under the rounded clip. matchParentSize keeps
+        // the watermark layer from inflating the card past the content.
+        Box(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
                 .background(sw.accent).padding(18.dp),
         ) {
-            Icon(
-                painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
-                contentDescription = null,
-                tint = sw.fixedDarkOnMint,
-                modifier = Modifier.size(56.dp),
-            )
-            Spacer(Modifier.size(width = 14.dp, height = 1.dp))
-            Column(Modifier.weight(1f)) {
+            Box(modifier = Modifier.matchParentSize()) {
+                Icon(
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
+                    contentDescription = null,
+                    tint = sw.fixedDarkOnMint.copy(alpha = 0.20f),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 30.dp)
+                        .size(140.dp),
+                )
+            }
+            Column {
                 Text(stringResource(R.string.deposit_hero_label),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.78f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
@@ -197,10 +203,10 @@ fun DepositListScreen(
                         fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = total, color = sw.fixedDarkOnMint,
-                    style = SwType.AmountXL.copy(fontSize = 28.sp,
-                        lineHeight = 28.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp,
+                        lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.75f),
                     style = SwType.LabelSmall.copy(fontSize = 12.sp, lineHeight = 14.sp))

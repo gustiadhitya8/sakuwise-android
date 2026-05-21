@@ -180,20 +180,23 @@ fun LandListScreen(
             ) { Icon(Icons.Outlined.Add, stringResource(R.string.land_add_cd), tint = Color.White, modifier = Modifier.size(20.dp)) }
         },
     ) {
-        // Hero: icon left (vertically centered, fully visible), text right.
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        // Land list hero — same proto watermark pattern.
+        Box(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
                 .background(sw.info).padding(18.dp),
         ) {
-            Icon(
-                painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(56.dp),
-            )
-            Spacer(Modifier.size(width = 14.dp, height = 1.dp))
-            Column(Modifier.weight(1f)) {
+            Box(modifier = Modifier.matchParentSize()) {
+                Icon(
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 30.dp)
+                        .size(140.dp),
+                )
+            }
+            Column {
                 Text(stringResource(R.string.land_hero_total),
                     color = Color.White.copy(alpha = 0.78f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
@@ -201,10 +204,10 @@ fun LandListScreen(
                         fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = total, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 28.sp,
-                        lineHeight = 28.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp,
+                        lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.land_hero_sub_format, items.size),
                     color = Color.White.copy(alpha = 0.75f),
                     style = SwType.LabelSmall.copy(fontSize = 12.sp, lineHeight = 14.sp))
@@ -314,28 +317,32 @@ fun LandDetailScreen(
         val value = l.currentValue ?: l.buyPrice
         val profit = value - l.buyPrice
         val pctProfit = if (l.buyPrice > 0) (profit.toFloat() / l.buyPrice.toFloat()) * 100f else 0f
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        // Land detail hero — same proto watermark pattern.
+        Box(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
                 .background(sw.info).padding(18.dp),
         ) {
-            Icon(
-                painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(56.dp),
-            )
-            Spacer(Modifier.size(width = 14.dp, height = 1.dp))
-            Column(Modifier.weight(1f)) {
+            Box(modifier = Modifier.matchParentSize()) {
+                Icon(
+                    painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 20.dp, y = 30.dp)
+                        .size(140.dp),
+                )
+            }
+            Column {
                 Text(stringResource(R.string.land_detail_value_label),
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp, lineHeight = 14.sp))
                 Spacer(Modifier.height(4.dp))
                 RupiahText(value = value, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 28.sp, lineHeight = 28.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp, lineHeight = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
                 if (profit != 0L) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(10.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
