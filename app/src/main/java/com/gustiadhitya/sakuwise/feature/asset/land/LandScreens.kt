@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -181,7 +182,7 @@ fun LandListScreen(
         ) {
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = (-20).dp, bottom = (-30).dp)) {
+                .offset(x = 20.dp, y = 30.dp)) {
                 Icon(Icons.Outlined.Landscape, null,
                     tint = Color.White.copy(alpha = 0.18f),
                     modifier = Modifier.size(160.dp))
@@ -306,7 +307,7 @@ fun LandDetailScreen(
             .background(sw.info).padding(horizontal = 22.dp, vertical = 20.dp)) {
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = (-20).dp, bottom = (-30).dp)) {
+                .offset(x = 20.dp, y = 30.dp)) {
                 Icon(
                     Icons.Outlined.Landscape, null,
                     tint = Color.White.copy(alpha = 0.18f),
