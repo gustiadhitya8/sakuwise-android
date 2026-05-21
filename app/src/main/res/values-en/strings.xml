@@ -72,6 +72,10 @@
     <string name="plan_alloc_sum_ok_format">Total %1$d%% · exactly 100</string>
     <string name="plan_alloc_sum_warn_format">Total %1$d%% — should be 100. Percentages will be auto-normalized in calculations.</string>
     <string name="plan_empty_no_allocs">This plan has no allocations yet (Needs/Wants/Investment).</string>
+    <string name="plan_empty_welcoming_title">Your plan is empty</string>
+    <string name="plan_empty_welcoming_body">Start clean — add your own categories &amp; items as you go. Or use the starter template to get going fast.</string>
+    <string name="plan_empty_add_first">Start blank</string>
+    <string name="plan_empty_use_starter">Use starter template</string>
     <string name="plan_apply_starter_btn">Apply Starter Template</string>
 
     <!-- Settings hub -->

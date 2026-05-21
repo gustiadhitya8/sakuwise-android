@@ -72,6 +72,10 @@
     <string name="plan_alloc_sum_ok_format">Total %1$d%% · pas 100</string>
     <string name="plan_alloc_sum_warn_format">Total %1$d%% — sebaiknya 100. Persentase akan dinormalisasi otomatis di perhitungan.</string>
     <string name="plan_empty_no_allocs">Plan ini belum punya alokasi (Kebutuhan/Keinginan/Investasi).</string>
+    <string name="plan_empty_welcoming_title">Plan kamu masih kosong</string>
+    <string name="plan_empty_welcoming_body">Mulai bersih — atur sendiri kategori &amp; item sesuai kebutuhan. Atau pakai template starter untuk cepat-cepat.</string>
+    <string name="plan_empty_add_first">Mulai dari kosong</string>
+    <string name="plan_empty_use_starter">Pakai template starter</string>
     <string name="plan_apply_starter_btn">Terapkan Template Starter</string>
 
     <!-- Settings hub -->

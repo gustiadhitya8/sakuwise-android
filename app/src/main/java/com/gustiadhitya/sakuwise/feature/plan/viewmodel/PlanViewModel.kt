@@ -231,6 +231,29 @@ class PlanViewModel @Inject constructor(
     }
 
     /**
+     * "Start from scratch" path — creates the plan + the 3 default allocation
+     * buckets (Kebutuhan / Keinginan / Investasi) but NO categories. Used by
+     * the empty-state CTA so the user can immediately add their first category
+     * via the existing "+ Tambah kategori" buttons that are scoped per
+     * allocation. Without this step the per-allocation add buttons can't render
+     * because there are no allocation containers yet.
+     */
+    fun setupEmptyPlanWithAllocations(onReady: () -> Unit = {}) {
+        viewModelScope.launch {
+            val plan = state.value.plan ?: run {
+                val prefs = prefsRepo.prefs.first()
+                val period = computePlanPeriod(planStartDay = prefs.planPeriodStartDay)
+                createPlan(period, expectedIncome = 0L).getOrNull() ?: return@launch
+            }
+            val existing = planRepo.observeAllocations(plan.id).first()
+            if (existing.isEmpty()) {
+                setupDefaultAllocations(plan.id).getOrNull()
+            }
+            onReady()
+        }
+    }
+
+    /**
      * PRD §7.5 — generate the NEXT period's plan after the latest existing one.
      *
      * Bug fix: previously used `state.value.plan` (the *current* plan) as the

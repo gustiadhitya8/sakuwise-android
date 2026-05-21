@@ -305,16 +305,45 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                 )
             }
             if (state.allocations.isEmpty() && !state.loading) {
+                // Welcoming empty state — user starts BLANK on fresh install
+                // (per user feedback). Primary action sets up the 3 alloc
+                // buckets only (Kebutuhan/Keinginan/Investasi) and opens the
+                // add-category sheet so they can build their plan from
+                // scratch. Starter template stays available as the secondary
+                // outline button for users who want a quick-start preset.
                 SwCard {
                     Column {
                         Text(
-                            stringResource(R.string.plan_empty_no_allocs),
-                            color = sw.inkMuted, style = SwType.Body,
+                            stringResource(R.string.plan_empty_welcoming_title),
+                            color = sw.ink,
+                            style = SwType.LabelStrong.copy(
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                            ),
                         )
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            stringResource(R.string.plan_empty_welcoming_body),
+                            color = sw.inkMuted,
+                            style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
+                        )
+                        Spacer(Modifier.height(14.dp))
                         SwButton(
-                            text = stringResource(R.string.plan_apply_starter_btn),
+                            text = stringResource(R.string.plan_empty_add_first),
+                            onClick = {
+                                viewModel.setupEmptyPlanWithAllocations {
+                                    // After the 3 allocs exist the per-alloc
+                                    // "+ Tambah kategori" buttons render at
+                                    // the bottom of each allocation section;
+                                    // a deliberate scroll cue is enough.
+                                }
+                            },
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        SwButton(
+                            text = stringResource(R.string.plan_empty_use_starter),
                             onClick = { viewModel.applyStarterTemplateToCurrentPlan() },
+                            variant = SwButtonVariant.Outline,
                         )
                     }
                 }
