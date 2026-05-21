@@ -272,7 +272,9 @@ fun LandDetailScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White.copy(alpha = 0.18f))
+                            // Black tint matches gold detail — white text on
+                            // info blue needs a darker chip to read.
+                            .background(Color.Black.copy(alpha = 0.22f))
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                     ) {
                         Text(

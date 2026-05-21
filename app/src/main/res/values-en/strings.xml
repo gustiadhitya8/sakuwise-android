@@ -399,6 +399,13 @@
     <string name="reminder_toast_scheduled">Reminder enabled</string>
     <string name="reminder_toast_canceled">Reminder turned off</string>
     <string name="reminder_toast_denied">Notification permission denied — reminder can\'t appear</string>
+    <string name="reminder_toast_scheduled_fmt">Reminder set for day %1$d at %2$s</string>
+    <string name="reminder_when_title">Set reminder</string>
+    <string name="reminder_when_intro">Pick when you want to be reminded each month. Recurs every 30 days at the same time.</string>
+    <string name="reminder_when_day_label">Day</string>
+    <string name="reminder_when_hour_label">Hour</string>
+    <string name="reminder_when_confirm">Set reminder</string>
+    <string name="txn_field_account_balance_format">Balance: %1$s</string>
     <string name="reminder_notif_title">Sakuwise bill due</string>
     <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>

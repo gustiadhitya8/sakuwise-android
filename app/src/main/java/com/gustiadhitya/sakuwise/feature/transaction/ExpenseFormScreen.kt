@@ -51,6 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.ImageCompression
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRelativeOrAbsolute
+import com.gustiadhitya.sakuwise.core.common.toRupiah
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
@@ -97,13 +99,15 @@ fun ExpenseFormScreen(
         null -> sw.ink
         else -> sw.onPrimary
     }
-    val allocLabel: String? = alloc?.let { a ->
-        val name = when (a) {
+    val allocName: String? = alloc?.let { a ->
+        when (a) {
             com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Needs -> stringResource(R.string.alloc_needs)
             com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> stringResource(R.string.alloc_wants)
             com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Invest -> stringResource(R.string.alloc_invest)
         }
-        stringResource(R.string.txn_expense_alloc_subtitle_format, name)
+    }
+    val allocLabel: String? = allocName?.let {
+        stringResource(R.string.txn_expense_alloc_subtitle_format, it)
     }
 
     TxnFormShell(
@@ -119,26 +123,63 @@ fun ExpenseFormScreen(
         saveEnabled = state.amount > 0 && state.accountId != null && state.planItemId != null && !state.saving,
         onSave = viewModel::submitExpense,
     ) {
+        val planSubtitle = if (state.planItemName != null && allocName != null) {
+            // "{categoryName} · {alloc}" — category not exposed by the VM
+            // today, so fall back to "{alloc}" alone. Better-than-nothing.
+            allocName
+        } else null
         FieldButton(
             label = stringResource(R.string.txn_field_plan_item),
             value = state.planItemName.orEmpty(),
             placeholder = stringResource(R.string.txn_field_plan_item_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.Checklist,
+            subtitle = planSubtitle,
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip(
+                    bg = heroBg.copy(alpha = if (alloc == null) 1f else 0.18f),
+                    fg = if (alloc == null) sw.inkMuted else heroBg,
+                ) {
+                    Text(
+                        state.planItemName?.firstOrNull()?.uppercase() ?: "?",
+                        color = androidx.compose.material3.LocalContentColor.current,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold),
+                    )
+                }
+            },
             onClick = { picker = ExpensePicker.PlanItem },
         )
+        val acctSubtitle = account?.let { a ->
+            // Saldo subtitle uses the seed/initial balance until the VM
+            // exposes a live-computed balance for txn forms. Better-than-
+            // nothing and matches the proto's "Saldo: Rp X" affordance.
+            stringResource(R.string.txn_field_account_balance_format,
+                a.initialBalance.toRupiah())
+        }
         FieldButton(
             label = stringResource(R.string.txn_field_account),
             value = account?.name.orEmpty(),
             placeholder = stringResource(R.string.txn_field_account_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.AccountBalanceWallet,
+            subtitle = acctSubtitle,
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.AccountBalanceWallet, null,
+                        modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = ExpensePicker.Account },
         )
         FieldButton(
             label = stringResource(R.string.txn_field_date),
             value = state.date.toAbsoluteId(),
-            leadingIcon = Icons.Outlined.CalendarToday,
+            subtitle = state.date.toRelativeOrAbsolute(),
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.CalendarToday, null,
+                        modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = ExpensePicker.Date },
         )
         SwField(

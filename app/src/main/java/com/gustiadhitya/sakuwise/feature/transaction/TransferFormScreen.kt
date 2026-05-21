@@ -1,6 +1,7 @@
 package com.gustiadhitya.sakuwise.feature.transaction
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRelativeOrAbsolute
+import com.gustiadhitya.sakuwise.core.common.toRupiah
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Box
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
@@ -84,7 +90,15 @@ fun TransferFormScreen(
             value = from?.name.orEmpty(),
             placeholder = stringResource(R.string.txn_transfer_from_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.AccountBalanceWallet,
+            subtitle = from?.let {
+                stringResource(R.string.txn_field_account_balance_format,
+                    it.initialBalance.toRupiah())
+            },
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.AccountBalanceWallet, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = TransferPicker.From },
         )
         FieldButton(
@@ -92,19 +106,45 @@ fun TransferFormScreen(
             value = to?.name.orEmpty(),
             placeholder = stringResource(R.string.txn_transfer_to_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.AccountBalanceWallet,
+            subtitle = to?.let {
+                stringResource(R.string.txn_field_account_balance_format,
+                    it.initialBalance.toRupiah())
+            },
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.AccountBalanceWallet, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = TransferPicker.To },
         )
-        FieldButton(
-            label = stringResource(R.string.txn_transfer_swap),
-            value = "↔",
-            leadingIcon = Icons.Outlined.SwapHoriz,
-            onClick = viewModel::swap,
-        )
+        // Swap button — compact horizontal row, NOT a field (proto pattern).
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(sw.primaryContainer)
+                .clickable { viewModel.swap() }
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+        ) {
+            Icon(Icons.Outlined.SwapHoriz, null,
+                tint = sw.onPrimaryContainer, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.txn_transfer_swap),
+                color = sw.onPrimaryContainer,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold))
+        }
+        Spacer(Modifier.height(14.dp))
         FieldButton(
             label = stringResource(R.string.txn_field_date),
             value = state.date.toAbsoluteId(),
-            leadingIcon = Icons.Outlined.CalendarToday,
+            subtitle = state.date.toRelativeOrAbsolute(),
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.CalendarToday, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = TransferPicker.Date },
         )
         // Transfer fee field — per prototype, fee is treated as expense

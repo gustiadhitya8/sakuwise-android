@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Savings
 import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import androidx.compose.material3.Icon
@@ -242,7 +243,7 @@ fun DepositDetailScreen(
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onEdit)) {
-                Icon(androidx.compose.material.icons.Icons.Outlined.MoreHoriz,
+                Icon(Icons.Outlined.MoreHoriz,
                     stringResource(R.string.action_edit),
                     tint = sw.ink, modifier = Modifier.size(22.dp))
             }

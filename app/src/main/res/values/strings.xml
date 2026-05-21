@@ -399,6 +399,13 @@
     <string name="reminder_toast_scheduled">Pengingat diaktifkan</string>
     <string name="reminder_toast_canceled">Pengingat dimatikan</string>
     <string name="reminder_toast_denied">Izin notifikasi ditolak — pengingat tidak bisa muncul</string>
+    <string name="reminder_toast_scheduled_fmt">Pengingat aktif: tiap tanggal %1$d, jam %2$s</string>
+    <string name="reminder_when_title">Atur pengingat</string>
+    <string name="reminder_when_intro">Pilih kapan kamu mau diingatkan tiap bulan. Pengingat berulang otomatis tiap 30 hari di waktu ini.</string>
+    <string name="reminder_when_day_label">Tanggal</string>
+    <string name="reminder_when_hour_label">Jam</string>
+    <string name="reminder_when_confirm">Atur pengingat</string>
+    <string name="txn_field_account_balance_format">Saldo: %1$s</string>
     <string name="reminder_notif_title">Tagihan Sakuwise jatuh tempo</string>
     <string name="reminder_notif_body_format">Jangan lupa bayar: %1$s</string>
     <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>

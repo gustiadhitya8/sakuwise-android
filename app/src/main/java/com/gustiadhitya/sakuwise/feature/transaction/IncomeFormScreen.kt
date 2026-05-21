@@ -1,6 +1,8 @@
 package com.gustiadhitya.sakuwise.feature.transaction
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRelativeOrAbsolute
+import com.gustiadhitya.sakuwise.core.common.toRupiah
+import androidx.compose.material3.Icon
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
@@ -79,7 +84,13 @@ fun IncomeFormScreen(
             value = state.incomeCategoryName.orEmpty(),
             placeholder = stringResource(R.string.txn_field_category_source_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.Category,
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip(
+                    bg = sw.successSoft, fg = sw.success,
+                ) {
+                    Icon(Icons.Outlined.Category, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = IncomePicker.Category },
         )
         FieldButton(
@@ -87,13 +98,26 @@ fun IncomeFormScreen(
             value = account?.name.orEmpty(),
             placeholder = stringResource(R.string.txn_field_account_placeholder),
             required = true,
-            leadingIcon = Icons.Outlined.AccountBalanceWallet,
+            subtitle = account?.let {
+                stringResource(R.string.txn_field_account_balance_format,
+                    it.initialBalance.toRupiah())
+            },
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.AccountBalanceWallet, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = IncomePicker.Account },
         )
         FieldButton(
             label = stringResource(R.string.txn_field_date),
             value = state.date.toAbsoluteId(),
-            leadingIcon = Icons.Outlined.CalendarToday,
+            subtitle = state.date.toRelativeOrAbsolute(),
+            leadingContent = {
+                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                    Icon(Icons.Outlined.CalendarToday, null, modifier = Modifier.size(16.dp))
+                }
+            },
             onClick = { picker = IncomePicker.Date },
         )
         SwField(

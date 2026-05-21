@@ -108,26 +108,30 @@ fun TxnFormShell(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp),
         ) {
-            // Hero amount card
+            // Hero amount card — per screens-addtxn.jsx:77-111. r22, big
+            // bold amount (44sp 800) with a smaller "Rp" prefix (22sp 600).
+            // Letter spacing tightened slightly so the number reads as a
+            // single visual unit on the alloc-colored field.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(22.dp))
                     .background(heroBg)
-                    .padding(start = 22.dp, end = 22.dp, top = 18.dp, bottom = 18.dp),
+                    .padding(horizontal = 22.dp, vertical = 24.dp),
             ) {
                 Column {
                     Text(
                         heroLabel.uppercase(),
-                        color = heroFg.copy(alpha = 0.8f),
-                        style = SwType.SectionLabel.copy(fontSize = 11.sp),
+                        color = heroFg.copy(alpha = 0.78f),
+                        style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold),
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             "Rp ",
                             color = heroFg.copy(alpha = 0.85f),
-                            fontSize = 28.sp, lineHeight = 32.sp,
+                            fontSize = 22.sp, lineHeight = 26.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
                         BasicTextField(
@@ -141,9 +145,9 @@ fun TxnFormShell(
                             cursorBrush = SolidColor(heroFg),
                             textStyle = TextStyle(
                                 color = heroFg,
-                                fontSize = 40.sp,
-                                lineHeight = 44.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontSize = 44.sp,
+                                lineHeight = 48.sp,
+                                fontWeight = FontWeight.ExtraBold,
                                 fontFeatureSettings = "tnum",
                             ),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -152,10 +156,10 @@ fun TxnFormShell(
                                     Text(
                                         "0",
                                         style = TextStyle(
-                                            color = heroFg.copy(alpha = 0.5f),
-                                            fontSize = 40.sp,
-                                            lineHeight = 44.sp,
-                                            fontWeight = FontWeight.Bold,
+                                            color = heroFg.copy(alpha = 0.45f),
+                                            fontSize = 44.sp,
+                                            lineHeight = 48.sp,
+                                            fontWeight = FontWeight.ExtraBold,
                                             fontFeatureSettings = "tnum",
                                         ),
                                     )
@@ -165,11 +169,12 @@ fun TxnFormShell(
                         )
                     }
                     if (heroSubtitle != null) {
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Text(
                             heroSubtitle,
-                            color = heroFg.copy(alpha = 0.85f),
-                            style = SwType.Body.copy(fontSize = 13.sp),
+                            color = heroFg.copy(alpha = 0.78f),
+                            style = SwType.Body.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium),
                         )
                     }
                 }
@@ -183,6 +188,14 @@ fun TxnFormShell(
 
 /**
  * "FieldButton" — a read-only row that looks like an input but opens a picker.
+ *
+ * The proto shows two visual variants:
+ *  1. Plain: label only (single line).
+ *  2. Rich: chip/dot + primary text + a muted subtitle (e.g. "Makan di Luar
+ *     · Wants" for plan items, "Saldo: Rp 280.000" for accounts).
+ *
+ * `subtitle` and `leadingContent` cover variant 2; if both are null we fall
+ * back to the plain row (matches old API for callers we haven't migrated).
  */
 @Composable
 fun FieldButton(
@@ -191,6 +204,8 @@ fun FieldButton(
     placeholder: String = "Pilih…",
     required: Boolean = false,
     leadingIcon: ImageVector? = null,
+    subtitle: String? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val sw = SwTheme.colors
@@ -205,11 +220,12 @@ fun FieldButton(
             style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 6.dp),
         )
+        val rich = subtitle != null || leadingContent != null
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp)
+                .let { if (rich) it else it.height(52.dp) }
                 .clip(RoundedCornerShape(12.dp))
                 .background(sw.surface)
                 .border(
@@ -218,19 +234,60 @@ fun FieldButton(
                     RoundedCornerShape(12.dp),
                 )
                 .clickable(onClick = onClick)
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = 14.dp, vertical = if (rich) 10.dp else 0.dp),
         ) {
-            if (leadingIcon != null) {
+            if (leadingContent != null) {
+                leadingContent()
+                Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+            } else if (leadingIcon != null) {
                 Icon(leadingIcon, null, tint = sw.inkMuted, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.size(10.dp))
             }
-            Text(
-                value.ifBlank { placeholder },
-                color = if (isEmpty) sw.inkSubtle else sw.ink,
-                style = SwType.BodyL.copy(fontSize = 15.sp),
-                modifier = Modifier.weight(1f),
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    value.ifBlank { placeholder },
+                    color = if (isEmpty) sw.inkSubtle else sw.ink,
+                    style = if (rich)
+                        SwType.LabelStrong.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    else
+                        SwType.BodyL.copy(fontSize = 15.sp),
+                )
+                if (subtitle != null && !isEmpty) {
+                    Text(
+                        subtitle,
+                        color = sw.inkMuted,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                            fontFeatureSettings = "tnum"),
+                    )
+                }
+            }
             Icon(Icons.Outlined.ChevronRight, null, tint = sw.inkSubtle, modifier = Modifier.size(18.dp))
         }
+    }
+}
+
+/**
+ * Round chip that goes in [FieldButton.leadingContent]. Used for category
+ * dots (single letter) and account icons (currency wallet). Defaults to the
+ * primaryContainer / onPrimaryContainer pair so chips read on both light
+ * and dark themes without per-call tinting.
+ */
+@Composable
+fun FieldChip(
+    size: Int = 32,
+    bg: Color = SwTheme.colors.primaryContainer,
+    fg: Color = SwTheme.colors.onPrimaryContainer,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(size.dp)
+            .clip(RoundedCornerShape((size / 3).dp))
+            .background(bg),
+    ) {
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.material3.LocalContentColor provides fg,
+        ) { content() }
     }
 }

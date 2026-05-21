@@ -920,24 +920,33 @@ private fun EditPlanItemSheet(
             enabled = name.isNotBlank() && amount.isNotBlank(),
         )
         // Reminder schedule controls — visible only for saved items with a
-        // recurring schedule. Tap schedules the periodic worker; "Batalkan"
-        // cancels by tag. We don't store the on/off state in DB — calling
-        // schedule again is idempotent at the WorkManager layer.
+        // recurring schedule. Tapping "Atur pengingat" opens a small picker
+        // so the user can choose day-of-month + time; WorkManager then fires
+        // at that local time once per 30 days. "Batalkan" cancels the unique
+        // work for this plan item.
         if (existing != null && rec != Recurrence.OneOff) {
             val ctx = androidx.compose.ui.platform.LocalContext.current
-            // Use a Toast for immediate feedback — WorkManager schedule is
-            // silent otherwise and the user assumes the buttons are dead.
             val scheduledMsg = stringResource(R.string.reminder_toast_scheduled)
             val canceledMsg = stringResource(R.string.reminder_toast_canceled)
             val deniedMsg = stringResource(R.string.reminder_toast_denied)
+            var showWhenSheet by remember { mutableStateOf(false) }
+            var pendingDay by remember { mutableStateOf(1) }
+            var pendingHour by remember { mutableStateOf(9) }
             val requestNotif = com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester { granted ->
                 if (granted) {
                     com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.scheduleMonthly(
                         ctx, existing.id,
                         title = ctx.getString(R.string.reminder_notif_title),
                         body = ctx.getString(R.string.reminder_notif_body_format, existing.name),
+                        dayOfMonth = pendingDay,
+                        hourOfDay = pendingHour,
                     )
-                    android.widget.Toast.makeText(ctx, scheduledMsg, android.widget.Toast.LENGTH_SHORT).show()
+                    val fmt = String.format("%02d:00", pendingHour)
+                    android.widget.Toast.makeText(
+                        ctx,
+                        ctx.getString(R.string.reminder_toast_scheduled_fmt, pendingDay, fmt),
+                        android.widget.Toast.LENGTH_LONG,
+                    ).show()
                 } else {
                     android.widget.Toast.makeText(ctx, deniedMsg, android.widget.Toast.LENGTH_LONG).show()
                 }
@@ -946,7 +955,7 @@ private fun EditPlanItemSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SwButton(
                     text = stringResource(R.string.plan_item_schedule_reminder),
-                    onClick = { requestNotif() },
+                    onClick = { showWhenSheet = true },
                     variant = SwButtonVariant.Outline,
                     modifier = Modifier.weight(1f),
                 )
@@ -960,6 +969,21 @@ private fun EditPlanItemSheet(
                     modifier = Modifier.weight(1f),
                 )
             }
+            if (showWhenSheet) {
+                ReminderWhenSheet(
+                    initialDay = pendingDay,
+                    initialHour = pendingHour,
+                    onConfirm = { d, h ->
+                        pendingDay = d; pendingHour = h
+                        showWhenSheet = false
+                        requestNotif()
+                    },
+                    onDismiss = { showWhenSheet = false },
+                )
+            }
+            // Suppress unused warning for scheduledMsg — kept for now in case
+            // we replace the formatted toast above with the plain one again.
+            @Suppress("UNUSED_VARIABLE") val _u = scheduledMsg
         }
         if (existing != null && onDelete != null) {
             Spacer(Modifier.height(8.dp))
@@ -1143,6 +1167,94 @@ private fun PerPlanAllocationEditorSheet(
             onClick = {
                 onSave(edits.toMap())
             },
+        )
+    }
+}
+
+/**
+ * Small picker: day-of-month (1..28) + hour-of-day (0..23). Stays simple —
+ * two horizontal scrollers of chips, then a Save button. We deliberately
+ * cap the day to 28 so months without 29-31 don't silently skip a cycle.
+ */
+@Composable
+private fun ReminderWhenSheet(
+    initialDay: Int,
+    initialHour: Int,
+    onConfirm: (Int, Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    var day by remember { mutableStateOf(initialDay.coerceIn(1, 28)) }
+    var hour by remember { mutableStateOf(initialHour.coerceIn(0, 23)) }
+    SwPickerSheet(title = stringResource(R.string.reminder_when_title), onDismiss = onDismiss) {
+        Text(stringResource(R.string.reminder_when_intro),
+            color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp))
+        Spacer(Modifier.height(12.dp))
+        Text(stringResource(R.string.reminder_when_day_label),
+            color = sw.inkMuted,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp))
+        Spacer(Modifier.height(6.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+        ) {
+            (1..28).forEach { d ->
+                val active = d == day
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(width = 40.dp, height = 36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (active) sw.primary else sw.surface)
+                        .border(1.dp, if (active) sw.primary else sw.border, RoundedCornerShape(10.dp))
+                        .clickable { day = d },
+                ) {
+                    Text(d.toString(),
+                        color = if (active) sw.onPrimary else sw.ink,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFeatureSettings = "tnum"))
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Text(stringResource(R.string.reminder_when_hour_label),
+            color = sw.inkMuted,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp))
+        Spacer(Modifier.height(6.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+        ) {
+            (0..23).forEach { h ->
+                val active = h == hour
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(width = 56.dp, height = 36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (active) sw.primary else sw.surface)
+                        .border(1.dp, if (active) sw.primary else sw.border, RoundedCornerShape(10.dp))
+                        .clickable { hour = h },
+                ) {
+                    Text(String.format("%02d:00", h),
+                        color = if (active) sw.onPrimary else sw.ink,
+                        style = SwType.LabelStrong.copy(fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFeatureSettings = "tnum"))
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        SwButton(
+            text = stringResource(R.string.reminder_when_confirm),
+            onClick = { onConfirm(day, hour) },
+        )
+        Spacer(Modifier.height(8.dp))
+        SwButton(
+            text = stringResource(R.string.action_cancel),
+            onClick = onDismiss,
+            variant = SwButtonVariant.Ghost,
         )
     }
 }

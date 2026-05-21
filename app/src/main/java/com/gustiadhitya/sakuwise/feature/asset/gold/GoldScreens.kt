@@ -660,7 +660,10 @@ private fun GoldProfitChip(profit: Long, buyPrice: Long) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(Color.White.copy(alpha = 0.18f))
+            // Darkened tint instead of white 0.18 — white-on-white-on-saffron
+            // had near-zero contrast. Black 0.22 darkens the saffron so the
+            // white profit text reads clearly.
+            .background(Color.Black.copy(alpha = 0.22f))
             .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         Icon(
