@@ -194,7 +194,7 @@ fun DebtPickerSheet(
     SwPickerSheet(title = stringResource(R.string.sheet_picker_debt_title), onDismiss = onDismiss) {
         if (debts.isEmpty()) {
             Text(
-                "Belum ada hutang terbuka. Tambah dulu di tab Aset → Hutang.",
+                stringResource(R.string.picker_no_open_debts),
                 color = sw.inkMuted, style = SwType.Body,
             )
             return@SwPickerSheet
@@ -420,7 +420,7 @@ fun IncomeCategoryPickerSheet(
     val sw = SwTheme.colors
     SwPickerSheet(title = stringResource(R.string.sheet_picker_income_category_title), onDismiss = onDismiss) {
         if (categories.isEmpty()) {
-            Text("Belum ada kategori sumber.", color = sw.inkMuted, style = SwType.Body)
+            Text(stringResource(R.string.picker_no_income_categories), color = sw.inkMuted, style = SwType.Body)
             return@SwPickerSheet
         }
         LazyColumn {

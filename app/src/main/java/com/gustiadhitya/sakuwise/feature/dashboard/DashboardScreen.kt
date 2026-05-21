@@ -466,7 +466,7 @@ private fun DashboardHero(
             Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "SISA ANGGARAN",
+                        stringResource(R.string.dashboard_remaining_budget),
                         color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                     )
@@ -510,7 +510,7 @@ private fun DashboardHero(
                 ) { Icon(Icons.Outlined.AutoAwesome, null, tint = sw.onPrimaryHero, modifier = Modifier.size(20.dp)) }
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Anggaran harian", color = sw.onPrimaryHero.copy(alpha = 0.78f),
+                    Text(stringResource(R.string.dashboard_daily_budget), color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.Caption.copy(fontSize = 12.sp))
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
@@ -518,7 +518,7 @@ private fun DashboardHero(
                             color = sw.onPrimaryHero,
                             style = SwType.AmountL.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                         )
-                        Text(" / hari", color = sw.onPrimaryHero.copy(alpha = 0.6f),
+                        Text(" " + stringResource(R.string.dashboard_per_day), color = sw.onPrimaryHero.copy(alpha = 0.6f),
                             style = SwType.Body.copy(fontSize = 14.sp))
                     }
                 }
@@ -531,9 +531,9 @@ private fun DashboardHero(
                 // Per prototype screens-dashboard.jsx:87-89:
                 //   Pemasukan tint = c.accent (sand), Pengeluaran tint = c.onPrimary (white)
                 // Both render as 17sp bold tabular-nums with the sign at opacity 0.7.
-                HeroMetric("Pemasukan", income, "+", sw.accent, hide, Modifier.weight(1f))
+                HeroMetric(stringResource(R.string.dashboard_metric_income), income, "+", sw.accent, hide, Modifier.weight(1f))
                 Box(Modifier.width(1.dp).height(40.dp).background(Color.White.copy(alpha = 0.18f)))
-                HeroMetric("Pengeluaran", expense, "−", sw.onPrimaryHero, hide, Modifier.weight(1f))
+                HeroMetric(stringResource(R.string.dashboard_metric_expense), expense, "−", sw.onPrimaryHero, hide, Modifier.weight(1f))
             }
         }
     }
@@ -665,12 +665,11 @@ private fun DashboardAssetsLink(
                 }
                 Spacer(Modifier.size(width = 14.dp, height = 1.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Aset & Kekayaan", color = sw.ink,
+                    Text(stringResource(R.string.dashboard_assets_card_title), color = sw.ink,
                         style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                     Text(
-                        "$accountsCount akun aktif" +
-                            (if (hide) "" else " · ${accountsTotal.toRupiahShort()} di akun") +
-                            " · detail di tab Aset",
+                        if (hide) stringResource(R.string.dashboard_assets_card_sub_hidden_format, accountsCount)
+                        else stringResource(R.string.dashboard_assets_card_sub_format, accountsCount, accountsTotal.toRupiahShort()),
                         color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp),
                     )
                 }
@@ -768,7 +767,7 @@ private fun DashboardAccountsStrip(
                         .clickable(onClick = onTap),
                 ) {
                     Icon(
-                        Icons.Outlined.Add, "Tambah akun",
+                        Icons.Outlined.Add, stringResource(R.string.dashboard_add_account_cd),
                         tint = sw.inkMuted, modifier = Modifier.size(20.dp),
                     )
                 }
@@ -786,10 +785,10 @@ private fun DashboardRecentTxns(
     val sw = SwTheme.colors
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
         SwSectionLabel(
-            text = "Transaksi Terbaru",
+            text = stringResource(R.string.dashboard_recent_txns),
             trailing = {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable(onClick = onTapAll)) {
-                    Text("Semua", color = sw.primary,
+                    Text(stringResource(R.string.dashboard_action_all), color = sw.primary,
                         style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
                     Icon(Icons.Outlined.ChevronRight, null, tint = sw.primary, modifier = Modifier.size(14.dp))
                 }
@@ -798,7 +797,7 @@ private fun DashboardRecentTxns(
         if (txns.isEmpty()) {
             SwCard {
                 Text(
-                    "Belum ada transaksi. Tap tombol + untuk catat pengeluaran pertamamu.",
+                    stringResource(R.string.dashboard_empty_txns),
                     color = sw.inkMuted,
                     style = SwType.Body,
                 )
@@ -874,8 +873,8 @@ private fun DashboardRecentTxns(
 @Composable
 private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
     val sw = SwTheme.colors
-    val label = if (overdueDays == Int.MAX_VALUE) "Belum pernah backup"
-                else "Backup tertunda $overdueDays hari"
+    val label = if (overdueDays == Int.MAX_VALUE) stringResource(R.string.dashboard_backup_never_label)
+                else stringResource(R.string.dashboard_backup_overdue_days_format, overdueDays)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -899,7 +898,7 @@ private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
             // taller than proto and unbalanced the dashboard bottom).
             Text(label, color = sw.ink,
                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
-            Text("Amankan data uangmu — backup sekarang.",
+            Text(stringResource(R.string.dashboard_backup_banner_sub_never),
                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
         }
         Box(
@@ -911,7 +910,7 @@ private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
                 .clickable(onClick = onTap)
                 .padding(horizontal = 12.dp),
         ) {
-            Text("Backup", color = Color.White,
+            Text(stringResource(R.string.dashboard_backup_banner_cta), color = Color.White,
                 style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold))
         }
     }

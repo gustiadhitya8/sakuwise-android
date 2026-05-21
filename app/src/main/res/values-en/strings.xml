@@ -76,6 +76,72 @@
     <string name="plan_empty_welcoming_body">Build a new one — set up categories &amp; items as you go. Or use the starter template if you\'d like a head start.</string>
     <string name="plan_empty_add_first">Create plan from scratch</string>
     <string name="plan_empty_use_starter">Use starter template</string>
+
+    <!-- Dashboard hero + sections (i18n round 2) -->
+    <string name="dashboard_remaining_budget">REMAINING BUDGET</string>
+    <string name="dashboard_daily_budget">Daily budget</string>
+    <string name="dashboard_per_day">/ day</string>
+    <string name="dashboard_metric_income">Income</string>
+    <string name="dashboard_metric_expense">Expense</string>
+    <string name="dashboard_assets_card_title">Assets &amp; Wealth</string>
+    <string name="dashboard_assets_card_sub_format">%1$d active accounts · %2$s in accounts · details in Assets tab</string>
+    <string name="dashboard_assets_card_sub_hidden_format">%1$d active accounts · details in Assets tab</string>
+    <string name="dashboard_recent_txns">Recent Transactions</string>
+    <string name="dashboard_action_all">All</string>
+    <string name="dashboard_empty_txns">No transactions yet. Tap the + button to log your first expense.</string>
+    <string name="dashboard_backup_never_label">No backup yet</string>
+    <string name="dashboard_backup_overdue_days_format">%1$d days since last backup</string>
+    <string name="dashboard_backup_banner_sub_never">Protect your money data — back up now.</string>
+    <string name="dashboard_backup_banner_cta">Backup</string>
+
+    <!-- Plan inline labels -->
+    <string name="plan_used_prefix">Used </string>
+    <string name="plan_of_prefix">of </string>
+    <string name="plan_old_readonly">Old plans are read-only.</string>
+    <string name="plan_period_active_hint">The active period is set automatically from Period Start Day in Settings. Old plans are read-only.</string>
+    <string name="plan_delete_category_body_format">Delete the \"%1$s\" category and all plan items inside it. This action can\'t be undone.</string>
+    <string name="plan_delete_category_confirm">Yes, delete category</string>
+    <string name="plan_expected_income_body">Total income you expect for this period. Used as the baseline for the plan progress bar.</string>
+
+    <!-- Plan reset confirm sheet -->
+    <string name="plan_reset_body">All categories and plan items in this period will be deleted.\n\nLogged transactions are kept but lose their link to the old plan items.</string>
+    <string name="plan_reset_irreversible">This action can\'t be undone.</string>
+    <string name="plan_reset_confirm">Yes, reset plan</string>
+
+    <!-- OCR + lock -->
+    <string name="ocr_idle_body">Photograph a receipt to auto-fill an expense</string>
+    <string name="ocr_review_info_format">Tap Continue to open the expense form. Detected fields are pre-filled. The receipt photo is auto-attached (~200 KB compressed).</string>
+    <string name="lock_biometric_subtitle">Use biometrics to unlock the app.</string>
+    <string name="lock_biometric_unsupported">Biometrics not supported in this context.</string>
+    <string name="lock_biometric_prompt_title">Open Sakuwise</string>
+
+    <!-- Settings + picker empty states -->
+    <string name="settings_last_backup_never">Never</string>
+    <string name="settings_days_ago_format">%1$d days ago</string>
+    <string name="picker_no_open_debts">No open debts yet. Add one via Assets → Debts.</string>
+    <string name="picker_no_income_categories">No income categories yet.</string>
+
+    <!-- Misc i18n round 2 -->
+    <string name="plan_expected_income_label">Expected income</string>
+    <string name="reconcile_already_match">Balance already matches</string>
+    <string name="reconcile_failed">Reconciliation failed</string>
+    <string name="reconcile_adjustment_plus_format">Adjustment +Rp %1$d saved</string>
+    <string name="reconcile_adjustment_minus_format">Adjustment -Rp %1$d saved</string>
+    <string name="backup_no_local_files">No local backup files yet. Create one with the Backup Now button first.</string>
+    <string name="export_pdf_no_accounts">No accounts.</string>
+    <string name="export_pdf_income_vs_expense">Income vs Expense</string>
+    <string name="export_pdf_no_transactions">No transactions.</string>
+    <string name="assets_hub_since_month_format">%1$s%2$s%% since %3$s</string>
+    <string name="land_since_purchase_format">%1$s · %2$s%3$s%% since buy</string>
+    <string name="expense_pick_debt_placeholder">Pick a debt…</string>
+    <string name="ocr_pick_from_gallery">Pick from Gallery</string>
+    <string name="backup_delete_failed_format">Delete failed: %1$s</string>
+    <string name="plan_delete_item">Delete item</string>
+    <string name="dashboard_add_account_cd">Add account</string>
+    <string name="settings_lang_biometric">Biometric on</string>
+    <string name="settings_lang_pin_only">PIN only</string>
+    <string name="settings_period_day_format">Day %1$d</string>
+
     <string name="plan_apply_starter_btn">Apply Starter Template</string>
 
     <!-- Settings hub -->

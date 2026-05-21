@@ -180,7 +180,7 @@ fun AssetsHubScreen(
                                 modifier = Modifier.size(11.dp),
                             )
                             Text(
-                                "$sign${"%.1f".format(kotlin.math.abs(deltaPct))}% sejak $firstMonth",
+                                stringResource(R.string.assets_hub_since_month_format, sign, "%.1f".format(kotlin.math.abs(deltaPct)), firstMonth),
                                 color = sw.onPrimaryHero,
                                 style = SwType.LabelSmall.copy(fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),

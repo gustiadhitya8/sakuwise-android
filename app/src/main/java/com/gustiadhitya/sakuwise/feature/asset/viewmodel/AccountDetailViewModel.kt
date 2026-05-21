@@ -1,7 +1,9 @@
 package com.gustiadhitya.sakuwise.feature.asset.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.domain.model.Account
 import com.gustiadhitya.sakuwise.core.domain.model.AccountSnapshot
 import com.gustiadhitya.sakuwise.core.domain.model.Transaction
@@ -30,10 +32,11 @@ data class AccountDetailState(
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AccountDetailViewModel @Inject constructor(
+    app: Application,
     private val accountRepo: AccountRepository,
     private val transactionRepo: TransactionRepository,
     private val reconcile: ReconcileAccountUseCase,
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     private val accountId = MutableStateFlow<String?>(null)
 
@@ -61,11 +64,12 @@ class AccountDetailViewModel @Inject constructor(
         val id = accountId.value ?: return
         viewModelScope.launch {
             val diff = reconcile(id, observedBalance, note = note).getOrNull()
+            val ctx = getApplication<Application>()
             _reconcileMessage.value = when {
-                diff == null -> "Gagal rekonsiliasi"
-                diff == 0L -> "Saldo sudah sesuai"
-                diff > 0L -> "Penyesuaian +Rp $diff disimpan"
-                else -> "Penyesuaian -Rp ${-diff} disimpan"
+                diff == null -> ctx.getString(R.string.reconcile_failed)
+                diff == 0L -> ctx.getString(R.string.reconcile_already_match)
+                diff > 0L -> ctx.getString(R.string.reconcile_adjustment_plus_format, diff)
+                else -> ctx.getString(R.string.reconcile_adjustment_minus_format, -diff)
             }
         }
     }

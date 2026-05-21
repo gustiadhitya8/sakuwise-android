@@ -280,7 +280,7 @@ class ExportPdfUseCase @Inject constructor(
         ctx.ensureRoom(40f)
         sectionTitle(ctx, "Akun")
         if (accounts.isEmpty()) {
-            mutedLine(ctx, "Belum ada akun.")
+            mutedLine(ctx, context.getString(com.gustiadhitya.sakuwise.R.string.export_pdf_no_accounts))
             return
         }
         // Header row
@@ -302,7 +302,7 @@ class ExportPdfUseCase @Inject constructor(
 
     private fun renderIncomeExpense(ctx: RenderContext, income: Long, expense: Long) {
         ctx.ensureRoom(80f)
-        sectionTitle(ctx, "Pemasukan vs Pengeluaran")
+        sectionTitle(ctx, context.getString(com.gustiadhitya.sakuwise.R.string.export_pdf_income_vs_expense))
         val page = ctx.page!!
         val canvas = page.canvas
         val cellW = (PAGE_W - 2 * MARGIN - 8f) / 2f
@@ -393,7 +393,7 @@ class ExportPdfUseCase @Inject constructor(
         ctx.ensureRoom(40f)
         sectionTitle(ctx, "Transaksi Terakhir (${txns.size})")
         if (txns.isEmpty()) {
-            mutedLine(ctx, "Belum ada transaksi.")
+            mutedLine(ctx, context.getString(com.gustiadhitya.sakuwise.R.string.export_pdf_no_transactions))
             return
         }
         tableHeader(

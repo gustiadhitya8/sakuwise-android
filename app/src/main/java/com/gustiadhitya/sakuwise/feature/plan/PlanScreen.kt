@@ -191,7 +191,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Terpakai ", color = sw.inkMuted,
+                            Text(stringResource(R.string.plan_used_prefix), color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
                             RupiahText(value = totalUsed, short = true,
                                 style = SwType.Amount.copy(fontSize = 12.sp,
@@ -200,7 +200,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                                 color = sw.ink)
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("dari ", color = sw.inkMuted,
+                            Text(stringResource(R.string.plan_of_prefix), color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
                             RupiahText(value = totalPlan, short = true,
                                 style = SwType.Amount.copy(fontSize = 12.sp,
@@ -598,8 +598,7 @@ private fun MonthPickerSheet(
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                "Periode aktif ditentukan otomatis dari Tanggal Mulai Periode di Pengaturan. " +
-                    "Plan lama bersifat read-only.",
+                stringResource(R.string.plan_period_active_hint),
                 color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 11.sp),
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             )
@@ -748,12 +747,11 @@ private fun ConfirmDeleteCategorySheet(
     val sw = SwTheme.colors
     SwPickerSheet(title = stringResource(R.string.sheet_plan_delete_category_title), onDismiss = onDismiss) {
         Text(
-            "Hapus kategori \"$categoryName\" dan semua plan item di dalamnya. " +
-                "Tindakan ini tidak bisa dibatalkan.",
+            stringResource(R.string.plan_delete_category_body_format, categoryName),
             color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
         )
         Spacer(Modifier.height(16.dp))
-        SwButton(text = "Ya, hapus kategori", onClick = onConfirm,
+        SwButton(text = stringResource(R.string.plan_delete_category_confirm), onClick = onConfirm,
             variant = SwButtonVariant.Danger,
             leading = { Icon(Icons.Outlined.Delete, null,
                 tint = Color.White, modifier = Modifier.size(16.dp)) })
@@ -1038,7 +1036,7 @@ private fun EditPlanItemSheet(
         if (existing != null && onDelete != null) {
             Spacer(Modifier.height(8.dp))
             SwButton(
-                text = "Hapus item",
+                text = stringResource(R.string.plan_delete_item),
                 onClick = { onDelete(existing) },
                 variant = SwButtonVariant.Danger,
                 leading = { Icon(Icons.Outlined.Delete, null, tint = Color.White, modifier = Modifier.size(16.dp)) },
@@ -1059,26 +1057,25 @@ private fun EditExpectedIncomeSheet(
     var amount by remember { mutableStateOf(if (current == 0L) "" else current.toString()) }
     SwPickerSheet(title = stringResource(R.string.sheet_plan_expected_income_title), onDismiss = onDismiss) {
         Text(
-            "Total pemasukan yang kamu ekspektasikan di periode ini. " +
-                "Dipakai sebagai baseline progress bar plan.",
+            stringResource(R.string.plan_expected_income_body),
             color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
         )
         Spacer(Modifier.height(12.dp))
         SwField(
             value = amount,
             onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
-            label = "Pemasukan diharapkan",
+            label = stringResource(R.string.plan_expected_income_label),
             prefix = "Rp", rupiah = true, placeholder = "0",
             keyboardType = KeyboardType.Number,
         )
         Spacer(Modifier.height(16.dp))
         SwButton(
-            text = "Simpan",
+            text = stringResource(R.string.action_save),
             onClick = { onSave(amount.toLongOrNull() ?: 0L) },
             enabled = amount.isNotBlank(),
         )
         Spacer(Modifier.height(8.dp))
-        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+        SwButton(text = stringResource(R.string.action_cancel), onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
 }
 
@@ -1095,18 +1092,17 @@ private fun ConfirmResetSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 .background(sw.dangerSoft),
         ) { Icon(Icons.Outlined.RestartAlt, null, tint = sw.danger, modifier = Modifier.size(32.dp)) }
         Text(
-            "Semua kategori dan plan item di periode ini akan dihapus.\n\n" +
-                "Transaksi yang sudah dicatat tidak terhapus, tapi hilang link-nya ke plan item lama.",
+            stringResource(R.string.plan_reset_body),
             color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
         )
         Spacer(Modifier.height(4.dp))
-        Text("Tindakan ini tidak bisa dibatalkan.",
+        Text(stringResource(R.string.plan_reset_irreversible),
             color = sw.danger,
             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(16.dp))
-        SwButton(text = "Ya, reset plan", onClick = onConfirm, variant = SwButtonVariant.Danger)
+        SwButton(text = stringResource(R.string.plan_reset_confirm), onClick = onConfirm, variant = SwButtonVariant.Danger)
         Spacer(Modifier.height(8.dp))
-        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+        SwButton(text = stringResource(R.string.action_cancel), onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
 }
 

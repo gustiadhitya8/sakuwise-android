@@ -161,7 +161,7 @@ private fun promptBiometric(
     onError: (String) -> Unit,
 ) {
     val activity = ctx as? FragmentActivity ?: run {
-        onError("Biometrik tidak didukung di context ini.")
+        onError(ctx.getString(com.gustiadhitya.sakuwise.R.string.lock_biometric_unsupported))
         return
     }
     val executor = androidx.core.content.ContextCompat.getMainExecutor(ctx)
@@ -179,8 +179,8 @@ private fun promptBiometric(
     }
     val prompt = BiometricPrompt(activity, executor, callback)
     val info = BiometricPrompt.PromptInfo.Builder()
-        .setTitle("Buka Sakuwise")
-        .setSubtitle("Gunakan biometrik untuk membuka aplikasi.")
+        .setTitle(ctx.getString(com.gustiadhitya.sakuwise.R.string.lock_biometric_prompt_title))
+        .setSubtitle(ctx.getString(com.gustiadhitya.sakuwise.R.string.lock_biometric_subtitle))
         .setAllowedAuthenticators(
             BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
         )

@@ -166,7 +166,7 @@ class BackupViewModel @Inject constructor(
             if (latest == null) {
                 _driveState.value = _driveState.value.copy(
                     busy = false,
-                    error = "Belum ada file backup lokal. Buat backup dulu lewat tombol Backup Sekarang.",
+                    error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_no_local_files),
                 )
                 return@launch
             }
@@ -246,7 +246,7 @@ class BackupViewModel @Inject constructor(
                 onFailure = { t ->
                     _driveState.value = _driveState.value.copy(
                         busy = false,
-                        error = "Hapus gagal: ${t.message ?: "unknown"}",
+                        error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_delete_failed_format, t.message ?: "unknown"),
                     )
                 },
             )

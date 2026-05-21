@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +43,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
@@ -224,7 +226,7 @@ private fun IdleBody(onCamera: () -> Unit, onGallery: () -> Unit) {
             Icon(Icons.Outlined.CameraAlt, null,
                 tint = sw.onPrimaryContainer, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(10.dp))
-            Text("Foto struk untuk auto-isi pengeluaran",
+            Text(stringResource(R.string.ocr_idle_body),
                 color = sw.onPrimaryContainer,
                 style = SwType.Body.copy(fontSize = 14.sp))
         }
@@ -236,7 +238,7 @@ private fun IdleBody(onCamera: () -> Unit, onGallery: () -> Unit) {
                 tint = sw.onPrimary, modifier = Modifier.size(16.dp))
         })
     Spacer(Modifier.height(8.dp))
-    SwButton(text = "Pilih dari Galeri", onClick = onGallery,
+    SwButton(text = stringResource(R.string.ocr_pick_from_gallery), onClick = onGallery,
         variant = SwButtonVariant.Outline,
         leading = {
             Icon(Icons.Outlined.Image, null,
@@ -333,7 +335,7 @@ private fun ReadyBody(draft: ReceiptDraft) {
             .padding(14.dp),
     ) {
         Text(
-            "Tap Lanjut untuk buka form pengeluaran. Field yang terdeteksi sudah di-prefill. Foto struk otomatis di-attach (terkompresi ~200 KB).",
+            stringResource(R.string.ocr_review_info_format),
             color = sw.ink,
             style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
         )
@@ -402,7 +404,7 @@ private fun FailureBody(message: String, onRetake: () -> Unit, onGallery: () -> 
     Spacer(Modifier.height(16.dp))
     SwButton(text = "Foto Ulang", onClick = onRetake)
     Spacer(Modifier.height(8.dp))
-    SwButton(text = "Pilih dari Galeri", onClick = onGallery,
+    SwButton(text = stringResource(R.string.ocr_pick_from_gallery), onClick = onGallery,
         variant = SwButtonVariant.Outline)
 }
 

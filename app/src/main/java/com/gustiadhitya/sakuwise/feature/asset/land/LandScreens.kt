@@ -333,11 +333,12 @@ fun LandDetailScreen(
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                     ) {
                         Text(
-                            (if (profit >= 0) "+ " else "− ") +
-                                kotlin.math.abs(profit).toRupiahShort() +
-                                " sejak beli · " +
-                                (if (pctProfit >= 0f) "+" else "−") +
-                                "%.1f".format(kotlin.math.abs(pctProfit)) + "%",
+                            stringResource(
+                                R.string.land_since_purchase_format,
+                                (if (profit >= 0) "+ " else "− ") + kotlin.math.abs(profit).toRupiahShort(),
+                                (if (pctProfit >= 0f) "+" else "−"),
+                                "%.1f".format(kotlin.math.abs(pctProfit)),
+                            ),
                             color = Color.White,
                             style = SwType.LabelStrong.copy(fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,

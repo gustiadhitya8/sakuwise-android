@@ -230,7 +230,7 @@ fun ExpenseFormScreen(
             FieldButton(
                 label = "Hutang",
                 value = state.debtLabel.orEmpty(),
-                placeholder = "Pilih hutang…",
+                placeholder = stringResource(R.string.expense_pick_debt_placeholder),
                 leadingIcon = Icons.Outlined.Link,
                 onClick = { picker = ExpensePicker.Debt },
             )

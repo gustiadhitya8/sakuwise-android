@@ -78,10 +78,10 @@ fun SettingsScreen(
     val sw = SwTheme.colors
     val prefs by mainVm.prefs.collectAsState()
     val initial = (prefs.userNickname.firstOrNull()?.uppercase() ?: "S")
-    val lastBackupLabel = if (prefs.lastBackupTimestamp == 0L) "Belum pernah"
+    val lastBackupLabel = if (prefs.lastBackupTimestamp == 0L) stringResource(R.string.settings_last_backup_never)
         else {
             val daysAgo = ((System.currentTimeMillis() - prefs.lastBackupTimestamp) / 86_400_000L).toInt()
-            "$daysAgo hari lalu"
+            stringResource(R.string.settings_days_ago_format, daysAgo)
         }
     val activeStr = stringResource(R.string.settings_active)
     val inactiveStr = stringResource(R.string.settings_inactive)
@@ -137,7 +137,7 @@ fun SettingsScreen(
                         style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     Text(
                         "${if (prefs.language == "id") "Bahasa Indonesia" else "English"} · " +
-                            if (prefs.biometricEnabled) "Biometrik aktif" else "PIN saja",
+                            if (prefs.biometricEnabled) stringResource(R.string.settings_lang_biometric) else stringResource(R.string.settings_lang_pin_only),
                         color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.LabelSmall.copy(fontSize = 12.sp),
                     )
@@ -153,7 +153,7 @@ fun SettingsScreen(
                 icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
                 onClick = onNavigateToAllocation)
             SettingsRow(stringResource(R.string.settings_period_start),
-                "Tanggal ${prefs.planPeriodStartDay}",
+                stringResource(R.string.settings_period_day_format, prefs.planPeriodStartDay),
                 icon = Icons.Outlined.CalendarToday,
                 onClick = onNavigateToPeriodStart)
         }

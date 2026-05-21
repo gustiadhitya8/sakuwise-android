@@ -76,6 +76,72 @@
     <string name="plan_empty_welcoming_body">Buat plan baru — atur sendiri kategori &amp; item sesuai kebutuhan kamu. Atau pakai template starter biar lebih cepat.</string>
     <string name="plan_empty_add_first">Buat plan dari awal</string>
     <string name="plan_empty_use_starter">Pakai template starter</string>
+
+    <!-- Dashboard hero + sections (i18n round 2) -->
+    <string name="dashboard_remaining_budget">SISA ANGGARAN</string>
+    <string name="dashboard_daily_budget">Anggaran harian</string>
+    <string name="dashboard_per_day">/ hari</string>
+    <string name="dashboard_metric_income">Pemasukan</string>
+    <string name="dashboard_metric_expense">Pengeluaran</string>
+    <string name="dashboard_assets_card_title">Aset &amp; Kekayaan</string>
+    <string name="dashboard_assets_card_sub_format">%1$d akun aktif · %2$s di akun · detail di tab Aset</string>
+    <string name="dashboard_assets_card_sub_hidden_format">%1$d akun aktif · detail di tab Aset</string>
+    <string name="dashboard_recent_txns">Transaksi Terbaru</string>
+    <string name="dashboard_action_all">Semua</string>
+    <string name="dashboard_empty_txns">Belum ada transaksi. Tap tombol + untuk catat pengeluaran pertamamu.</string>
+    <string name="dashboard_backup_never_label">Belum pernah backup</string>
+    <string name="dashboard_backup_overdue_days_format">%1$d hari sejak backup terakhir</string>
+    <string name="dashboard_backup_banner_sub_never">Amankan data uangmu — backup sekarang.</string>
+    <string name="dashboard_backup_banner_cta">Backup</string>
+
+    <!-- Plan inline labels -->
+    <string name="plan_used_prefix">Terpakai </string>
+    <string name="plan_of_prefix">dari </string>
+    <string name="plan_old_readonly">Plan lama bersifat read-only.</string>
+    <string name="plan_period_active_hint">Periode aktif ditentukan otomatis dari Tanggal Mulai Periode di Pengaturan. Plan lama bersifat read-only.</string>
+    <string name="plan_delete_category_body_format">Hapus kategori \"%1$s\" dan semua plan item di dalamnya. Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="plan_delete_category_confirm">Ya, hapus kategori</string>
+    <string name="plan_expected_income_body">Total pemasukan yang kamu ekspektasikan di periode ini. Dipakai sebagai baseline progress bar plan.</string>
+
+    <!-- Plan reset confirm sheet -->
+    <string name="plan_reset_body">Semua kategori dan plan item di periode ini akan dihapus.\n\nTransaksi yang sudah dicatat tidak terhapus, tapi hilang link-nya ke plan item lama.</string>
+    <string name="plan_reset_irreversible">Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="plan_reset_confirm">Ya, reset plan</string>
+
+    <!-- OCR + lock -->
+    <string name="ocr_idle_body">Foto struk untuk auto-isi pengeluaran</string>
+    <string name="ocr_review_info_format">Tap Lanjut untuk buka form pengeluaran. Field yang terdeteksi sudah di-prefill. Foto struk otomatis di-attach (terkompresi ~200 KB).</string>
+    <string name="lock_biometric_subtitle">Gunakan biometrik untuk membuka aplikasi.</string>
+    <string name="lock_biometric_unsupported">Biometrik tidak didukung di context ini.</string>
+    <string name="lock_biometric_prompt_title">Buka Sakuwise</string>
+
+    <!-- Settings + picker empty states -->
+    <string name="settings_last_backup_never">Belum pernah</string>
+    <string name="settings_days_ago_format">%1$d hari lalu</string>
+    <string name="picker_no_open_debts">Belum ada hutang terbuka. Tambah dulu di tab Aset → Hutang.</string>
+    <string name="picker_no_income_categories">Belum ada kategori sumber.</string>
+
+    <!-- Misc i18n round 2 -->
+    <string name="plan_expected_income_label">Pemasukan diharapkan</string>
+    <string name="reconcile_already_match">Saldo sudah sesuai</string>
+    <string name="reconcile_failed">Gagal rekonsiliasi</string>
+    <string name="reconcile_adjustment_plus_format">Penyesuaian +Rp %1$d disimpan</string>
+    <string name="reconcile_adjustment_minus_format">Penyesuaian -Rp %1$d disimpan</string>
+    <string name="backup_no_local_files">Belum ada file backup lokal. Buat backup dulu lewat tombol Backup Sekarang.</string>
+    <string name="export_pdf_no_accounts">Belum ada akun.</string>
+    <string name="export_pdf_income_vs_expense">Pemasukan vs Pengeluaran</string>
+    <string name="export_pdf_no_transactions">Belum ada transaksi.</string>
+    <string name="assets_hub_since_month_format">%1$s%2$s%% sejak %3$s</string>
+    <string name="land_since_purchase_format">%1$s · %2$s%3$s%% sejak beli</string>
+    <string name="expense_pick_debt_placeholder">Pilih hutang…</string>
+    <string name="ocr_pick_from_gallery">Pilih dari Galeri</string>
+    <string name="backup_delete_failed_format">Hapus gagal: %1$s</string>
+    <string name="plan_delete_item">Hapus item</string>
+    <string name="dashboard_add_account_cd">Tambah akun</string>
+    <string name="settings_lang_biometric">Biometrik aktif</string>
+    <string name="settings_lang_pin_only">PIN saja</string>
+    <string name="settings_period_day_format">Tanggal %1$d</string>
+
     <string name="plan_apply_starter_btn">Terapkan Template Starter</string>
 
     <!-- Settings hub -->
