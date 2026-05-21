@@ -24,7 +24,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Diamond
 import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Landscape
@@ -50,6 +49,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -250,7 +250,7 @@ fun AssetsHubScreen(
         ) {
             AssetClassCard(stringResource(R.string.assets_class_accounts),
                 stringResource(R.string.assets_class_active_format, state.accounts.size),
-                state.accountsTotal, sw.primary, Icons.Outlined.AccountBalanceWallet,
+                state.accountsTotal, sw.primary, R.drawable.ic_asset_wallet,
                 Modifier.weight(1f), onClick = onNavigateToAccounts)
             val goldBuy = state.gold.sumOf { it.buyPrice }
             val goldGrowth = if (goldBuy > 0L)
@@ -258,7 +258,7 @@ fun AssetsHubScreen(
             else null
             AssetClassCard(stringResource(R.string.assets_class_gold),
                 stringResource(R.string.assets_class_count_format, state.gold.size),
-                nw.goldTotal, sw.warning, Icons.Outlined.Diamond,
+                nw.goldTotal, sw.warning, R.drawable.ic_asset_gold,
                 Modifier.weight(1f),
                 growthPct = goldGrowth,
                 onClick = onNavigateToGold)
@@ -274,13 +274,13 @@ fun AssetsHubScreen(
             else null
             AssetClassCard(stringResource(R.string.assets_class_land),
                 stringResource(R.string.assets_class_count_format, state.land.size),
-                nw.landTotal, sw.info, Icons.Outlined.Landscape,
+                nw.landTotal, sw.info, R.drawable.ic_asset_land,
                 Modifier.weight(1f),
                 growthPct = landGrowth,
                 onClick = onNavigateToLand)
             AssetClassCard(stringResource(R.string.assets_class_deposit),
                 stringResource(R.string.assets_class_count_format, state.deposits.size),
-                nw.depositTotal, sw.accent, Icons.Outlined.Savings,
+                nw.depositTotal, sw.accent, R.drawable.ic_asset_deposit,
                 Modifier.weight(1f),
                 // Deposit growth needs first vs last snapshot per asset, not
                 // exposed in HubState today. Hide chip until VM supplies it.
@@ -470,7 +470,7 @@ private fun AssetClassCard(
     sub: String,
     value: Long,
     tint: Color,
-    icon: ImageVector,
+    @androidx.annotation.DrawableRes iconRes: Int,
     modifier: Modifier = Modifier,
     growthPct: Float? = null,
     onClick: (() -> Unit)? = null,
@@ -479,6 +479,8 @@ private fun AssetClassCard(
     // Proto AssetCard (screens-assets.jsx:138): 14dp padding, 36dp icon, 10dp
     // gap, no decorative watermark. Earlier Android impl added a 96dp tinted
     // background icon that roughly doubled card height — drop it to match.
+    // Icons use VectorDrawables ported from proto/icons.jsx so the wallet
+    // clasp dot, gold facets, land peaks, and deposit "$"-coin all match 1:1.
     SwCard(modifier = modifier, padding = PaddingValues(14.dp), onClick = onClick) {
         Column {
             Box(
@@ -487,7 +489,7 @@ private fun AssetClassCard(
                     .size(36.dp)
                     .clip(RoundedCornerShape(11.dp))
                     .background(tint.copy(alpha = 0.15f)),
-            ) { Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp)) }
+            ) { Icon(painterResource(iconRes), null, tint = tint, modifier = Modifier.size(20.dp)) }
             Spacer(Modifier.height(10.dp))
             Text(title, color = sw.ink,
                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
