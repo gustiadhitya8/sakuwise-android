@@ -185,13 +185,17 @@ fun AssetsHubScreen(
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .background(Color.White.copy(alpha = 0.12f)),
+                        // Track is brighter (0.22) so Akun's primary slice has
+                        // enough contrast against the same-coloured hero bg.
+                        .background(Color.White.copy(alpha = 0.22f)),
                 ) {
-                    // Slice palette per screens-dashboard.jsx:220-225 — Akun=primary,
-                    // Emas=warning, Properti=info, Deposito=accent.
+                    // Akun uses sw.onPrimaryHero (light mint in dark, light cream
+                    // in light) — its primary-coloured bar slice on the primary-
+                    // coloured hero bg was invisible. Other classes contrast OK.
+                    val akunColor = sw.onPrimaryHero
                     if (nw.accountsTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.accountsTotal.toFloat() / totalPos)
-                        .background(sw.primary))
+                        .background(akunColor))
                     if (nw.goldTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.goldTotal.toFloat() / totalPos)
                         .background(sw.warning))
@@ -212,7 +216,9 @@ fun AssetsHubScreen(
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState()),
                 ) {
-                    LegendDot(sw.primary,
+                    // Akun dot mirrors the bar slice colour (onPrimaryHero) so
+                    // legend ↔ bar stay in sync and both stay visible.
+                    LegendDot(sw.onPrimaryHero,
                         "${stringResource(R.string.assets_class_accounts)} ${pct(nw.accountsTotal)}%")
                     LegendDot(sw.warning,
                         "${stringResource(R.string.assets_class_gold)} ${pct(nw.goldTotal)}%")

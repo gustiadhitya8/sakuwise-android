@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Savings
+import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -234,11 +236,15 @@ fun DepositDetailScreen(
     SimpleSettingsScreen(
         title = d.name, onBack = onBack,
         actions = {
+            // Proto Deposito detail has no top-right action. Keep the edit
+            // affordance reachable via long-press of any snapshot row would
+            // be invisible, so render a tiny pencil-equivalent transparently.
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
-                    .background(sw.primary).clickable(onClick = onEdit)) {
-                Text(stringResource(R.string.action_edit), color = sw.onPrimary,
-                    style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                    .clickable(onClick = onEdit)) {
+                Icon(androidx.compose.material.icons.Icons.Outlined.MoreHoriz,
+                    stringResource(R.string.action_edit),
+                    tint = sw.ink, modifier = Modifier.size(22.dp))
             }
         },
     ) {
@@ -297,43 +303,84 @@ fun DepositDetailScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
+        // "DETAIL" section label.
+        Text(stringResource(R.string.gold_section_detail), color = sw.inkSubtle,
+            style = SwType.SectionLabel.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp))
+        Spacer(Modifier.height(4.dp))
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
                 DetailRow(stringResource(R.string.deposit_field_type), d.typeLabel.code())
-                DetailRow(stringResource(R.string.deposit_field_institution), d.institutionInfo ?: stringResource(R.string.gold_dash))
+                DetailRow(stringResource(R.string.deposit_field_institution),
+                    d.institutionInfo ?: stringResource(R.string.gold_dash), last = true)
             }
         }
         Spacer(Modifier.height(16.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.deposit_section_snapshot), color = sw.ink,
-                style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+        // "RIWAYAT SNAPSHOT" label with "+ Snapshot baru" link on the right.
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 4.dp)) {
+            Text(stringResource(R.string.deposit_section_snapshot).uppercase(),
+                color = sw.inkSubtle,
+                style = SwType.SectionLabel.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.deposit_snapshot_add), color = sw.primary,
-                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.clickable { addSnap = true })
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { addSnap = true }
+                    .padding(horizontal = 4.dp, vertical = 4.dp)) {
+                Icon(Icons.Outlined.Add, null, tint = sw.primary, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.size(width = 2.dp, height = 1.dp))
+                Text(stringResource(R.string.deposit_snapshot_add), color = sw.primary,
+                    style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold))
+            }
         }
         Spacer(Modifier.height(8.dp))
         if (snapshots.isEmpty()) {
             SwCard { Text(stringResource(R.string.deposit_snapshot_empty), color = sw.inkMuted, style = SwType.Body) }
         } else SwCard(padding = PaddingValues(0.dp)) {
             Column {
-                snapshots.reversed().forEach { s ->
-                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+                val reversed = snapshots.reversed()
+                reversed.forEachIndexed { idx, s ->
+                    val prev = reversed.getOrNull(idx + 1)
+                    val diff = if (prev != null) s.balance - prev.balance else 0L
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        // 36×36 r10 primaryContainer calendar chip per proto.
+                        Box(contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp))
+                                .background(sw.primaryContainer)) {
+                            Icon(Icons.Outlined.CalendarMonth, null,
+                                tint = sw.onPrimaryContainer, modifier = Modifier.size(16.dp))
+                        }
+                        Spacer(Modifier.size(width = 12.dp, height = 1.dp))
                         Column(Modifier.weight(1f)) {
                             Text(s.date.toAbsoluteId(), color = sw.ink,
                                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
-                            if (s.note != null) Text(s.note, color = sw.inkSubtle,
-                                style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                            if (prev != null) {
+                                val sign = if (diff >= 0L) "+" else "−"
+                                Text("$sign ${kotlin.math.abs(diff).toRupiahShort()} vs sebelumnya",
+                                    color = if (diff >= 0L) sw.success else sw.danger,
+                                    style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold))
+                            } else if (s.note != null) {
+                                Text(s.note, color = sw.inkSubtle,
+                                    style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                            }
                         }
-                        RupiahText(value = s.balance, short = true,
-                            style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                        RupiahText(value = s.balance,
+                            style = SwType.Amount.copy(fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
+                    }
+                    if (idx < reversed.lastIndex) {
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
                     }
                 }
             }
         }
         Spacer(Modifier.height(20.dp))
-        SwButton(text = stringResource(R.string.deposit_delete), onClick = { viewModel.delete(); onBack() },
-            variant = SwButtonVariant.Danger)
+        // Proto has no destructive button in body; keep delete as a tiny link.
+        Text(stringResource(R.string.deposit_delete), color = sw.danger,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.clickable { viewModel.delete(); onBack() }
+                .padding(horizontal = 4.dp, vertical = 6.dp))
     }
     if (addSnap) {
         AddSnapshotSheet(
@@ -527,13 +574,18 @@ fun DepositEditScreen(
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, last: Boolean = false) {
     val sw = SwTheme.colors
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
-        Text(label, color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp),
-            modifier = Modifier.weight(1f))
-        Text(value, color = sw.ink,
-            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
+    Column(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(label, color = sw.inkMuted,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium))
+            Spacer(Modifier.weight(1f))
+            Text(value, color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
+        }
+        if (!last) Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
     }
 }

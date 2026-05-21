@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -58,6 +59,8 @@ class RecurringPaymentReminderWorker(
             }
         }
 
+        private fun uniqueName(planItemId: String) = "reminder-$planItemId"
+
         fun scheduleMonthly(ctx: Context, planItemId: String, title: String, body: String) {
             val data = androidx.work.workDataOf(
                 KEY_TITLE to title,
@@ -65,12 +68,35 @@ class RecurringPaymentReminderWorker(
             )
             val request = PeriodicWorkRequestBuilder<RecurringPaymentReminderWorker>(
                 30, TimeUnit.DAYS,
-            ).addTag("reminder-$planItemId").setInputData(data).build()
-            WorkManager.getInstance(ctx).enqueue(request)
+            ).addTag(uniqueName(planItemId)).setInputData(data).build()
+            // Replace any prior schedule for the same plan item — prevents
+            // duplicate periodic work stacking up across taps.
+            WorkManager.getInstance(ctx).enqueueUniquePeriodicWork(
+                uniqueName(planItemId),
+                ExistingPeriodicWorkPolicy.UPDATE,
+                request,
+            )
+            // Immediate confirmation notification so the user can see the
+            // pipeline actually works (periodic fires only after ~30 days).
+            ensureChannel(ctx)
+            val notif = NotificationCompat.Builder(ctx, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setAutoCancel(true)
+                .build()
+            try {
+                NotificationManagerCompat.from(ctx).notify(planItemId.hashCode(), notif)
+            } catch (_: SecurityException) {
+                // POST_NOTIFICATIONS revoked between check and call — ignore.
+            }
         }
 
         fun cancelFor(ctx: Context, planItemId: String) {
-            WorkManager.getInstance(ctx).cancelAllWorkByTag("reminder-$planItemId")
+            val wm = WorkManager.getInstance(ctx)
+            wm.cancelUniqueWork(uniqueName(planItemId))
+            wm.cancelAllWorkByTag(uniqueName(planItemId))
         }
     }
 }

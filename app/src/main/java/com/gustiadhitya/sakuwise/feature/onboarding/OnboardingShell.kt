@@ -56,13 +56,14 @@ fun OnboardingShell(
             .background(sw.bg)
             .windowInsetsPadding(WindowInsets.statusBars),
     ) {
-        // Progress dots
+        // Progress dots — tightened from 52dp to 24dp top so 4-step content
+        // fits on small phones (Galaxy S25 was scrolling on every step).
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 52.dp, start = 20.dp, end = 20.dp),
+                .padding(top = 24.dp, start = 20.dp, end = 20.dp),
         ) {
             repeat(total) { i ->
                 val isCurrent = i == step - 1
@@ -81,12 +82,12 @@ fun OnboardingShell(
             }
         }
 
-        // Hero artwork
+        // Hero artwork — tighter vertical padding so it sits closer to copy.
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
+                .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
         ) { hero() }
 
         // Copy + scrollable content
@@ -99,25 +100,25 @@ fun OnboardingShell(
             Text(
                 title,
                 color = sw.ink,
-                style = SwType.H1.copy(fontSize = 28.sp, letterSpacing = (-0.025).em),
+                style = SwType.H1.copy(fontSize = 24.sp, letterSpacing = (-0.025).em),
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
             Text(
                 subtitle,
                 color = sw.inkMuted,
-                style = SwType.BodyL.copy(fontSize = 15.sp),
+                style = SwType.BodyL.copy(fontSize = 14.sp),
             )
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(16.dp))
             content()
             Spacer(Modifier.height(8.dp))
         }
 
-        // Sticky actions
+        // Sticky actions — bottom inset trimmed; safe-area handles the rest.
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 40.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp),
         ) {
             SwButton(
                 text = primaryLabel,

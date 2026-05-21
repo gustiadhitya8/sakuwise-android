@@ -1,8 +1,10 @@
 package com.gustiadhitya.sakuwise.feature.plan
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +28,11 @@ import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Tune
@@ -262,30 +266,14 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         name = cat.category.name,
                         plan = cat.plan, used = cat.used,
                         allocColor = allocColor,
-                        items = cat.items.size,
+                        items = cat.items,
                         expanded = isOpen,
                         onToggle = { expanded[cat.category.id] = !isOpen },
-                        onMore = { deleteCategoryConfirm = cat.category.id to cat.category.name },
+                        onDeleteCategory = { deleteCategoryConfirm = cat.category.id to cat.category.name },
+                        onEditItem = { pi -> editItem = pi.item },
+                        onAddItem = { addToCategory = cat.category.id },
                     )
-                    if (isOpen) {
-                        Column(modifier = Modifier.padding(start = 14.dp, top = 4.dp, bottom = 2.dp)) {
-                            cat.items.forEach { pi ->
-                                PlanItemRow(
-                                    name = pi.item.name,
-                                    plan = pi.item.plannedAmount,
-                                    used = pi.used,
-                                    allocColor = allocColor,
-                                    recurrence = pi.item.recurrence,
-                                    onClick = { editItem = pi.item },
-                                )
-                            }
-                            DashedAddButton("+ Tambah item",
-                                onClick = { addToCategory = cat.category.id })
-                        }
-                        Spacer(Modifier.height(12.dp))
-                    } else {
-                        Spacer(Modifier.height(8.dp))
-                    }
+                    Spacer(Modifier.height(8.dp))
                 }
                 // Always-visible add-category button — recovers from full delete
                 Spacer(Modifier.height(4.dp))
@@ -569,79 +557,104 @@ private fun MonthPickerSheet(
     }
 }
 
-// ─── CategoryCard ─── Per prototype screens-plan.jsx:184-213. Padding 14/16
-// inside the card, title 14sp bold, used/plan on the same row (used = bold
-// ink/danger, plan = inkSubtle), 6dp bar tinted by allocation, then a footer
-// row: "{items} item · {pct}%" (inkSubtle 10sp) + optional "Over X" (danger
-// 10sp bold). Chevron drives expand/collapse; the trailing MoreHoriz pill
-// stays for delete-category, but lives outside the proto-spec area so it
-// doesn't visually clutter the row.
+// ─── CategoryCard ─── Per prototype screens-plan.jsx:184-232. The entire
+// expand/collapse panel lives inside ONE SwCard:
+//   • header row: title + used/plan + 6dp tinted bar + footer line, chevron
+//     on the right (rotates when expanded — we swap icons since AnimatedRotate
+//     isn't worth the dep).
+//   • when expanded: 1px border-top divider, then each item as a row with a
+//     subtle 33%-alpha bottom border, and a plain "+ Tambah item" link.
+// Delete-category is reachable via long-press on the header (proto shows no
+// per-card delete affordance; the global 3-dots action sheet covers reset).
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CategoryCard(
     name: String, plan: Long, used: Long,
     allocColor: Color,
-    items: Int, expanded: Boolean, onToggle: () -> Unit,
-    onMore: () -> Unit = {},
+    items: List<com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow>,
+    expanded: Boolean, onToggle: () -> Unit,
+    onDeleteCategory: () -> Unit,
+    onEditItem: (com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow) -> Unit,
+    onAddItem: () -> Unit,
 ) {
     val sw = SwTheme.colors
     val over = used > plan
     val pct = if (plan > 0) ((used.toFloat() / plan.toFloat()) * 100f).toInt() else 0
-    SwCard(padding = PaddingValues(0.dp), onClick = onToggle) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-        ) {
-            Column(Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(name, color = sw.ink,
-                        style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                        modifier = Modifier.weight(1f))
-                    Spacer(Modifier.width(8.dp))
-                    RupiahText(value = used, short = true,
-                        style = SwType.Amount.copy(fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
-                        color = if (over) sw.danger else sw.ink)
-                    Text(" / ", color = sw.inkSubtle,
-                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
-                    RupiahText(value = plan, short = true,
-                        style = SwType.Amount.copy(fontSize = 12.sp,
-                            fontFeatureSettings = "tnum"),
-                        color = sw.inkSubtle)
-                }
-                Spacer(Modifier.height(8.dp))
-                SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor)
-                Spacer(Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text("$items item · $pct%", color = sw.inkSubtle,
-                        style = SwType.LabelSmall.copy(fontSize = 10.sp,
-                            fontFeatureSettings = "tnum"))
-                    if (over) {
-                        Text("Over ${(used - plan).toRupiahShort()}",
-                            color = sw.danger,
+    SwCard(padding = PaddingValues(0.dp)) {
+        Column(Modifier.fillMaxWidth()) {
+            // Header (whole row tap = toggle, long-press = delete)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = onToggle,
+                        onLongClick = onDeleteCategory,
+                    )
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(name, color = sw.ink,
+                            style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier.weight(1f))
+                        Spacer(Modifier.width(8.dp))
+                        RupiahText(value = used, short = true,
+                            style = SwType.Amount.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"),
+                            color = if (over) sw.danger else sw.ink)
+                        Text(" / ", color = sw.inkSubtle,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                        RupiahText(value = plan, short = true,
+                            style = SwType.Amount.copy(fontSize = 12.sp,
+                                fontFeatureSettings = "tnum"),
+                            color = sw.inkSubtle)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor, heightDp = 6)
+                    Spacer(Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text("${items.size} item · $pct%", color = sw.inkSubtle,
                             style = SwType.LabelSmall.copy(fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold))
+                                fontFeatureSettings = "tnum"))
+                        if (over) {
+                            Text("Over ${(used - plan).toRupiahShort()}",
+                                color = sw.danger,
+                                style = SwType.LabelSmall.copy(fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold))
+                        }
                     }
                 }
+                Spacer(Modifier.width(12.dp))
+                Icon(
+                    if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.KeyboardArrowDown,
+                    null, tint = sw.inkSubtle, modifier = Modifier.size(20.dp),
+                )
             }
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
-                null, tint = sw.inkSubtle, modifier = Modifier.size(20.dp),
-            )
-            Spacer(Modifier.width(2.dp))
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = onMore),
-            ) { Icon(Icons.Outlined.MoreHoriz, "Hapus kategori", tint = sw.inkSubtle, modifier = Modifier.size(18.dp)) }
+            if (expanded) {
+                // Top border divider, then padded item list (proto: padding
+                // '4px 16px 12px', borderTop 1px c.border).
+                Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
+                    items.forEach { pi ->
+                        PlanItemRowProto(
+                            name = pi.item.name,
+                            plan = pi.item.plannedAmount,
+                            used = pi.used,
+                            allocColor = allocColor,
+                            recurrence = pi.item.recurrence,
+                            onClick = { onEditItem(pi) },
+                        )
+                    }
+                    AddItemLink(onClick = onAddItem, primary = sw.primary)
+                }
+            }
         }
     }
 }
@@ -699,76 +712,74 @@ private fun ConfirmDeleteCategorySheet(
     }
 }
 
-// ─── PlanItemRow ─── CHILD: no card chrome, indent guide line, smaller text
+// ─── PlanItemRowProto ─── Per prototype screens-plan.jsx:234-261.
+// No indent guide line, just name + recurrence chip + used/plan + thin bar,
+// with a 33%-alpha bottom divider between rows (matches `border-bottom:
+// `${c.border}55``). Padding 10dp top/bottom.
 @Composable
-private fun PlanItemRow(
+private fun PlanItemRowProto(
     name: String, plan: Long, used: Long,
     allocColor: Color,
     recurrence: Recurrence,
     onClick: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    Row(
-        verticalAlignment = Alignment.Top,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 6.dp),
+            .padding(vertical = 10.dp),
     ) {
-        // Indent guide
-        Box(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .size(width = 2.dp, height = 32.dp)
-                .clip(RoundedCornerShape(1.dp))
-                .background(allocColor.copy(alpha = 0.5f)),
-        )
-        Spacer(Modifier.size(width = 10.dp, height = 1.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(name, color = sw.ink,
-                    style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium),
-                    modifier = Modifier.weight(1f))
-                if (recurrence != Recurrence.OneOff) {
-                    val chipText = when (recurrence) {
-                        Recurrence.Monthly -> stringResource(R.string.recurrence_chip_monthly)
-                        Recurrence.Quarterly -> stringResource(R.string.recurrence_chip_quarterly)
-                        Recurrence.Yearly -> stringResource(R.string.recurrence_chip_yearly)
-                        else -> ""
-                    }
-                    Text(
-                        "⟳ $chipText",
-                        color = sw.inkSubtle,
-                        style = SwType.LabelSmall.copy(fontSize = 10.sp),
-                    )
-                    Spacer(Modifier.size(width = 6.dp, height = 1.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(name, color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium),
+                modifier = Modifier.weight(1f))
+            if (recurrence != Recurrence.OneOff) {
+                val chipText = when (recurrence) {
+                    Recurrence.Monthly -> stringResource(R.string.recurrence_chip_monthly)
+                    Recurrence.Quarterly -> stringResource(R.string.recurrence_chip_quarterly)
+                    Recurrence.Yearly -> stringResource(R.string.recurrence_chip_yearly)
+                    else -> ""
                 }
-                RupiahText(value = used, short = true,
-                    style = SwType.Amount.copy(fontSize = 12.sp,
-                        fontWeight = if (used > plan) FontWeight.Bold else FontWeight.SemiBold),
-                    color = if (used > plan) sw.danger else sw.ink)
-                Text(" / ", color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 10.sp))
-                RupiahText(value = plan, short = true,
-                    style = SwType.Amount.copy(fontSize = 12.sp), color = sw.inkSubtle)
+                Text(
+                    "⟳ $chipText",
+                    color = sw.inkSubtle,
+                    style = SwType.LabelSmall.copy(fontSize = 10.sp),
+                )
+                Spacer(Modifier.width(6.dp))
             }
-            Spacer(Modifier.height(4.dp))
-            SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor, heightDp = 4)
+            RupiahText(value = used, short = true,
+                style = SwType.Amount.copy(fontSize = 12.sp,
+                    fontWeight = if (used > plan) FontWeight.Bold else FontWeight.SemiBold),
+                color = if (used > plan) sw.danger else sw.ink)
+            Text(" / ", color = sw.inkSubtle, style = SwType.LabelSmall.copy(fontSize = 10.sp))
+            RupiahText(value = plan, short = true,
+                style = SwType.Amount.copy(fontSize = 12.sp), color = sw.inkSubtle)
         }
+        Spacer(Modifier.height(6.dp))
+        SwBar(used = used, plan = plan.coerceAtLeast(1L), color = allocColor, heightDp = 4)
+        Spacer(Modifier.height(10.dp))
+        Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border.copy(alpha = 0.33f)))
     }
 }
 
+// Plain centered "+ Tambah item" link, primary color — proto has NO dashed
+// border for the in-card add (only the outer "+ Tambah kategori" is dashed).
 @Composable
-private fun DashedAddButton(text: String, onClick: () -> Unit) {
-    val sw = SwTheme.colors
+private fun AddItemLink(onClick: () -> Unit, primary: Color) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(start = 12.dp, top = 10.dp, bottom = 4.dp),
+            .padding(top = 10.dp, bottom = 4.dp),
     ) {
-        Text(text, color = sw.primary,
-            style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
+        Icon(Icons.Outlined.Add, null, tint = primary, modifier = Modifier.size(14.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(R.string.plan_add_item),
+            color = primary,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
     }
 }
 
@@ -914,6 +925,11 @@ private fun EditPlanItemSheet(
         // schedule again is idempotent at the WorkManager layer.
         if (existing != null && rec != Recurrence.OneOff) {
             val ctx = androidx.compose.ui.platform.LocalContext.current
+            // Use a Toast for immediate feedback — WorkManager schedule is
+            // silent otherwise and the user assumes the buttons are dead.
+            val scheduledMsg = stringResource(R.string.reminder_toast_scheduled)
+            val canceledMsg = stringResource(R.string.reminder_toast_canceled)
+            val deniedMsg = stringResource(R.string.reminder_toast_denied)
             val requestNotif = com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester { granted ->
                 if (granted) {
                     com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.scheduleMonthly(
@@ -921,6 +937,9 @@ private fun EditPlanItemSheet(
                         title = ctx.getString(R.string.reminder_notif_title),
                         body = ctx.getString(R.string.reminder_notif_body_format, existing.name),
                     )
+                    android.widget.Toast.makeText(ctx, scheduledMsg, android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    android.widget.Toast.makeText(ctx, deniedMsg, android.widget.Toast.LENGTH_LONG).show()
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -935,6 +954,7 @@ private fun EditPlanItemSheet(
                     text = stringResource(R.string.plan_item_cancel_reminder),
                     onClick = {
                         com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.cancelFor(ctx, existing.id)
+                        android.widget.Toast.makeText(ctx, canceledMsg, android.widget.Toast.LENGTH_SHORT).show()
                     },
                     variant = SwButtonVariant.Ghost,
                     modifier = Modifier.weight(1f),

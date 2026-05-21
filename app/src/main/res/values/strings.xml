@@ -393,6 +393,12 @@
     <string name="passphrase_min_hint_format">Minimal %1$d karakter.</string>
     <string name="plan_item_schedule_reminder">Jadwalkan pengingat</string>
     <string name="plan_item_cancel_reminder">Batalkan pengingat</string>
+    <string name="plan_add_item">Tambah item</string>
+    <string name="reconcile_action_matched">✓ Sudah sesuai · Selesai</string>
+    <string name="land_tax_total">Total dibayar</string>
+    <string name="reminder_toast_scheduled">Pengingat diaktifkan</string>
+    <string name="reminder_toast_canceled">Pengingat dimatikan</string>
+    <string name="reminder_toast_denied">Izin notifikasi ditolak — pengingat tidak bisa muncul</string>
     <string name="reminder_notif_title">Tagihan Sakuwise jatuh tempo</string>
     <string name="reminder_notif_body_format">Jangan lupa bayar: %1$s</string>
     <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>
@@ -480,6 +486,8 @@
     <string name="gold_field_serial">Nomor seri</string>
     <string name="gold_delete">Hapus batch</string>
     <string name="gold_record_sale">Catat Penjualan</string>
+    <string name="gold_section_detail">DETAIL</string>
+    <string name="gold_add_photo">Tambah foto</string>
     <string name="gold_sold_label">SUDAH TERJUAL</string>
     <string name="gold_sold_summary_format">Terjual %1$s</string>
     <string name="gold_sale_intro">Catat harga jual akhir. Jika akun dipilih, hasil penjualan akan masuk sebagai pemasukan otomatis.</string>

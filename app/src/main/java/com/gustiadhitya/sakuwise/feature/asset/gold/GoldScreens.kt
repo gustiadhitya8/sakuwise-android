@@ -45,8 +45,13 @@ import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.app.MainViewModel
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRupiah
 import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
+import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
+import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.automirrored.outlined.CallMade
+import androidx.compose.material.icons.outlined.PhotoCamera
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwField
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwSpace
@@ -356,15 +361,17 @@ fun GoldDetailScreen(
         else stringResource(R.string.gold_item_title_format, g.weightGram),
         onBack = onBack,
         actions = {
+            // Proto screens-assets.jsx:466 — transparent 40×40 r12 with a
+            // MoreHoriz glyph. Tap currently routes to edit; long-press is
+            // available for delete via the action sheet at the bottom.
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(sw.primary)
                     .clickable(onClick = onEdit),
-            ) { Text(stringResource(R.string.action_edit), color = sw.onPrimary,
-                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)) }
+            ) { Icon(Icons.Outlined.MoreHoriz, stringResource(R.string.action_edit),
+                tint = sw.ink, modifier = Modifier.size(22.dp)) }
         },
     ) {
         if (g == null) {
@@ -379,52 +386,76 @@ fun GoldDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(22.dp))
                 .background(sw.warning)
-                .padding(20.dp),
+                .padding(horizontal = 22.dp, vertical = 20.dp),
         ) {
-            // Diamond watermark behind the content per proto land-detail
-            // pattern (icon at -20/-30 with opacity 0.18).
+            // Diamond watermark per proto screens-assets.jsx:478-480 — icon
+            // sized 160 with 0.18 alpha, anchored bottom-right with negative
+            // offsets so it spills out of the card edge.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 0.dp, bottom = 0.dp),
+                    .padding(end = (-20).dp, bottom = (-30).dp),
             ) {
                 Icon(
                     Icons.Outlined.Diamond, null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(140.dp),
+                    modifier = Modifier.size(160.dp),
                 )
             }
             Column {
                 Text(stringResource(R.string.gold_hero_value_label),
                     color = Color.White.copy(alpha = 0.85f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        letterSpacing = androidx.compose.ui.unit.TextUnit.Unspecified))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = currentValue, color = Color.White, style = SwType.AmountXL)
+                RupiahText(value = currentValue, color = Color.White,
+                    style = SwType.AmountXL.copy(fontSize = 34.sp, fontWeight = FontWeight.ExtraBold))
                 Spacer(Modifier.height(10.dp))
                 GoldProfitChip(profit = profit, buyPrice = g.buyPrice.coerceAtLeast(1L))
             }
         }
         Spacer(Modifier.height(14.dp))
+        // Per proto: "DETAIL" section label above the card.
+        Text(stringResource(R.string.gold_section_detail),
+            color = sw.inkSubtle,
+            style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp))
+        Spacer(Modifier.height(4.dp))
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
+                val pricePerGram = if (g.weightGram > 0) g.buyPrice / g.weightGram else 0L
                 DetailRow(stringResource(R.string.gold_field_weight),
                     stringResource(R.string.gold_field_weight_value_format, g.weightGram))
                 DetailRow(stringResource(R.string.gold_field_buy_date), g.purchaseDate.toAbsoluteId())
-                DetailRow(stringResource(R.string.gold_field_buy_price), g.buyPrice.toString())
+                DetailRow(stringResource(R.string.gold_field_buy_price), g.buyPrice.toRupiah())
                 DetailRow(stringResource(R.string.gold_field_price_per_gram),
-                    if (g.weightGram > 0) (g.buyPrice / g.weightGram).toString() else stringResource(R.string.gold_dash))
-                DetailRow(stringResource(R.string.gold_field_serial), g.serial ?: stringResource(R.string.gold_dash))
+                    if (g.weightGram > 0) pricePerGram.toRupiah() else stringResource(R.string.gold_dash))
+                DetailRow(stringResource(R.string.gold_field_serial),
+                    g.serial ?: stringResource(R.string.gold_dash), last = true)
             }
         }
         Spacer(Modifier.height(20.dp))
         var showSellSheet by remember { mutableStateOf(false) }
         if (g.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held) {
+            // Proto: Secondary "Tambah foto" with camera icon, then Outline
+            // "Catat penjualan" with arrow_up_right.
+            SwButton(
+                text = stringResource(R.string.gold_add_photo),
+                onClick = { /* photo flow handled via edit screen */ onEdit() },
+                variant = SwButtonVariant.Secondary,
+                leading = { Icon(Icons.Outlined.PhotoCamera, null,
+                    tint = sw.ink, modifier = Modifier.size(16.dp)) },
+            )
+            Spacer(Modifier.height(10.dp))
             SwButton(
                 text = stringResource(R.string.gold_record_sale),
                 onClick = { showSellSheet = true },
-                variant = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant.Secondary,
+                variant = SwButtonVariant.Outline,
+                leading = { Icon(Icons.AutoMirrored.Outlined.CallMade, null,
+                    tint = sw.ink, modifier = Modifier.size(16.dp)) },
             )
             Spacer(Modifier.height(10.dp))
         } else {
@@ -648,16 +679,22 @@ private fun GoldProfitChip(profit: Long, buyPrice: Long) {
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, last: Boolean = false) {
     val sw = SwTheme.colors
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        Text(label, color = sw.inkMuted,
-            style = SwType.LabelSmall.copy(fontSize = 12.sp),
-            modifier = Modifier.weight(1f))
-        Text(value, color = sw.ink,
-            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+        ) {
+            Text(label, color = sw.inkMuted,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium))
+            Spacer(Modifier.weight(1f))
+            Text(value, color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
+        }
+        if (!last) {
+            Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+        }
     }
 }

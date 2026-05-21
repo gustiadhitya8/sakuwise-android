@@ -40,7 +40,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
+import com.gustiadhitya.sakuwise.core.common.toRupiah
 import com.gustiadhitya.sakuwise.core.common.toRupiahShort
+import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.Receipt
+import androidx.compose.material.icons.outlined.Add
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
@@ -229,12 +233,13 @@ fun LandDetailScreen(
     SimpleSettingsScreen(
         title = l.name, onBack = onBack,
         actions = {
+            // Proto: transparent 40×40 r12 MoreHoriz glyph (no filled CTA).
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
-                    .background(sw.primary).clickable(onClick = onEdit),
-            ) { Text(stringResource(R.string.action_edit), color = sw.onPrimary,
-                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)) }
+                    .clickable(onClick = onEdit),
+            ) { Icon(Icons.Outlined.MoreHoriz, stringResource(R.string.action_edit),
+                tint = sw.ink, modifier = Modifier.size(22.dp)) }
         },
     ) {
         // Hero — per proto screens-assets-detail.jsx:84-103. Info-blue bg,
@@ -244,8 +249,10 @@ fun LandDetailScreen(
         val profit = value - l.buyPrice
         val pctProfit = if (l.buyPrice > 0) (profit.toFloat() / l.buyPrice.toFloat()) * 100f else 0f
         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
-            .background(sw.info).padding(20.dp)) {
-            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+            .background(sw.info).padding(horizontal = 22.dp, vertical = 20.dp)) {
+            Box(modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = (-20).dp, bottom = (-30).dp)) {
                 Icon(
                     Icons.Outlined.Landscape, null,
                     tint = Color.White.copy(alpha = 0.18f),
@@ -257,7 +264,8 @@ fun LandDetailScreen(
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = value, color = Color.White, style = SwType.AmountXL)
+                RupiahText(value = value, color = Color.White,
+                    style = SwType.AmountXL.copy(fontSize = 32.sp, fontWeight = FontWeight.ExtraBold))
                 if (profit != 0L) {
                     Spacer(Modifier.height(10.dp))
                     Row(
@@ -283,47 +291,96 @@ fun LandDetailScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
+        // "DETAIL" label per proto SW_SectionLabel.
+        Text(stringResource(R.string.gold_section_detail), color = sw.inkSubtle,
+            style = SwType.SectionLabel.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp))
+        Spacer(Modifier.height(4.dp))
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
                 DetailRow(stringResource(R.string.land_field_location), l.location)
                 DetailRow(stringResource(R.string.land_field_size),
                     stringResource(R.string.land_field_size_value_format, l.sizeM2))
                 DetailRow(stringResource(R.string.land_field_certificate), l.sertifikatId)
-                DetailRow(stringResource(R.string.land_field_buy_price), l.buyPrice.toString())
-                if (l.currentValue != null) DetailRow(stringResource(R.string.land_field_current_value), l.currentValue.toString())
+                DetailRow(stringResource(R.string.land_field_buy_price), l.buyPrice.toRupiah(),
+                    last = l.currentValue == null)
+                if (l.currentValue != null) {
+                    DetailRow(stringResource(R.string.land_field_current_value),
+                        l.currentValue.toRupiah(), last = true)
+                }
             }
         }
         Spacer(Modifier.height(16.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.land_section_tax), color = sw.ink,
-                style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+        // "PEMBAYARAN PAJAK (PBB)" label with "+ Tambah" link on the right.
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 4.dp)) {
+            Text(stringResource(R.string.land_section_tax).uppercase(), color = sw.inkSubtle,
+                style = SwType.SectionLabel.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.land_tax_add), color = sw.primary,
-                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.clickable { addTax = true })
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { addTax = true }
+                    .padding(horizontal = 4.dp, vertical = 4.dp)) {
+                Icon(Icons.Outlined.Add, null, tint = sw.primary, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.size(width = 2.dp, height = 1.dp))
+                Text(stringResource(R.string.land_tax_add), color = sw.primary,
+                    style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold))
+            }
         }
         Spacer(Modifier.height(8.dp))
         if (taxes.isEmpty()) {
             SwCard { Text(stringResource(R.string.land_tax_empty), color = sw.inkMuted, style = SwType.Body) }
         } else SwCard(padding = PaddingValues(0.dp)) {
             Column {
-                taxes.forEach { t ->
-                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+                val totalTax = taxes.sumOf { it.amount }
+                taxes.forEachIndexed { idx, t ->
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        // Receipt chip 36×36 r10 in warningSoft + warning fg.
+                        Box(contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp))
+                                .background(sw.warningSoft)) {
+                            Icon(Icons.Outlined.Receipt, null, tint = sw.warning,
+                                modifier = Modifier.size(16.dp))
+                        }
+                        Spacer(Modifier.size(width = 12.dp, height = 1.dp))
                         Column(Modifier.weight(1f)) {
                             Text(t.note ?: stringResource(R.string.land_tax_default_note), color = sw.ink,
                                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
                             Text(t.date.toAbsoluteId(), color = sw.inkSubtle,
                                 style = SwType.LabelSmall.copy(fontSize = 11.sp))
                         }
-                        RupiahText(value = t.amount, short = true,
-                            style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                        RupiahText(value = t.amount,
+                            style = SwType.Amount.copy(fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
+                    }
+                    if (idx < taxes.lastIndex) {
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+                    }
+                }
+                // "TOTAL DIBAYAR" footer row in bg (slightly inset visually).
+                Box(Modifier.fillMaxWidth().background(sw.bg)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.land_tax_total).uppercase(),
+                            color = sw.inkSubtle,
+                            style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold))
+                        Spacer(Modifier.weight(1f))
+                        RupiahText(value = totalTax,
+                            style = SwType.Amount.copy(fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
                     }
                 }
             }
         }
         Spacer(Modifier.height(20.dp))
-        SwButton(text = stringResource(R.string.land_delete), onClick = { viewModel.delete(); onBack() },
-            variant = SwButtonVariant.Danger)
+        // Delete moved to the more-menu in production; proto shows no in-page
+        // destructive button. Keep it as a Ghost-tinted small link so power
+        // users still have a path, but it doesn't dominate the layout.
+        Text(stringResource(R.string.land_delete), color = sw.danger,
+            style = SwType.LabelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.clickable { viewModel.delete(); onBack() }
+                .padding(horizontal = 4.dp, vertical = 6.dp))
     }
     if (addTax) {
         val accounts by viewModel.accounts.collectAsState()
@@ -476,14 +533,21 @@ fun LandEditScreen(
     }
 }
 
+// DetailRow per proto screens-assets.jsx:512-521 — 13/14 sized text with a
+// 1dp border between rows (suppressed via `last=true` on the final entry).
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, last: Boolean = false) {
     val sw = SwTheme.colors
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
-        Text(label, color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp),
-            modifier = Modifier.weight(1f))
-        Text(value, color = sw.ink,
-            style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
+    Column(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(label, color = sw.inkMuted,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Medium))
+            Spacer(Modifier.weight(1f))
+            Text(value, color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
+        }
+        if (!last) Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
     }
 }

@@ -393,6 +393,12 @@
     <string name="passphrase_min_hint_format">Minimum %1$d characters.</string>
     <string name="plan_item_schedule_reminder">Schedule reminder</string>
     <string name="plan_item_cancel_reminder">Cancel reminder</string>
+    <string name="plan_add_item">Add item</string>
+    <string name="reconcile_action_matched">✓ Already matched · Done</string>
+    <string name="land_tax_total">Total paid</string>
+    <string name="reminder_toast_scheduled">Reminder enabled</string>
+    <string name="reminder_toast_canceled">Reminder turned off</string>
+    <string name="reminder_toast_denied">Notification permission denied — reminder can\'t appear</string>
     <string name="reminder_notif_title">Sakuwise bill due</string>
     <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
@@ -480,6 +486,8 @@
     <string name="gold_field_serial">Serial number</string>
     <string name="gold_delete">Delete batch</string>
     <string name="gold_record_sale">Record Sale</string>
+    <string name="gold_section_detail">DETAILS</string>
+    <string name="gold_add_photo">Add photo</string>
     <string name="gold_sold_label">SOLD</string>
     <string name="gold_sold_summary_format">Sold %1$s</string>
     <string name="gold_sale_intro">Record the final sale price. If you pick an account, the proceeds will be logged as automatic income.</string>

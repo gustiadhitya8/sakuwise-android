@@ -65,13 +65,14 @@ fun OnbLanguageScreen(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    // Hero squircle reduced from 180dp → 140dp so all 4 onboarding
-                    // steps fit a single viewport without scroll on standard phones.
-                    .size(140.dp)
-                    .clip(RoundedCornerShape(46.dp))
+                    // Hero squircle reduced 180→140→120 so even step 4 (account
+                    // card preview) fits without scrolling on Galaxy S25-class
+                    // phones with non-tiny system fonts.
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(40.dp))
                     .background(sw.primaryContainer),
             ) {
-                LogoDaun(sizeDp = 84)
+                LogoDaun(sizeDp = 72)
             }
         },
         title = stringResource(R.string.onb_step1_title),
@@ -150,27 +151,27 @@ fun OnbIdentityScreen(
     OnboardingShell(
         step = 2, total = 4,
         hero = {
-            Box(modifier = Modifier.size(140.dp)) {
+            Box(modifier = Modifier.size(120.dp)) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(180.dp)
-                        .clip(RoundedCornerShape(60.dp))
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(40.dp))
                         .background(sw.primaryContainer),
                 ) {
-                    Icon(Icons.Outlined.Shield, null, tint = sw.primary, modifier = Modifier.size(90.dp))
+                    Icon(Icons.Outlined.Shield, null, tint = sw.primary, modifier = Modifier.size(72.dp))
                 }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset(x = 8.dp, y = 8.dp)
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(18.dp))
+                        .offset(x = 6.dp, y = 6.dp)
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(14.dp))
                         .background(sw.surface)
-                        .border(2.dp, sw.bg, RoundedCornerShape(18.dp)),
+                        .border(2.dp, sw.bg, RoundedCornerShape(14.dp)),
                 ) {
-                    Icon(Icons.Outlined.Person, null, tint = sw.primary, modifier = Modifier.size(28.dp))
+                    Icon(Icons.Outlined.Person, null, tint = sw.primary, modifier = Modifier.size(22.dp))
                 }
             }
         },
@@ -249,14 +250,12 @@ fun OnbPrivacyScreen(onNext: () -> Unit) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    // Hero squircle reduced from 180dp → 140dp so all 4 onboarding
-                    // steps fit a single viewport without scroll on standard phones.
-                    .size(140.dp)
-                    .clip(RoundedCornerShape(46.dp))
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(40.dp))
                     .background(sw.primaryContainer),
             ) {
-                Icon(Icons.Outlined.Shield, null, tint = sw.primary, modifier = Modifier.size(100.dp))
-                Icon(Icons.Outlined.Check, null, tint = sw.primary, modifier = Modifier.size(40.dp))
+                Icon(Icons.Outlined.Shield, null, tint = sw.primary, modifier = Modifier.size(80.dp))
+                Icon(Icons.Outlined.Check, null, tint = sw.primary, modifier = Modifier.size(32.dp))
             }
         },
         title = stringResource(R.string.onb_step3_title),
@@ -323,21 +322,20 @@ fun OnbFirstAccountScreen(
         hero = {
             Box(
                 modifier = Modifier
-                    .width(220.dp)
-                    .height(130.dp)
-                    .clip(RoundedCornerShape(18.dp))
+                    .width(200.dp)
+                    .height(112.dp)
+                    .clip(RoundedCornerShape(16.dp))
                     .background(sw.primary)
-                    .padding(18.dp),
+                    .padding(14.dp),
             ) {
-                // Decorative leaf in corner
+                // Decorative leaf in corner — shrunk with the card.
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset(x = 20.dp, y = 20.dp),
+                        .offset(x = 18.dp, y = 18.dp),
                 ) {
-                    // Watermark — swap squircle/leaf so the cream squircle reads on dark green
                     LogoDaun(
-                        sizeDp = 108,
+                        sizeDp = 84,
                         bg = sw.onPrimary.copy(alpha = 0.18f),
                         leaf = sw.primary.copy(alpha = 0.18f),
                         vein = sw.onPrimary.copy(alpha = 0.18f),
@@ -349,23 +347,21 @@ fun OnbFirstAccountScreen(
                         color = sw.onPrimary.copy(alpha = 0.8f),
                         style = SwType.SectionLabel.copy(fontSize = 10.sp),
                     )
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         state.accountName.ifEmpty { defaultName },
                         color = sw.onPrimary,
-                        style = SwType.H2.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold),
+                        style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
-                    Spacer(Modifier.height(10.dp))
-                    // Proto renders SW_FORMAT.rp inline — plain text, equal-size "Rp 0",
-                    // not the dimmed/shrunk prefix that RupiahText emits.
+                    Spacer(Modifier.height(8.dp))
                     Text(
                         text = "Rp " + java.text.NumberFormat
                             .getInstance(java.util.Locale("id", "ID"))
                             .format(state.accountBalance),
                         color = sw.onPrimary,
                         style = SwType.AmountL.copy(
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             fontFeatureSettings = "tnum",
                         ),

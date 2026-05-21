@@ -334,23 +334,9 @@ private fun ReconcileSheet(
         },
         onDismiss = onDismiss,
     ) {
-        // Progress dots
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 12.dp),
-        ) {
-            ReconcileStage.entries.forEach { s ->
-                val active = s.ordinal <= stage.ordinal
-                Box(
-                    modifier = Modifier
-                        .size(width = if (active) 18.dp else 8.dp, height = 6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(if (active) sw.primary else sw.border),
-                )
-            }
-        }
-
+        // Proto shows each reconcile stage as a separate full screen with
+        // a clear title — no inline progress dots. The title above already
+        // signals the stage, so the dots add visual noise.
         when (stage) {
             ReconcileStage.Input -> {
                 Text(
@@ -378,8 +364,9 @@ private fun ReconcileSheet(
                         )
                         Spacer(Modifier.height(6.dp))
                         RupiahText(value = currentBalance,
-                            style = SwType.AmountL.copy(fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold),
+                            style = SwType.AmountL.copy(fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFeatureSettings = "tnum"),
                             color = sw.ink)
                         Spacer(Modifier.height(4.dp))
                         Text(
@@ -406,11 +393,25 @@ private fun ReconcileSheet(
                     placeholder = stringResource(R.string.reconcile_note_placeholder),
                 )
                 Spacer(Modifier.height(16.dp))
-                SwButton(
-                    text = stringResource(R.string.action_continue),
-                    onClick = { stage = ReconcileStage.Confirm },
-                    enabled = observed.isNotEmpty(),
-                )
+                // Per proto screen 48: when the observed matches the app balance
+                // exactly (delta == 0), the CTA flips to "Sudah sesuai · Selesai"
+                // and skips the Confirm stage — there's nothing to reconcile.
+                val matched = observed.isNotEmpty() && delta == 0L
+                if (matched) {
+                    SwButton(
+                        text = stringResource(R.string.reconcile_action_matched),
+                        onClick = {
+                            onSubmit(observedLong, note.ifBlank { null })
+                            stage = ReconcileStage.Done
+                        },
+                    )
+                } else {
+                    SwButton(
+                        text = stringResource(R.string.action_continue),
+                        onClick = { stage = ReconcileStage.Confirm },
+                        enabled = observed.isNotEmpty(),
+                    )
+                }
             }
 
             ReconcileStage.Confirm -> {
