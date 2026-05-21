@@ -176,25 +176,25 @@ fun DepositListScreen(
     ) {
         // Hero per proto 26-assets-deposito-list.png — mint bg, r22, savings
         // watermark at -20/-30.
-        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
-            .background(sw.accent).padding(horizontal = 22.dp, vertical = 20.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
+            .background(sw.accent).padding(18.dp)) {
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 20.dp, y = 30.dp)) {
+                .offset(x = 20.dp, y = 20.dp)) {
                 Icon(Icons.Outlined.Savings, null,
                     tint = sw.fixedDarkOnMint.copy(alpha = 0.18f),
-                    modifier = Modifier.size(160.dp))
+                    modifier = Modifier.size(140.dp))
             }
             Column {
                 Text(stringResource(R.string.deposit_hero_label),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
                         fontWeight = FontWeight.Bold))
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 RupiahText(value = total, color = sw.fixedDarkOnMint,
-                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
                     style = SwType.LabelSmall.copy(fontSize = 12.sp))

@@ -198,19 +198,19 @@ fun GoldListScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
+                .clip(RoundedCornerShape(20.dp))
                 .background(sw.warning)
-                .padding(horizontal = 22.dp, vertical = 20.dp),
+                .padding(18.dp),
         ) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(x = 20.dp, y = 30.dp),
+                    .offset(x = 20.dp, y = 20.dp),
             ) {
                 Icon(
                     Icons.Outlined.Diamond, null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(160.dp),
+                    modifier = Modifier.size(140.dp),
                 )
             }
             Column {
@@ -218,9 +218,9 @@ fun GoldListScreen(
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
                         fontWeight = FontWeight.Bold))
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 RupiahText(value = totalValue, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
                 if (totalBuy > 0L) {
                     Spacer(Modifier.height(8.dp))

@@ -182,26 +182,26 @@ fun LandListScreen(
         // Hero per proto 23-assets-land-list.png — info-blue bg + landscape
         // watermark at -20/-30, r22, large 32sp amount.
         Box(
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
-                .background(sw.info).padding(horizontal = 22.dp, vertical = 20.dp),
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
+                .background(sw.info).padding(18.dp),
         ) {
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 20.dp, y = 30.dp)) {
+                .offset(x = 20.dp, y = 20.dp)) {
                 Icon(Icons.Outlined.Landscape, null,
                     tint = Color.White.copy(alpha = 0.18f),
-                    modifier = Modifier.size(160.dp))
+                    modifier = Modifier.size(140.dp))
             }
             Column {
                 Text(stringResource(R.string.land_hero_total),
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.SectionLabel.copy(fontSize = 11.sp,
                         fontWeight = FontWeight.Bold))
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 RupiahText(value = total, color = Color.White,
-                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                    style = SwType.AmountXL.copy(fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold))
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(stringResource(R.string.land_hero_sub_format, items.size),
                     color = Color.White.copy(alpha = 0.85f),
                     style = SwType.LabelSmall.copy(fontSize = 12.sp))

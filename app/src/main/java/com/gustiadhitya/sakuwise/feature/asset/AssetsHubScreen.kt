@@ -7,12 +7,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -76,6 +77,7 @@ import com.gustiadhitya.sakuwise.feature.asset.viewmodel.AssetsHubViewModel
  */
 private val AccountsAccent = Color(0xFF86EFAC)
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AssetsHubScreen(
     onNavigateToAccounts: () -> Unit = {},
@@ -220,25 +222,18 @@ fun AssetsHubScreen(
                         .background(sw.accent))
                 }
                 Spacer(Modifier.height(6.dp))
-                // Legend row — name + percentage of total per slice so the
-                // user can read the breakdown without doing the math.
-                val pct = { v: Long -> if (totalPos > 0L) ((v * 100.0) / totalPos).let { "%.0f".format(it) } else "0" }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
+                // Legend — proto uses flex-wrap so 4 items reflow onto a
+                // second line when the device is too narrow (e.g. Galaxy S22)
+                // instead of clipping the last entry off the hero card.
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    // Akun dot mirrors the bar slice (AccountsAccent lavender)
-                    // so legend ↔ bar stay in sync.
-                    LegendDot(AccountsAccent,
-                        "${stringResource(R.string.assets_class_accounts)} ${pct(nw.accountsTotal)}%")
-                    LegendDot(sw.warning,
-                        "${stringResource(R.string.assets_class_gold)} ${pct(nw.goldTotal)}%")
-                    LegendDot(sw.info,
-                        "${stringResource(R.string.assets_class_land)} ${pct(nw.landTotal)}%")
-                    LegendDot(sw.accent,
-                        "${stringResource(R.string.assets_class_deposit)} ${pct(nw.depositTotal)}%")
+                    LegendDot(AccountsAccent, stringResource(R.string.assets_class_accounts))
+                    LegendDot(sw.warning, stringResource(R.string.assets_class_gold))
+                    LegendDot(sw.info, stringResource(R.string.assets_class_land))
+                    LegendDot(sw.accent, stringResource(R.string.assets_class_deposit))
                 }
             }
         }
@@ -481,49 +476,40 @@ private fun AssetClassCard(
     onClick: (() -> Unit)? = null,
 ) {
     val sw = SwTheme.colors
-    SwCard(modifier = modifier, padding = PaddingValues(0.dp), onClick = onClick) {
-        Box {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = tint.copy(alpha = 0.10f),
+    // Proto AssetCard (screens-assets.jsx:138): 14dp padding, 36dp icon, 10dp
+    // gap, no decorative watermark. Earlier Android impl added a 96dp tinted
+    // background icon that roughly doubled card height — drop it to match.
+    SwCard(modifier = modifier, padding = PaddingValues(14.dp), onClick = onClick) {
+        Column {
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 14.dp, y = 14.dp)
-                    .size(96.dp),
-            )
-            Column(modifier = Modifier.padding(14.dp)) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(11.dp))
-                        .background(tint.copy(alpha = 0.15f)),
-                ) { Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp)) }
-                Spacer(Modifier.height(10.dp))
-                Text(title, color = sw.ink,
-                    style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                Text(sub, color = sw.inkMuted,
-                    style = SwType.LabelSmall.copy(fontSize = 11.sp))
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()) {
-                    RupiahText(value = value, short = true,
-                        style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                        color = sw.ink)
-                    if (growthPct != null && growthPct != 0f) {
-                        Spacer(Modifier.weight(1f))
-                        // Green/red growth pct chip per proto 14-assets-hub.png.
-                        val pos = growthPct >= 0f
-                        Text(
-                            (if (pos) "+" else "−") +
-                                "%.1f".format(kotlin.math.abs(growthPct)) + "%",
-                            color = if (pos) sw.success else sw.danger,
-                            style = SwType.LabelSmall.copy(fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFeatureSettings = "tnum"),
-                        )
-                    }
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(11.dp))
+                    .background(tint.copy(alpha = 0.15f)),
+            ) { Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp)) }
+            Spacer(Modifier.height(10.dp))
+            Text(title, color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+            Text(sub, color = sw.inkSubtle,
+                style = SwType.LabelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Medium))
+            Spacer(Modifier.height(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()) {
+                RupiahText(value = value, short = true,
+                    style = SwType.Amount.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                    color = sw.ink)
+                if (growthPct != null && growthPct != 0f) {
+                    Spacer(Modifier.weight(1f))
+                    val pos = growthPct >= 0f
+                    Text(
+                        (if (pos) "+" else "−") +
+                            "%.1f".format(kotlin.math.abs(growthPct)) + "%",
+                        color = if (pos) sw.success else sw.danger,
+                        style = SwType.LabelSmall.copy(fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFeatureSettings = "tnum"),
+                    )
                 }
             }
         }
