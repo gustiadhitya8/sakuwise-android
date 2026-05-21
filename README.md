@@ -69,9 +69,10 @@ A full feature spec lives in [`design/uploads/Sakuwise PRD v1.3 (ID).md`](design
 
 <p align="center">
   <img src="docs/screenshots/04-add-transaction.png" alt="Add transaction sheet" width="22%">
+  <img src="docs/screenshots/06-gold-detail-backdate.png" alt="Gold batch detail with backdated purchase" width="22%">
 </p>
 
-From left to right: **Home** (remaining budget hero + allocation bars + top expenses) · **Plan** (period chip + expected-income progress + needs/wants/investment chips + starter-template tree) · **Assets** (total wealth + wealth-trend chart + four asset classes) · **Me** (profile + plan/security/backup settings). Below: the FAB-launched **Add Transaction** sheet that fans out into Expense / Income / Transfer / Scan Receipt.
+From left to right: **Home** (remaining budget hero + allocation bars + top expenses) · **Plan** (period chip + expected-income progress + needs/wants/investment chips + starter-template tree) · **Assets** (total wealth + wealth-trend chart + four asset classes) · **Me** (profile + plan/security/backup settings). Below: the FAB-launched **Add Transaction** sheet that fans out into Expense / Income / Transfer / Scan Receipt, and a **Gold batch detail** showing a backdated purchase (5 g bought 10 Mar 2024, current value Rp 5.25 M, +16.7%).
 
 Screenshots are captured in English locale; the Indonesian locale shows the same screens with localized labels (Beranda · Plan · Aset · Saya, SISA ANGGARAN, etc.).
 
