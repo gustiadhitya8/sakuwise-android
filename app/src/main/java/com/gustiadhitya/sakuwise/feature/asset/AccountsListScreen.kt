@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -174,8 +175,22 @@ fun AccountsListScreen(
                             tint = sw.info, modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+                        // Build an AnnotatedString that bolds the "Tap akun"
+                        // lead phrase per proto, then appends the rest of the
+                        // sentence in regular weight.
+                        val lead = stringResource(R.string.accounts_list_hint_lead)
+                        val full = stringResource(R.string.accounts_list_hint)
+                        val tail = full.removePrefix(lead).trimStart()
                         Text(
-                            stringResource(R.string.accounts_list_hint),
+                            text = androidx.compose.ui.text.buildAnnotatedString {
+                                withStyle(
+                                    androidx.compose.ui.text.SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                    ),
+                                ) { append(lead) }
+                                append(" ")
+                                append(tail)
+                            },
                             color = sw.ink,
                             style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
                         )

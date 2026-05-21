@@ -409,7 +409,8 @@
     <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · Tanpa telemetry</string>
     <string name="settings_footer_line2">Made in Indonesia 🌱</string>
     <string name="accounts_row_sub_rekon_format">%1$s · rekon %2$s</string>
-    <string name="accounts_list_hint"><![CDATA[<b>Tap akun</b> untuk lihat detail, snapshot history, dan rekonsiliasi.]]></string>
+    <string name="accounts_list_hint">Tap akun untuk lihat detail, snapshot history, dan rekonsiliasi.</string>
+    <string name="accounts_list_hint_lead">Tap akun</string>
     <string name="gold_hero_profit_format">Profit %1$s Rp %2$s · %3$s%4$s%%</string>
     <string name="gold_batches_section_format">%1$d BATCH DIPEGANG</string>
     <string name="deposit_section_label">ASET DEPOSITO / PENSIUN</string>
