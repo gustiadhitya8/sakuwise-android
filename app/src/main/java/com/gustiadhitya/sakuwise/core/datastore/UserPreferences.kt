@@ -46,6 +46,8 @@ data class UserPreferences(
      *  clear the unread badge on the dashboard bell — any notification whose
      *  source timestamp is < this value is considered "read". */
     val notificationsLastSeenAt: Long,
+    /** Persisted eye-toggle so the hide-balance state survives app restarts. */
+    val balancesHidden: Boolean,
 ) {
     companion object {
         val DEFAULTS = UserPreferences(
@@ -67,6 +69,7 @@ data class UserPreferences(
             driveAccountEmail = null,
             lastDriveBackupTimestamp = 0L,
             notificationsLastSeenAt = 0L,
+            balancesHidden = false,
         )
     }
 }
@@ -93,6 +96,7 @@ interface UserPreferencesRepository {
     suspend fun setDriveAccountEmail(email: String?)
     suspend fun markDriveBackupNow(epochMs: Long)
     suspend fun markNotificationsSeenNow(epochMs: Long)
+    suspend fun setBalancesHidden(hidden: Boolean)
     suspend fun setOnboardingIncomplete()
     suspend fun resetAll()
 }
@@ -116,6 +120,7 @@ internal object PrefKeys {
     val DRIVE_ACCOUNT_EMAIL = stringPreferencesKey("drive_account_email")
     val LAST_DRIVE_BACKUP_TIMESTAMP = longPreferencesKey("last_drive_backup_timestamp")
     val NOTIFICATIONS_LAST_SEEN_AT = longPreferencesKey("notifications_last_seen_at")
+    val BALANCES_HIDDEN = booleanPreferencesKey("balances_hidden")
 }
 
 class UserPreferencesRepositoryImpl(
@@ -144,6 +149,7 @@ class UserPreferencesRepositoryImpl(
             driveAccountEmail = p[PrefKeys.DRIVE_ACCOUNT_EMAIL] ?: d.driveAccountEmail,
             lastDriveBackupTimestamp = p[PrefKeys.LAST_DRIVE_BACKUP_TIMESTAMP] ?: d.lastDriveBackupTimestamp,
             notificationsLastSeenAt = p[PrefKeys.NOTIFICATIONS_LAST_SEEN_AT] ?: d.notificationsLastSeenAt,
+            balancesHidden = p[PrefKeys.BALANCES_HIDDEN] ?: d.balancesHidden,
         )
     }
 
@@ -228,6 +234,10 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun markNotificationsSeenNow(epochMs: Long) {
         dataStore.edit { it[PrefKeys.NOTIFICATIONS_LAST_SEEN_AT] = epochMs }
+    }
+
+    override suspend fun setBalancesHidden(hidden: Boolean) {
+        dataStore.edit { it[PrefKeys.BALANCES_HIDDEN] = hidden }
     }
 
     override suspend fun setOnboardingIncomplete() {

@@ -118,22 +118,23 @@ fun AssetsHubScreen(
                     vein = sw.onPrimaryHero.copy(alpha = 0.10f),
                 )
             }
-            // Local mask state per prototype eye toggle.
-            var hideTotal by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+            // Eye toggle is now persisted via DataStore (balancesHidden) so
+            // the masked state survives app restarts and stays in sync with
+            // the dashboard hero's toggle.
+            val hideTotal = state.balancesHidden
             Column(modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.assets_total_wealth),
                         color = sw.onPrimaryHero.copy(alpha = 0.78f),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                         modifier = Modifier.weight(1f))
-                    // Eye toggle mirrors the dashboard "hide saldo" affordance.
                     androidx.compose.foundation.layout.Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.16f))
-                            .clickable { hideTotal = !hideTotal },
+                            .clickable { viewModel.toggleBalancesHidden() },
                     ) {
                         Icon(
                             if (hideTotal) androidx.compose.material.icons.Icons.Outlined.VisibilityOff

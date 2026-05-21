@@ -100,6 +100,7 @@ fun DashboardScreen(
         onNavigateToMe = onNavigateToMe,
         onBackupTap = onBackupTap,
         onMarkNotificationsSeen = viewModel::markNotificationsSeen,
+        onToggleHide = viewModel::toggleBalancesHidden,
         onEditTxn = onEditTxn,
     )
 }
@@ -112,10 +113,11 @@ private fun DashboardContent(
     onNavigateToMe: () -> Unit,
     onBackupTap: () -> Unit,
     onMarkNotificationsSeen: () -> Unit = {},
+    onToggleHide: () -> Unit = {},
     onEditTxn: (Transaction) -> Unit = {},
 ) {
     val sw = SwTheme.colors
-    var hide by remember { mutableStateOf(false) }
+    val hide = state.balancesHidden
     val nickname = state.nickname.ifBlank { "Teman" }
     val initial = (nickname.firstOrNull()?.uppercase() ?: "S")
 
@@ -178,7 +180,7 @@ private fun DashboardContent(
             expense = state.expenseMonth,
             period = state.period,
             hide = hide,
-            onToggleHide = { hide = !hide },
+            onToggleHide = onToggleHide,
         )
         if (overspent) {
             DashboardOverspendBanner(onTap = onNavigateToPlan)

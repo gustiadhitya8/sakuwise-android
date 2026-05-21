@@ -6,6 +6,7 @@ import com.gustiadhitya.sakuwise.core.domain.model.Account
 import com.gustiadhitya.sakuwise.core.domain.model.DepositAsset
 import com.gustiadhitya.sakuwise.core.domain.model.GoldAsset
 import com.gustiadhitya.sakuwise.core.domain.model.LandAsset
+import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import com.gustiadhitya.sakuwise.core.domain.repository.AccountRepository
 import com.gustiadhitya.sakuwise.core.domain.repository.DebtRepository
 import com.gustiadhitya.sakuwise.core.domain.repository.DepositRepository
@@ -33,6 +34,7 @@ data class AssetsHubState(
     val land: List<LandAsset> = emptyList(),
     val deposits: List<DepositAsset> = emptyList(),
     val netWorthTrend: List<Pair<LocalDate, Long>> = emptyList(),
+    val balancesHidden: Boolean = false,
 )
 
 @HiltViewModel
@@ -44,6 +46,7 @@ class AssetsHubViewModel @Inject constructor(
     private val debtRepo: DebtRepository,
     private val computeNetWorth: ComputeNetWorthUseCase,
     private val computeNetWorthTrend: ComputeNetWorthTrendUseCase,
+    private val prefsRepo: UserPreferencesRepository,
 ) : ViewModel() {
 
     private val _trend = MutableStateFlow<List<Pair<LocalDate, Long>>>(emptyList())
@@ -66,6 +69,7 @@ class AssetsHubViewModel @Inject constructor(
         landRepo.observeAll(),
         depositRepo.observeAll(),
         _trend,
+        prefsRepo.prefs,
     ) { args ->
         val nw = args[0] as ComputeNetWorthUseCase.NetWorth
         @Suppress("UNCHECKED_CAST") val accs = args[1] as List<Account>
@@ -74,6 +78,7 @@ class AssetsHubViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST") val land = args[4] as List<LandAsset>
         @Suppress("UNCHECKED_CAST") val deposits = args[5] as List<DepositAsset>
         @Suppress("UNCHECKED_CAST") val trend = args[6] as List<Pair<LocalDate, Long>>
+        val prefs = args[7] as com.gustiadhitya.sakuwise.core.datastore.UserPreferences
         AssetsHubState(
             netWorth = nw,
             accounts = accs,
@@ -82,6 +87,14 @@ class AssetsHubViewModel @Inject constructor(
             land = land,
             deposits = deposits,
             netWorthTrend = trend,
+            balancesHidden = prefs.balancesHidden,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AssetsHubState())
+
+    fun toggleBalancesHidden() {
+        viewModelScope.launch {
+            val current = state.value.balancesHidden
+            prefsRepo.setBalancesHidden(!current)
+        }
+    }
 }

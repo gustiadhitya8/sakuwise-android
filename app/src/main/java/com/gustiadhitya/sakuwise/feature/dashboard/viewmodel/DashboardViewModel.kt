@@ -54,6 +54,7 @@ data class DashboardUiState(
      *  timestamp is newer than this value — opening the sheet sets it to
      *  now() so the dot disappears. */
     val notificationsLastSeenAt: Long = 0L,
+    val balancesHidden: Boolean = false,
     val loading: Boolean = true,
 )
 
@@ -144,6 +145,7 @@ class DashboardViewModel @Inject constructor(
             topCategories = tops.map { TopCategorySpend(name = it.name, amount = it.total) },
             backupOverdueDays = computeOverdueDays(prefs.lastBackupTimestamp),
             notificationsLastSeenAt = prefs.notificationsLastSeenAt,
+            balancesHidden = prefs.balancesHidden,
             loading = false,
         )
     }.stateIn(
@@ -163,6 +165,13 @@ class DashboardViewModel @Inject constructor(
     fun markNotificationsSeen() {
         viewModelScope.launch {
             prefsRepo.markNotificationsSeenNow(System.currentTimeMillis())
+        }
+    }
+
+    fun toggleBalancesHidden() {
+        viewModelScope.launch {
+            val current = state.value.balancesHidden
+            prefsRepo.setBalancesHidden(!current)
         }
     }
 }
