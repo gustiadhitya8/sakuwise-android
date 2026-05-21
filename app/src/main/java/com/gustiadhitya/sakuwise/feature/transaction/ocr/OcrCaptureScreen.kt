@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -117,14 +118,28 @@ fun OcrCaptureScreen(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted -> if (granted) cameraLauncher.launch(null) }
 
-    LaunchedEffect(Unit) {
-        if (stage is OcrStage.Idle) {
-            val granted = ContextCompat.checkSelfPermission(
-                ctx, Manifest.permission.CAMERA,
-            ) == PackageManager.PERMISSION_GRANTED
-            if (granted) cameraLauncher.launch(null)
-            else permissionLauncher.launch(Manifest.permission.CAMERA)
+    // Gallery launcher — picks any image and decodes it bounded to the OCR
+    // recogniser. Lets users OCR receipts they already photographed
+    // (e.g. screenshots, scans saved to Drive) without re-shooting.
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        if (uri != null) {
+            val stream = ctx.contentResolver.openInputStream(uri)
+            val bm = stream?.let {
+                com.gustiadhitya.sakuwise.core.common.ImageCompression
+                    .decodeBoundedFromStream(it)
+            }
+            if (bm != null) viewModel.process(bm)
         }
+    }
+
+    fun launchCamera() {
+        val granted = ContextCompat.checkSelfPermission(
+            ctx, Manifest.permission.CAMERA,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (granted) cameraLauncher.launch(null)
+        else permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
     Column(modifier = Modifier.fillMaxSize().background(sw.bg)) {
@@ -178,15 +193,16 @@ fun OcrCaptureScreen(
                 .padding(horizontal = SwSpace.pageH),
         ) {
             when (val s = stage) {
-                is OcrStage.Idle -> IdleHero(sw.primaryContainer, sw.onPrimaryContainer)
+                is OcrStage.Idle -> IdleBody(
+                    onCamera = ::launchCamera,
+                    onGallery = { galleryLauncher.launch("image/*") },
+                )
                 is OcrStage.Processing -> ProcessingHero()
                 is OcrStage.Ready -> ReadyBody(draft = s.draft)
                 is OcrStage.Failure -> FailureBody(
                     message = s.message,
-                    onRetake = {
-                        viewModel.reset()
-                        cameraLauncher.launch(null)
-                    },
+                    onRetake = ::launchCamera,
+                    onGallery = { galleryLauncher.launch("image/*") },
                 )
             }
         }
@@ -194,21 +210,38 @@ fun OcrCaptureScreen(
 }
 
 @Composable
-private fun IdleHero(bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color) {
+private fun IdleBody(onCamera: () -> Unit, onGallery: () -> Unit) {
+    val sw = SwTheme.colors
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(bg),
+            .background(sw.primaryContainer),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Outlined.CameraAlt, null, tint = fg, modifier = Modifier.size(48.dp))
-            Spacer(Modifier.height(12.dp))
-            Text("Menyiapkan kamera…", color = fg, style = SwType.Body.copy(fontSize = 14.sp))
+            Icon(Icons.Outlined.CameraAlt, null,
+                tint = sw.onPrimaryContainer, modifier = Modifier.size(48.dp))
+            Spacer(Modifier.height(10.dp))
+            Text("Foto struk untuk auto-isi pengeluaran",
+                color = sw.onPrimaryContainer,
+                style = SwType.Body.copy(fontSize = 14.sp))
         }
     }
+    Spacer(Modifier.height(16.dp))
+    SwButton(text = "Foto Struk", onClick = onCamera,
+        leading = {
+            Icon(Icons.Outlined.CameraAlt, null,
+                tint = sw.onPrimary, modifier = Modifier.size(16.dp))
+        })
+    Spacer(Modifier.height(8.dp))
+    SwButton(text = "Pilih dari Galeri", onClick = onGallery,
+        variant = SwButtonVariant.Outline,
+        leading = {
+            Icon(Icons.Outlined.Image, null,
+                tint = sw.ink, modifier = Modifier.size(16.dp))
+        })
 }
 
 @Composable
@@ -347,7 +380,7 @@ private fun OcrDraftFieldCard(
 }
 
 @Composable
-private fun FailureBody(message: String, onRetake: () -> Unit) {
+private fun FailureBody(message: String, onRetake: () -> Unit, onGallery: () -> Unit) {
     val sw = SwTheme.colors
     Box(
         modifier = Modifier
@@ -368,5 +401,8 @@ private fun FailureBody(message: String, onRetake: () -> Unit) {
     }
     Spacer(Modifier.height(16.dp))
     SwButton(text = "Foto Ulang", onClick = onRetake)
+    Spacer(Modifier.height(8.dp))
+    SwButton(text = "Pilih dari Galeri", onClick = onGallery,
+        variant = SwButtonVariant.Outline)
 }
 
