@@ -55,20 +55,73 @@ class IndonesianReceiptParser @Inject constructor() {
         line.length in 3..40 && digitRatio < 0.3f && !line.contains("Rp", ignoreCase = true)
     }?.uppercase(Locale.ROOT)
 
-    private val totalKeywords = listOf("total", "tunai", "bayar", "jumlah", "subtotal")
-    private val moneyRegex = Regex("""(?:Rp\s*)?([0-9]{1,3}(?:[.,][0-9]{3})*|[0-9]+)""", RegexOption.IGNORE_CASE)
+    // Primary keywords identify the canonical "total" amount line. Secondary
+    // keywords ("tunai" cash, "bayar" payment) usually equal or exceed the
+    // total — so they win on tiebreak unless we score them lower.
+    private val primaryKeywords = listOf("total", "grand", "jumlah", "subtotal")
+    private val secondaryKeywords = listOf("tunai", "bayar")
+    // Exclude lines that mention change-given amounts ("kembalian" / "change")
+    // and per-line discounts — those would otherwise win the "largest amount"
+    // tiebreaker against the real total.
+    private val excludeKeywords = listOf("kembalian", "change", "diskon", "discount")
+    // Allow "Rp" prefix (optional), then digits with . , or space group separators
+    // (e.g. "53.000", "53,000", "53 000"). Minimum 3 digits to avoid catching
+    // table row numbers / qty.
+    private val moneyRegex = Regex(
+        """(?:Rp\s*)?([0-9]{1,3}(?:[.,\s][0-9]{3})+|[0-9]{4,})""",
+        RegexOption.IGNORE_CASE,
+    )
 
+    /**
+     * Total-extraction heuristic, robust to OCR's frequent split of "TOTAL …
+     * Rp X" into two visual lines because of wide whitespace columns:
+     *
+     *  1. Walk every line, drop any line containing "kembalian"/"change" etc.
+     *     (those are change-given amounts, not the total).
+     *  2. For each remaining line, find all money matches and score them:
+     *      • +1000 if the SAME line has a total keyword
+     *      • +500  if the PREVIOUS line had a total keyword (handles the
+     *        "TOTAL\nRp 53.000" split)
+     *      • +0    otherwise (still eligible — receipts without explicit
+     *        TOTAL labels exist)
+     *  3. Pick the highest score. On ties, take the largest amount —
+     *     receipts almost always have the total as the biggest figure once
+     *     change/discount lines are excluded.
+     */
     private fun extractTotal(lines: List<String>): Long? {
-        val candidates = lines.filter { line ->
+        data class Candidate(val amount: Long, val score: Int)
+        val out = mutableListOf<Candidate>()
+        // Track which kind of keyword sat on the previous line — needed for
+        // ML Kit's frequent split of "TOTAL\nRp X".
+        var prevPrimary = false
+        var prevSecondary = false
+        lines.forEach { line ->
             val lower = line.lowercase(Locale.ROOT)
-            totalKeywords.any { kw -> lower.contains(kw) }
-        }.ifEmpty { lines }
-
-        return candidates
-            .flatMap { line -> moneyRegex.findAll(line).map { it.groupValues[1] } }
-            .mapNotNull { raw -> raw.replace(".", "").replace(",", "").toLongOrNull() }
-            .filter { it >= 1000L } // skip qty/page numbers
-            .maxOrNull()
+            if (excludeKeywords.any { kw -> lower.contains(kw) }) {
+                prevPrimary = false; prevSecondary = false
+                return@forEach
+            }
+            val hasPrimary = primaryKeywords.any { kw -> lower.contains(kw) }
+            val hasSecondary = !hasPrimary && secondaryKeywords.any { kw -> lower.contains(kw) }
+            val score = when {
+                hasPrimary -> 2000
+                prevPrimary -> 1000
+                hasSecondary -> 500
+                prevSecondary -> 250
+                else -> 0
+            }
+            moneyRegex.findAll(line).forEach { m ->
+                val raw = m.groupValues[1]
+                val amount = raw.replace(".", "").replace(",", "").replace(" ", "")
+                    .toLongOrNull() ?: return@forEach
+                if (amount >= 1000L) out += Candidate(amount, score)
+            }
+            prevPrimary = hasPrimary
+            prevSecondary = hasSecondary
+        }
+        if (out.isEmpty()) return null
+        val maxScore = out.maxOf { it.score }
+        return out.filter { it.score == maxScore }.maxOf { it.amount }
     }
 
     private val datePatterns = listOf(
