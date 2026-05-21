@@ -65,6 +65,16 @@ import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
 import com.gustiadhitya.sakuwise.core.ui.RupiahText
 import com.gustiadhitya.sakuwise.feature.asset.viewmodel.AssetsHubViewModel
 
+/**
+ * Lavender accent reserved for the Akun (accounts) class on the Aset hero
+ * breakdown. The other three classes already own brand colours — warning
+ * (gold), info (land), accent/mint (deposit) — so Akun needs a fourth
+ * distinct hue. Lavender pops on the deep-green hero in both light and
+ * dark mode (hero stays primaryHero / PrimaryContainerDark) and reads
+ * cleanly next to the orange / blue / mint siblings.
+ */
+private val AccountsAccent = Color(0xFFB5A4F0)
+
 @Composable
 fun AssetsHubScreen(
     onNavigateToAccounts: () -> Unit = {},
@@ -189,10 +199,12 @@ fun AssetsHubScreen(
                         // enough contrast against the same-coloured hero bg.
                         .background(Color.White.copy(alpha = 0.22f)),
                 ) {
-                    // Akun uses sw.onPrimaryHero (light mint in dark, light cream
-                    // in light) — its primary-coloured bar slice on the primary-
-                    // coloured hero bg was invisible. Other classes contrast OK.
-                    val akunColor = sw.onPrimaryHero
+                    // Akun gets a soft lavender — distinct from warning/info/
+                    // accent (the other three asset slices) AND pops cleanly
+                    // against the deep-green hero in BOTH light and dark mode.
+                    // Was using onPrimaryHero (cream/light-mint) which was
+                    // too close to "no color at all" against the bright track.
+                    val akunColor = AccountsAccent
                     if (nw.accountsTotal > 0) Box(Modifier.fillMaxHeight()
                         .fillMaxWidth(nw.accountsTotal.toFloat() / totalPos)
                         .background(akunColor))
@@ -216,9 +228,9 @@ fun AssetsHubScreen(
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState()),
                 ) {
-                    // Akun dot mirrors the bar slice colour (onPrimaryHero) so
-                    // legend ↔ bar stay in sync and both stay visible.
-                    LegendDot(sw.onPrimaryHero,
+                    // Akun dot mirrors the bar slice (AccountsAccent lavender)
+                    // so legend ↔ bar stay in sync.
+                    LegendDot(AccountsAccent,
                         "${stringResource(R.string.assets_class_accounts)} ${pct(nw.accountsTotal)}%")
                     LegendDot(sw.warning,
                         "${stringResource(R.string.assets_class_gold)} ${pct(nw.goldTotal)}%")

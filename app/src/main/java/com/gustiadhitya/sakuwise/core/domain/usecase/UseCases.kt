@@ -635,6 +635,7 @@ class ComputeNetWorthUseCase @Inject constructor(
     private val depositRepo: DepositRepository,
     private val debtRepo: DebtRepository,
     private val prefsRepo: UserPreferencesRepository,
+    private val txnRepo: TransactionRepository,
 ) {
     data class NetWorth(
         val accountsTotal: Long,
@@ -645,28 +646,45 @@ class ComputeNetWorthUseCase @Inject constructor(
         val total: Long,
     )
 
+    /**
+     * Emits a new NetWorth whenever any of the underlying tables changes —
+     * including transactions (which previously was NOT in the outer combine
+     * so a new expense would not re-trigger the aggregation, leaving the
+     * Aset hub showing the stale account total). We use observeRecent(1) as
+     * a cheap change-stamp on the transactions table; the value is ignored,
+     * the emission is what matters.
+     */
     operator fun invoke(): Flow<NetWorth> = flow {
         val base = combine(
             accountRepo.observeActive(),
+            accountRepo.observeTotalBalance(),
             goldRepo.observeAll(),
             landRepo.observeAll(),
             depositRepo.observeAll(),
             debtRepo.observeAll(),
-        ) { accounts, gold, land, deposits, debts ->
-            Quintuple(accounts, gold, land, deposits, debts)
+            txnRepo.observeRecent(1),
+        ) { args ->
+            @Suppress("UNCHECKED_CAST")
+            Septet(
+                args[0] as List<com.gustiadhitya.sakuwise.core.domain.model.Account>,
+                args[1] as Long,
+                args[2] as List<com.gustiadhitya.sakuwise.core.domain.model.GoldAsset>,
+                args[3] as List<com.gustiadhitya.sakuwise.core.domain.model.LandAsset>,
+                args[4] as List<com.gustiadhitya.sakuwise.core.domain.model.DepositAsset>,
+                args[5] as List<com.gustiadhitya.sakuwise.core.domain.model.Debt>,
+                args[6],
+            )
         }
-        combine(base, prefsRepo.prefs) { (accounts, gold, land, deposits, debts), prefs ->
-            val accountsTotal = accounts.fold(0L) { sum, a ->
-                sum + accountRepo.observeBalance(a.id).first()
-            }
-            val goldTotal = gold.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
+        combine(base, prefsRepo.prefs) { tuple, prefs ->
+            val accountsTotal = tuple.b // already Room-tracked via observeTotalBalance subqueries
+            val goldTotal = tuple.c.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
                 .sumOf { it.weightGram * prefs.goldPriceGlobal }
-            val landTotal = land.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
+            val landTotal = tuple.d.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
                 .sumOf { it.currentValue ?: it.buyPrice }
-            val depositTotal = deposits.fold(0L) { sum, d ->
+            val depositTotal = tuple.e.fold(0L) { sum, d ->
                 sum + (depositRepo.observeLatestSnapshot(d.id).first()?.balance ?: 0L)
             }
-            val debtsTotal = debts
+            val debtsTotal = tuple.f
                 .filter { it.open && it.direction == com.gustiadhitya.sakuwise.core.domain.model.DebtDirection.IOwe }
                 .sumOf { d ->
                     val paid = debtRepo.observePaidTotal(d.id).first()
@@ -679,8 +697,8 @@ class ComputeNetWorthUseCase @Inject constructor(
         }.collect { emit(it) }
     }
 
-    private data class Quintuple<A, B, C, D, E>(
-        val a: A, val b: B, val c: C, val d: D, val e: E,
+    private data class Septet<A, B, C, D, E, F, G>(
+        val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G,
     )
 }
 
