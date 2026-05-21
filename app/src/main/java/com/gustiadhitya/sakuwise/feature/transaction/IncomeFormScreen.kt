@@ -54,6 +54,7 @@ private enum class IncomePicker { Account, Date, Category }
 fun IncomeFormScreen(
     onClose: () -> Unit,
     viewModel: TxnFormViewModel = hiltViewModel(),
+    txnId: String? = null,
 ) {
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
@@ -62,6 +63,7 @@ fun IncomeFormScreen(
     var picker by remember { mutableStateOf<IncomePicker?>(null) }
 
     LaunchedEffect(state.saved) { if (state.saved) onClose() }
+    LaunchedEffect(txnId) { if (txnId != null) viewModel.loadExisting(txnId) }
 
     val account = accounts.firstOrNull { it.id == state.accountId }
 
@@ -74,10 +76,11 @@ fun IncomeFormScreen(
         onAmountChange = viewModel::setAmount,
         heroSubtitle = account?.let { "ke akun ${it.name}" },
         onCancel = onClose,
-        saveLabel = "Simpan",
+        saveLabel = stringResource(R.string.action_save),
         saveEnabled = state.amount > 0 && state.accountId != null
             && state.incomeCategoryId != null && !state.saving,
         onSave = viewModel::submitIncome,
+        onDelete = if (state.editingId != null) viewModel::delete else null,
     ) {
         FieldButton(
             label = stringResource(R.string.txn_field_category_source),

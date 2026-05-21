@@ -87,6 +87,9 @@ fun DashboardScreen(
     // Default routes the Backup banner CTA to the Me tab. Callers can override
     // to deep-link directly into Backup settings (preferred).
     onBackupTap: () -> Unit = onNavigateToMe,
+    // Tapping a row in "Recent Transactions" opens the matching edit form.
+    // Default is a no-op so previews/tests don't crash; the host wires it.
+    onEditTxn: (Transaction) -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -97,6 +100,7 @@ fun DashboardScreen(
         onNavigateToMe = onNavigateToMe,
         onBackupTap = onBackupTap,
         onMarkNotificationsSeen = viewModel::markNotificationsSeen,
+        onEditTxn = onEditTxn,
     )
 }
 
@@ -108,6 +112,7 @@ private fun DashboardContent(
     onNavigateToMe: () -> Unit,
     onBackupTap: () -> Unit,
     onMarkNotificationsSeen: () -> Unit = {},
+    onEditTxn: (Transaction) -> Unit = {},
 ) {
     val sw = SwTheme.colors
     var hide by remember { mutableStateOf(false) }
@@ -195,7 +200,7 @@ private fun DashboardContent(
         DashboardRecentTxns(
             txns = state.recentTransactions,
             accountNameLookup = { id -> state.accounts.firstOrNull { it.id == id }?.name },
-            onTapAll = onNavigateToPlan,
+            onEditTxn = onEditTxn,
         )
         if (state.backupOverdueDays > 30 || state.backupOverdueDays == Int.MAX_VALUE) {
             DashboardBanner(overdueDays = state.backupOverdueDays, onTap = onBackupTap)
@@ -575,11 +580,11 @@ private fun DashboardAlloc(
     if (allocations.isEmpty()) return
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
         com.gustiadhitya.sakuwise.core.designsystem.components.SwSectionLabel(
-            text = "Alokasi",
+            text = stringResource(R.string.dashboard_alloc_section),
             trailing = {
                 Row(verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable(onClick = onTap)) {
-                    Text("Detail", color = sw.primary,
+                    Text(stringResource(R.string.dashboard_alloc_detail), color = sw.primary,
                         style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
                     Icon(Icons.Outlined.ChevronRight, null, tint = sw.primary, modifier = Modifier.size(14.dp))
                 }
@@ -625,10 +630,10 @@ private fun DashboardAlloc(
                     )
                     Spacer(Modifier.height(4.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("${pct.toInt()}% terpakai", color = sw.inkSubtle,
+                        Text(stringResource(R.string.dashboard_alloc_used_pct_format, pct.toInt()), color = sw.inkSubtle,
                             style = SwType.LabelSmall.copy(fontSize = 10.sp, fontFeatureSettings = "tnum"))
                         if (over) {
-                            Text("Over ${(row.used - row.plan).toRupiahShort()}",
+                            Text(stringResource(R.string.dashboard_alloc_over_format, (row.used - row.plan).toRupiahShort()),
                                 color = sw.danger,
                                 style = SwType.LabelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold))
                         }
@@ -784,20 +789,14 @@ private fun DashboardAccountsStrip(
 private fun DashboardRecentTxns(
     txns: List<Transaction>,
     accountNameLookup: (String) -> String?,
-    onTapAll: () -> Unit,
+    onEditTxn: (Transaction) -> Unit = {},
 ) {
     val sw = SwTheme.colors
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
-        SwSectionLabel(
-            text = stringResource(R.string.dashboard_recent_txns),
-            trailing = {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable(onClick = onTapAll)) {
-                    Text(stringResource(R.string.dashboard_action_all), color = sw.primary,
-                        style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
-                    Icon(Icons.Outlined.ChevronRight, null, tint = sw.primary, modifier = Modifier.size(14.dp))
-                }
-            },
-        )
+        // Section header is plain — the old "All" trailing chevron previously
+        // mis-routed to the Plan tab. Users now edit/delete by tapping a row
+        // directly; a dedicated "All transactions" screen is a future feature.
+        SwSectionLabel(text = stringResource(R.string.dashboard_recent_txns))
         if (txns.isEmpty()) {
             SwCard {
                 Text(
@@ -825,6 +824,15 @@ private fun DashboardRecentTxns(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
+                                // Only Expense / Income / Transfer have edit forms.
+                                // Reconciliation + Debt rows stay non-clickable —
+                                // editing them via the same form would skip the
+                                // reconciliation snapshot / debt-balance side
+                                // effects that produced them.
+                                .let { m ->
+                                    if (t.type == TxnType.Expense || t.type == TxnType.Income || t.type == TxnType.Transfer)
+                                        m.clickable { onEditTxn(t) } else m
+                                }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                         ) {
                             SwCategoryDot(

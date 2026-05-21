@@ -3,6 +3,9 @@ package com.gustiadhitya.sakuwise.feature.transaction.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.ui.res.stringResource
+import com.gustiadhitya.sakuwise.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +62,10 @@ fun TxnFormShell(
     saveLabel: String,
     saveEnabled: Boolean,
     onSave: () -> Unit,
+    // When non-null, shows a destructive trash button next to Save. Used by
+    // edit-mode forms so the user can remove an existing transaction without
+    // a long detour through a separate delete screen.
+    onDelete: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     val sw = SwTheme.colors
@@ -85,6 +92,24 @@ fun TxnFormShell(
                 style = SwType.H2.copy(fontSize = 19.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.weight(1f).padding(start = 4.dp),
             )
+            if (onDelete != null) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(sw.dangerSoft)
+                        .clickable(onClick = onDelete),
+                ) {
+                    Icon(
+                        androidx.compose.material.icons.Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.action_delete),
+                        tint = sw.danger,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+                androidx.compose.foundation.layout.Spacer(Modifier.size(width = 8.dp, height = 1.dp))
+            }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier

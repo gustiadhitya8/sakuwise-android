@@ -70,6 +70,7 @@ private enum class ExpensePicker { Account, PlanItem, Date, Debt }
 fun ExpenseFormScreen(
     onClose: () -> Unit,
     viewModel: TxnFormViewModel = hiltViewModel(),
+    txnId: String? = null,
 ) {
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
@@ -79,6 +80,12 @@ fun ExpenseFormScreen(
     var picker by remember { mutableStateOf<ExpensePicker?>(null) }
 
     LaunchedEffect(state.saved) { if (state.saved) onClose() }
+    // Edit mode — load existing once. Keyed by txnId so re-entering with a
+    // different id refills; keyed once per id since loadExisting is itself
+    // idempotent. NB: planItemAllocation isn't reconstructed here — the user
+    // sees the field but the hero tint defers to plain surface until they
+    // re-pick. Worth a follow-up if it becomes a UX gripe.
+    LaunchedEffect(txnId) { if (txnId != null) viewModel.loadExisting(txnId) }
 
     val account = accounts.firstOrNull { it.id == state.accountId }
 
@@ -119,9 +126,10 @@ fun ExpenseFormScreen(
         onAmountChange = viewModel::setAmount,
         heroSubtitle = allocLabel,
         onCancel = onClose,
-        saveLabel = "Simpan",
+        saveLabel = stringResource(R.string.action_save),
         saveEnabled = state.amount > 0 && state.accountId != null && state.planItemId != null && !state.saving,
         onSave = viewModel::submitExpense,
+        onDelete = if (state.editingId != null) viewModel::delete else null,
     ) {
         val planSubtitle = if (state.planItemName != null && allocName != null) {
             // "{categoryName} · {alloc}" — category not exposed by the VM

@@ -27,6 +27,26 @@ fun OnboardingFlow(
 ) {
     var step by rememberSaveable { mutableIntStateOf(0) }
     val state by viewModel.state.collectAsState()
+
+    // Seed state.lang from the active per-app locale once. The default in
+    // OnboardingUiState is "id"; if the user never explicitly taps the radio
+    // (because the picker already visually shows the active locale checked),
+    // finish() would otherwise commit "id" and clobber a pre-set EN locale.
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        val active = AppCompatDelegate.getApplicationLocales()
+            .toLanguageTags()
+            .takeIf { it.isNotEmpty() }
+            ?: if (android.os.Build.VERSION.SDK_INT >= 33) {
+                androidx.core.os.LocaleListCompat.getAdjustedDefault()
+                    .toLanguageTags().split(",").firstOrNull().orEmpty()
+            } else ""
+        val tag = active.substringBefore('-').lowercase()
+        if (tag == "en" || tag == "id") {
+            if (viewModel.state.value.lang != tag) {
+                viewModel.update { it.copy(lang = tag) }
+            }
+        }
+    }
     // OnboardingUi adapter for the existing step screens (which take OnboardingUi).
     val ui = OnboardingUi(
         lang = state.lang,

@@ -59,6 +59,9 @@ fun AccountDetailScreen(
     accountId: String,
     onBack: () -> Unit,
     onEdit: (String) -> Unit = {},
+    // Tapping a row in "Account Transactions" routes to the matching edit form.
+    // Default is a no-op so previews/tests don't crash; host wires it.
+    onEditTxn: (com.gustiadhitya.sakuwise.core.domain.model.Transaction) -> Unit = {},
     viewModel: AccountDetailViewModel = hiltViewModel(),
 ) {
     val sw = SwTheme.colors
@@ -130,7 +133,7 @@ fun AccountDetailScreen(
                             // Show last selisih inline so the user sees the
                             // health of the latest reconcile at a glance.
                             if (lastSnap.diff != 0L) {
-                                Text(" · selisih ",
+                                Text(stringResource(R.string.account_detail_diff_label),
                                     color = sw.onPrimaryHero.copy(alpha = 0.78f),
                                     style = SwType.LabelSmall.copy(fontSize = 12.sp))
                                 RupiahText(
@@ -238,6 +241,10 @@ fun AccountDetailScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .let { m ->
+                                        if (t.type == TxnType.Expense || t.type == TxnType.Income || t.type == TxnType.Transfer)
+                                            m.clickable { onEditTxn(t) } else m
+                                    }
                                     .padding(horizontal = 16.dp, vertical = 10.dp),
                             ) {
                                 val typeFallback = stringResource(when (t.type) {

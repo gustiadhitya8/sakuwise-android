@@ -29,7 +29,12 @@ private sealed interface AssetRoute {
 }
 
 @Composable
-fun AssetTabHost() {
+fun AssetTabHost(
+    // Bubbled up so the host (MainShell) can open the full-screen edit
+    // overlay when a row inside AccountDetail is tapped. Defaulted to a
+    // no-op so existing call sites and previews keep working.
+    onEditTxn: (com.gustiadhitya.sakuwise.core.domain.model.Transaction) -> Unit = {},
+) {
     var route by remember { mutableStateOf<AssetRoute>(AssetRoute.Hub) }
 
     // Intra-tab back: sub-routes back-step toward Hub, then MainShell takes over.
@@ -67,6 +72,7 @@ fun AssetTabHost() {
             accountId = r.accountId,
             onBack = { route = AssetRoute.Accounts },
             onEdit = { id -> route = AssetRoute.AccountEdit(id) },
+            onEditTxn = onEditTxn,
         )
         is AssetRoute.AccountEdit -> AccountEditScreenHost(
             accountId = r.accountId,
@@ -155,9 +161,16 @@ private fun AccountDetailScreenHost(
     accountId: String,
     onBack: () -> Unit,
     onEdit: (String) -> Unit,
+    onEditTxn: (com.gustiadhitya.sakuwise.core.domain.model.Transaction) -> Unit = {},
 ) {
     val vm: AccountDetailViewModel = hiltViewModel(key = "account-$accountId")
-    AccountDetailScreen(accountId = accountId, onBack = onBack, onEdit = onEdit, viewModel = vm)
+    AccountDetailScreen(
+        accountId = accountId,
+        onBack = onBack,
+        onEdit = onEdit,
+        onEditTxn = onEditTxn,
+        viewModel = vm,
+    )
 }
 
 @Composable

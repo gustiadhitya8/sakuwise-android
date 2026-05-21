@@ -99,6 +99,7 @@ class CreateFirstAccountUseCase @Inject constructor(private val repo: AccountRep
 class ReconcileAccountUseCase @Inject constructor(
     private val accountRepo: AccountRepository,
     private val transactionRepo: TransactionRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val ctx: android.content.Context,
 ) {
     suspend operator fun invoke(
         accountId: String,
@@ -133,7 +134,7 @@ class ReconcileAccountUseCase @Inject constructor(
                     debtId = null,
                     photoBlob = null,
                     incomeCategoryId = null,
-                    note = note ?: "Rekonsiliasi",
+                    note = note ?: ctx.getString(com.gustiadhitya.sakuwise.R.string.reconcile_default_note),
                     createdAt = System.currentTimeMillis(),
                 ),
             )

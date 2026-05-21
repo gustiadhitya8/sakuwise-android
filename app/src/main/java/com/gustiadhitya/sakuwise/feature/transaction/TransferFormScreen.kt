@@ -55,6 +55,7 @@ private enum class TransferPicker { From, To, Date, FeePlanItem }
 fun TransferFormScreen(
     onClose: () -> Unit,
     viewModel: TxnFormViewModel = hiltViewModel(),
+    txnId: String? = null,
 ) {
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
@@ -63,6 +64,7 @@ fun TransferFormScreen(
     var picker by remember { mutableStateOf<TransferPicker?>(null) }
 
     LaunchedEffect(state.saved) { if (state.saved) onClose() }
+    LaunchedEffect(txnId) { if (txnId != null) viewModel.loadExisting(txnId) }
 
     val from = accounts.firstOrNull { it.id == state.accountId }
     val to = accounts.firstOrNull { it.id == state.destAccountId }
@@ -80,10 +82,11 @@ fun TransferFormScreen(
         onAmountChange = viewModel::setAmount,
         heroSubtitle = subtitle,
         onCancel = onClose,
-        saveLabel = "Simpan",
+        saveLabel = stringResource(R.string.action_save),
         saveEnabled = state.amount > 0 && state.accountId != null &&
             state.destAccountId != null && state.accountId != state.destAccountId && !state.saving,
         onSave = viewModel::submitTransfer,
+        onDelete = if (state.editingId != null) viewModel::delete else null,
     ) {
         FieldButton(
             label = stringResource(R.string.txn_transfer_from),

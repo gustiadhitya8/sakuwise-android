@@ -142,6 +142,14 @@
     <string name="settings_lang_pin_only">PIN only</string>
     <string name="settings_period_day_format">Day %1$d</string>
 
+    <!-- i18n round 3: dashboard alloc + account detail diff + reconcile note -->
+    <string name="dashboard_alloc_section">Allocation</string>
+    <string name="dashboard_alloc_detail">Details</string>
+    <string name="dashboard_alloc_used_pct_format">%1$d%% used</string>
+    <string name="dashboard_alloc_over_format">Over %1$s</string>
+    <string name="account_detail_diff_label"> · diff </string>
+    <string name="reconcile_default_note">Reconciliation</string>
+
     <string name="plan_apply_starter_btn">Apply Starter Template</string>
 
     <!-- Settings hub -->

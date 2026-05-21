@@ -31,6 +31,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 data class TxnFormState(
+    val editingId: String? = null,
     val amount: Long = 0L,
     val date: LocalDate = LocalDate.now(),
     val accounts: List<Account> = emptyList(),
@@ -187,8 +188,65 @@ class TxnFormViewModel @Inject constructor(
      */
     fun resetForNewEntry() {
         // Explicitly null out photoBlob + feePlanItem so a previous OCR/manual
-        // attach doesn't bleed into the next unrelated form opening.
+        // attach doesn't bleed into the next unrelated form opening. Also
+        // clears editingId so a fresh open doesn't accidentally upsert into a
+        // stale row.
         _state.value = TxnFormState(accounts = _state.value.accounts)
+    }
+
+    /**
+     * Edit mode — prefills the form from an existing transaction. The active
+     * form (Expense / Income / Transfer) should call this in a LaunchedEffect
+     * keyed by [txnId]. Subsequent submit* calls upsert in-place against the
+     * same id; [delete] removes the row entirely.
+     *
+     * Plan-item allocation, debt label, income-category name, and transfer-fee
+     * plan-item name are best-effort: we resolve them off the side state we
+     * already have (planItemOptions, accounts, openOwedDebts, incomeCategories).
+     */
+    fun loadExisting(txnId: String) {
+        viewModelScope.launch {
+            val txn = transactionRepo.getById(txnId) ?: return@launch
+            // Side resolves — these flows may not have emitted yet on first
+            // launch; we read .value (which has a sensible default) and fall
+            // back to the raw id if a name lookup misses.
+            val planItem = planItemOptions.value.firstOrNull { it.id == txn.planItemId }
+            val incomeCat = incomeCategories.value.firstOrNull { it.id == txn.incomeCategoryId }
+            val debt = openOwedDebts.value.firstOrNull { it.id == txn.debtId }
+            _state.value = TxnFormState(
+                editingId = txn.id,
+                amount = txn.amount,
+                date = txn.date,
+                accounts = _state.value.accounts,
+                accountId = txn.sourceAccountId,
+                destAccountId = txn.destAccountId,
+                planItemId = txn.planItemId,
+                planItemName = planItem?.name,
+                planItemAllocation = null,
+                transferFee = txn.transferFee ?: 0L,
+                debtId = txn.debtId,
+                debtLabel = debt?.counterparty,
+                incomeCategoryId = txn.incomeCategoryId,
+                incomeCategoryName = incomeCat?.name,
+                recurringIncome = txn.note?.contains("[BERULANG]") == true,
+                note = txn.note?.replace("[BERULANG]", "")?.trim().orEmpty(),
+                photoBlob = txn.photoBlob,
+            )
+        }
+    }
+
+    /**
+     * Delete the currently-edited transaction. Balances + plan-item used
+     * totals are reactive to the txn table so they recompute automatically.
+     * No-op if not in edit mode.
+     */
+    fun delete() {
+        val id = _state.value.editingId ?: return
+        _state.value = _state.value.copy(saving = true)
+        viewModelScope.launch {
+            transactionRepo.delete(id)
+            _state.value = _state.value.copy(saving = false, saved = true)
+        }
     }
 
     fun submitExpense() {
@@ -196,12 +254,28 @@ class TxnFormViewModel @Inject constructor(
         if (s.amount <= 0 || s.accountId == null || s.planItemId == null) return
         _state.value = s.copy(saving = true)
         viewModelScope.launch {
-            addExpense(
-                amount = s.amount, date = s.date, planItemId = s.planItemId,
-                accountId = s.accountId, note = s.note.ifBlank { null },
-                photoBlob = s.photoBlob,
-                debtId = s.debtId,
-            )
+            if (s.editingId == null) {
+                addExpense(
+                    amount = s.amount, date = s.date, planItemId = s.planItemId,
+                    accountId = s.accountId, note = s.note.ifBlank { null },
+                    photoBlob = s.photoBlob,
+                    debtId = s.debtId,
+                )
+            } else {
+                val existing = transactionRepo.getById(s.editingId)
+                if (existing != null) {
+                    transactionRepo.upsert(
+                        existing.copy(
+                            amount = s.amount, date = s.date,
+                            sourceAccountId = s.accountId,
+                            planItemId = s.planItemId,
+                            note = s.note.ifBlank { null },
+                            photoBlob = s.photoBlob,
+                            debtId = s.debtId,
+                        ),
+                    )
+                }
+            }
             _state.value = _state.value.copy(saving = false, saved = true)
         }
     }
@@ -215,10 +289,24 @@ class TxnFormViewModel @Inject constructor(
                 "[BERULANG]".takeIf { s.recurringIncome },
                 s.note.ifBlank { null },
             ).joinToString(" ").ifBlank { null }
-            addIncome(
-                amount = s.amount, date = s.date, accountId = s.accountId,
-                incomeCategoryId = s.incomeCategoryId, note = noteOut,
-            )
+            if (s.editingId == null) {
+                addIncome(
+                    amount = s.amount, date = s.date, accountId = s.accountId,
+                    incomeCategoryId = s.incomeCategoryId, note = noteOut,
+                )
+            } else {
+                val existing = transactionRepo.getById(s.editingId)
+                if (existing != null) {
+                    transactionRepo.upsert(
+                        existing.copy(
+                            amount = s.amount, date = s.date,
+                            sourceAccountId = s.accountId,
+                            incomeCategoryId = s.incomeCategoryId,
+                            note = noteOut,
+                        ),
+                    )
+                }
+            }
             _state.value = _state.value.copy(saving = false, saved = true)
         }
     }
@@ -229,12 +317,34 @@ class TxnFormViewModel @Inject constructor(
         if (s.accountId == s.destAccountId) return
         _state.value = s.copy(saving = true)
         viewModelScope.launch {
-            addTransfer(
-                amount = s.amount, date = s.date,
-                fromAccountId = s.accountId, toAccountId = s.destAccountId,
-                feeAmount = s.transferFee, note = s.note.ifBlank { null },
-                feePlanItemId = s.feePlanItemId,
-            )
+            if (s.editingId == null) {
+                addTransfer(
+                    amount = s.amount, date = s.date,
+                    fromAccountId = s.accountId, toAccountId = s.destAccountId,
+                    feeAmount = s.transferFee, note = s.note.ifBlank { null },
+                    feePlanItemId = s.feePlanItemId,
+                )
+            } else {
+                // Edit-in-place: update the Transfer row's fields. The
+                // fee-as-Expense child row (when feePlanItemId is set on
+                // create) is NOT auto-updated here — that's a known limit;
+                // editing the fee on a transfer that previously booked a
+                // child expense will leave the child untouched. Most users
+                // edit amount/date/note/accounts, not fee — flag if/when
+                // someone asks for it.
+                val existing = transactionRepo.getById(s.editingId)
+                if (existing != null) {
+                    transactionRepo.upsert(
+                        existing.copy(
+                            amount = s.amount, date = s.date,
+                            sourceAccountId = s.accountId,
+                            destAccountId = s.destAccountId,
+                            transferFee = s.transferFee.takeIf { it > 0 },
+                            note = s.note.ifBlank { null },
+                        ),
+                    )
+                }
+            }
             _state.value = _state.value.copy(saving = false, saved = true)
         }
     }

@@ -142,6 +142,14 @@
     <string name="settings_lang_pin_only">PIN saja</string>
     <string name="settings_period_day_format">Tanggal %1$d</string>
 
+    <!-- i18n round 3: dashboard alloc + account detail diff + reconcile note -->
+    <string name="dashboard_alloc_section">Alokasi</string>
+    <string name="dashboard_alloc_detail">Detail</string>
+    <string name="dashboard_alloc_used_pct_format">%1$d%% terpakai</string>
+    <string name="dashboard_alloc_over_format">Over %1$s</string>
+    <string name="account_detail_diff_label"> · selisih </string>
+    <string name="reconcile_default_note">Rekonsiliasi</string>
+
     <string name="plan_apply_starter_btn">Terapkan Template Starter</string>
 
     <!-- Settings hub -->

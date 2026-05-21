@@ -733,7 +733,7 @@ private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
         SwField(value = name, onValueChange = { name = it },
             label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
         Spacer(Modifier.height(16.dp))
-        SwButton(text = "Simpan",
+        SwButton(text = stringResource(R.string.action_save),
             onClick = { onSave(name.trim()) },
             enabled = name.isNotBlank())
         Spacer(Modifier.height(8.dp))
@@ -964,7 +964,7 @@ private fun EditPlanItemSheet(
         }
         Spacer(Modifier.height(16.dp))
         SwButton(
-            text = "Simpan",
+            text = stringResource(R.string.action_save),
             onClick = { onSave(existing, name, amount.toLongOrNull() ?: 0L, rec) },
             enabled = name.isNotBlank() && amount.isNotBlank(),
         )

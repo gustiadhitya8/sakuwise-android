@@ -103,7 +103,17 @@ fun SakuwiseApp(mainViewModel: MainViewModel = hiltViewModel()) {
     }
 }
 
-private enum class FullScreenOverlay { Expense, Income, Transfer, Ocr }
+/**
+ * Sealed overlay so each variant can carry an optional [txnId] — when
+ * non-null the matching form opens in edit mode, prefilling from the
+ * existing transaction and surfacing a Delete button.
+ */
+private sealed class FullScreenOverlay {
+    data class Expense(val txnId: String? = null) : FullScreenOverlay()
+    data class Income(val txnId: String? = null) : FullScreenOverlay()
+    data class Transfer(val txnId: String? = null) : FullScreenOverlay()
+    data object Ocr : FullScreenOverlay()
+}
 
 @Composable
 private fun MainShell() {
@@ -158,9 +168,38 @@ private fun MainShell() {
                             meInitialRoute = com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Backup
                             active = SwTab.Me
                         },
+                        onEditTxn = { txn ->
+                            txnFormVm.resetForNewEntry()
+                            overlay = when (txn.type) {
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Expense ->
+                                    FullScreenOverlay.Expense(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income ->
+                                    FullScreenOverlay.Income(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Transfer ->
+                                    FullScreenOverlay.Transfer(txnId = txn.id)
+                                // Other TxnTypes (Reconciliation, DebtInflow,
+                                // DebtOutflow) shouldn't reach here — the
+                                // dashboard row only fires onEditTxn for the
+                                // three editable types.
+                                else -> null
+                            }
+                        },
                     )
                     SwTab.Plan -> PlanScreen()
-                    SwTab.Assets -> AssetTabHost()
+                    SwTab.Assets -> AssetTabHost(
+                        onEditTxn = { txn ->
+                            txnFormVm.resetForNewEntry()
+                            overlay = when (txn.type) {
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Expense ->
+                                    FullScreenOverlay.Expense(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income ->
+                                    FullScreenOverlay.Income(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Transfer ->
+                                    FullScreenOverlay.Transfer(txnId = txn.id)
+                                else -> null
+                            }
+                        },
+                    )
                     SwTab.Me -> {
                         val initial = meInitialRoute
                         SettingsTabHost(initialRoute = initial)
@@ -187,14 +226,21 @@ private fun MainShell() {
                     .background(sw.bg)
                     .windowInsetsPadding(WindowInsets.statusBars),
             ) {
-                when (overlay) {
-                    FullScreenOverlay.Expense -> ExpenseFormScreen(
+                when (val ov = overlay) {
+                    is FullScreenOverlay.Expense -> ExpenseFormScreen(
                         viewModel = txnFormVm,
                         onClose = { overlay = null },
+                        txnId = ov.txnId,
                     )
-                    FullScreenOverlay.Income -> IncomeFormScreen(onClose = { overlay = null })
-                    FullScreenOverlay.Transfer -> TransferFormScreen(onClose = { overlay = null })
-                    FullScreenOverlay.Ocr -> OcrCaptureScreen(
+                    is FullScreenOverlay.Income -> IncomeFormScreen(
+                        onClose = { overlay = null },
+                        txnId = ov.txnId,
+                    )
+                    is FullScreenOverlay.Transfer -> TransferFormScreen(
+                        onClose = { overlay = null },
+                        txnId = ov.txnId,
+                    )
+                    is FullScreenOverlay.Ocr -> OcrCaptureScreen(
                         onClose = { overlay = null },
                         onComplete = { draft ->
                             txnFormVm.prefillFromOcrDraft(
@@ -203,7 +249,7 @@ private fun MainShell() {
                                 merchant = draft.merchant,
                                 photoBlob = draft.photoBlob,
                             )
-                            overlay = FullScreenOverlay.Expense
+                            overlay = FullScreenOverlay.Expense()
                         },
                     )
                     null -> Unit
@@ -222,9 +268,9 @@ private fun MainShell() {
                     // bleeds into unrelated openings.
                     txnFormVm.resetForNewEntry()
                     overlay = when (kind) {
-                        AddTxnKind.Expense -> FullScreenOverlay.Expense
-                        AddTxnKind.Income -> FullScreenOverlay.Income
-                        AddTxnKind.Transfer -> FullScreenOverlay.Transfer
+                        AddTxnKind.Expense -> FullScreenOverlay.Expense()
+                        AddTxnKind.Income -> FullScreenOverlay.Income()
+                        AddTxnKind.Transfer -> FullScreenOverlay.Transfer()
                         AddTxnKind.Ocr -> FullScreenOverlay.Ocr
                     }
                 },
