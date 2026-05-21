@@ -173,15 +173,28 @@ fun LandListScreen(
             ) { Icon(Icons.Outlined.Add, stringResource(R.string.land_add_cd), tint = Color.White, modifier = Modifier.size(20.dp)) }
         },
     ) {
+        // Hero per proto 23-assets-land-list.png — info-blue bg + landscape
+        // watermark at -20/-30, r22, large 32sp amount.
         Box(
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
-                .background(sw.info).padding(20.dp),
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
+                .background(sw.info).padding(horizontal = 22.dp, vertical = 20.dp),
         ) {
+            Box(modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = (-20).dp, bottom = (-30).dp)) {
+                Icon(Icons.Outlined.Landscape, null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier.size(160.dp))
+            }
             Column {
-                Text(stringResource(R.string.land_hero_total), color = Color.White.copy(alpha = 0.85f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                Text(stringResource(R.string.land_hero_total),
+                    color = Color.White.copy(alpha = 0.85f),
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = total, color = Color.White, style = SwType.AmountXL)
+                RupiahText(value = total, color = Color.White,
+                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold))
                 Spacer(Modifier.height(6.dp))
                 Text(stringResource(R.string.land_hero_sub_format, items.size),
                     color = Color.White.copy(alpha = 0.85f),
@@ -194,23 +207,64 @@ fun LandListScreen(
                 Text(stringResource(R.string.land_empty),
                     color = sw.inkMuted, style = SwType.Body)
             }
-        } else items.forEach { l ->
-            SwCard(modifier = Modifier.padding(vertical = 4.dp), onClick = { onItemClick(l.id) }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(44.dp).clip(RoundedCornerShape(13.dp))
-                            .background(sw.info.copy(alpha = 0.18f)),
-                    ) { Icon(Icons.Outlined.Landscape, null, tint = sw.info, modifier = Modifier.size(22.dp)) }
-                    Spacer(Modifier.size(width = 12.dp, height = 1.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(l.name, color = sw.ink,
-                            style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-                        Text(stringResource(R.string.land_item_sub_format, l.location, l.sizeM2),
-                            color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+        } else {
+            // Single SwCard with rows per proto.
+            SwCard(padding = PaddingValues(0.dp)) {
+                Column {
+                    items.forEachIndexed { i, l ->
+                        val value = l.currentValue ?: l.buyPrice
+                        val growth = if (l.buyPrice > 0L)
+                            ((value - l.buyPrice).toFloat() / l.buyPrice.toFloat()) * 100f
+                        else 0f
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onItemClick(l.id) }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
+                                    .background(sw.info.copy(alpha = 0.15f)),
+                            ) {
+                                Icon(Icons.Outlined.Landscape, null,
+                                    tint = sw.info, modifier = Modifier.size(26.dp))
+                            }
+                            Spacer(Modifier.size(width = 12.dp, height = 1.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(l.name, color = sw.ink,
+                                    style = SwType.LabelStrong.copy(fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold))
+                                Text(stringResource(R.string.land_item_sub_format,
+                                    l.location, l.sizeM2),
+                                    color = sw.inkMuted,
+                                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                RupiahText(value = value,
+                                    style = SwType.Amount.copy(fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFeatureSettings = "tnum"))
+                                if (l.currentValue != null && l.buyPrice > 0L) {
+                                    val pos = growth >= 0f
+                                    Text(
+                                        (if (pos) "+" else "−") +
+                                            "%.1f".format(kotlin.math.abs(growth)) + "%",
+                                        color = if (pos) sw.success else sw.danger,
+                                        style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFeatureSettings = "tnum"),
+                                    )
+                                }
+                            }
+                        }
+                        if (i < items.lastIndex) {
+                            Box(Modifier.fillMaxWidth().height(1.dp)
+                                .padding(start = 84.dp)
+                                .background(sw.border))
+                        }
                     }
-                    RupiahText(value = l.currentValue ?: l.buyPrice, short = true,
-                        style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                 }
             }
         }

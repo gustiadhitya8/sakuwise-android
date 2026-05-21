@@ -2,6 +2,7 @@ package com.gustiadhitya.sakuwise.feature.asset.deposit
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -172,17 +173,26 @@ fun DepositListScreen(
             }
         },
     ) {
-        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
-            .background(sw.accent).padding(20.dp)) {
+        // Hero per proto 26-assets-deposito-list.png — mint bg, r22, savings
+        // watermark at -20/-30.
+        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
+            .background(sw.accent).padding(horizontal = 22.dp, vertical = 20.dp)) {
+            Box(modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = (-20).dp, bottom = (-30).dp)) {
+                Icon(Icons.Outlined.Savings, null,
+                    tint = sw.fixedDarkOnMint.copy(alpha = 0.18f),
+                    modifier = Modifier.size(160.dp))
+            }
             Column {
-                // Deposito hero bg=accent (mint). Use fixedDarkOnMint as fg —
-                // sw.onPrimaryContainer is ALSO mint in dark mode (same hue),
-                // which rendered the entire card invisible to dark-mode users.
                 Text(stringResource(R.string.deposit_hero_label),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = total, color = sw.fixedDarkOnMint, style = SwType.AmountXL)
+                RupiahText(value = total, color = sw.fixedDarkOnMint,
+                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold))
                 Spacer(Modifier.height(6.dp))
                 Text(stringResource(R.string.deposit_hero_sub_format, items.size),
                     color = sw.fixedDarkOnMint.copy(alpha = 0.85f),
@@ -190,30 +200,71 @@ fun DepositListScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
+        Text(stringResource(R.string.deposit_section_label),
+            color = sw.inkSubtle,
+            style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp))
+        Spacer(Modifier.height(4.dp))
         if (items.isEmpty()) {
             SwCard {
                 Text(stringResource(R.string.deposit_empty),
                     color = sw.inkMuted, style = SwType.Body)
             }
-        } else items.forEach { row ->
-            SwCard(modifier = Modifier.padding(vertical = 4.dp),
-                onClick = { onItemClick(row.deposit.id) }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(44.dp).clip(RoundedCornerShape(13.dp))
-                            .background(sw.accent.copy(alpha = 0.18f))) {
-                        Icon(Icons.Outlined.Savings, null, tint = sw.accent, modifier = Modifier.size(22.dp))
+        } else {
+            SwCard(padding = PaddingValues(0.dp)) {
+                Column {
+                    items.forEachIndexed { i, row ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onItemClick(row.deposit.id) }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
+                                    .background(sw.accent.copy(alpha = 0.18f))) {
+                                Icon(Icons.Outlined.Savings, null,
+                                    tint = sw.accent, modifier = Modifier.size(26.dp))
+                            }
+                            Spacer(Modifier.size(width = 12.dp, height = 1.dp))
+                            Column(Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text(row.deposit.name, color = sw.ink,
+                                        style = SwType.LabelStrong.copy(fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold))
+                                    // Tiny type tag pill per proto.
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(sw.bg)
+                                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                                    ) {
+                                        Text(row.deposit.typeLabel.code(),
+                                            color = sw.inkSubtle,
+                                            style = SwType.LabelSmall.copy(fontSize = 10.sp,
+                                                fontWeight = FontWeight.SemiBold))
+                                    }
+                                }
+                                Text(stringResource(R.string.deposit_item_sub_format,
+                                    row.deposit.typeLabel.code(), row.snapshotCount),
+                                    color = sw.inkMuted,
+                                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                            }
+                            RupiahText(value = row.latestBalance,
+                                style = SwType.Amount.copy(fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFeatureSettings = "tnum"))
+                        }
+                        if (i < items.lastIndex) {
+                            Box(Modifier.fillMaxWidth().height(1.dp)
+                                .padding(start = 84.dp)
+                                .background(sw.border))
+                        }
                     }
-                    Spacer(Modifier.size(width = 12.dp, height = 1.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(row.deposit.name, color = sw.ink,
-                            style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-                        Text(stringResource(R.string.deposit_item_sub_format,
-                            row.deposit.typeLabel.code(), row.snapshotCount),
-                            color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
-                    }
-                    RupiahText(value = row.latestBalance, short = true,
-                        style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                 }
             }
         }

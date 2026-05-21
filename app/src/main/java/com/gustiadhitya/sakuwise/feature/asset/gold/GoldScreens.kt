@@ -190,25 +190,52 @@ fun GoldListScreen(
             ) { Icon(Icons.Outlined.Add, stringResource(R.string.gold_add_cd), tint = Color.White, modifier = Modifier.size(20.dp)) }
         },
     ) {
-        // Hero — per proto screens-assets-detail.jsx LandDetail pattern adapted
-        // for Gold: warning bg + WHITE text everywhere, profit/loss shown as a
-        // translucent-white pill chip (NOT green/red, which blends with the
-        // warning background). Includes an arrow_up_right glyph for direction.
+        // Hero per proto 20-assets-emas-list.png — saffron bg with the
+        // "NILAI SAAT INI · {N} GRAM" label, large 32sp amount, profit line,
+        // and the diamond watermark at the bottom-right (negative offset).
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(22.dp))
                 .background(sw.warning)
-                .padding(20.dp),
+                .padding(horizontal = 22.dp, vertical = 20.dp),
         ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = (-20).dp, bottom = (-30).dp),
+            ) {
+                Icon(
+                    Icons.Outlined.Diamond, null,
+                    tint = Color.White.copy(alpha = 0.18f),
+                    modifier = Modifier.size(160.dp),
+                )
+            }
             Column {
                 Text(stringResource(R.string.gold_hero_label_format, totalWeight),
                     color = Color.White.copy(alpha = 0.85f),
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                    style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold))
                 Spacer(Modifier.height(4.dp))
-                RupiahText(value = totalValue, color = Color.White, style = SwType.AmountXL)
-                Spacer(Modifier.height(10.dp))
-                GoldProfitChip(profit = profit, buyPrice = totalBuy.coerceAtLeast(1L))
+                RupiahText(value = totalValue, color = Color.White,
+                    style = SwType.AmountXL.copy(fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold))
+                if (totalBuy > 0L) {
+                    Spacer(Modifier.height(8.dp))
+                    val pct = (profit.toFloat() / totalBuy.toFloat()) * 100f
+                    val sign = if (profit >= 0L) "+" else "−"
+                    Text(
+                        stringResource(
+                            R.string.gold_hero_profit_format,
+                            sign, kotlin.math.abs(profit).toRupiahShort(prefix = ""),
+                            sign, "%.1f".format(kotlin.math.abs(pct)),
+                        ),
+                        color = Color.White,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFeatureSettings = "tnum"),
+                    )
+                }
             }
         }
         Spacer(Modifier.height(14.dp))
@@ -252,32 +279,79 @@ fun GoldListScreen(
                     color = sw.inkMuted, style = SwType.Body)
             }
         } else {
-            items.forEach { g ->
-                SwCard(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    onClick = { onItemClick(g.id) },
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            contentAlignment = Alignment.Center,
+            // "{N} BATCH DIPEGANG" section label per proto.
+            val heldCount = items.count { it.status == AssetStatus.Held }
+            Text(
+                stringResource(R.string.gold_batches_section_format, heldCount),
+                color = sw.inkSubtle,
+                style = SwType.SectionLabel.copy(fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+            )
+            Spacer(Modifier.height(4.dp))
+            // Single SwCard with all rows + dividers — proto pattern.
+            SwCard(padding = PaddingValues(0.dp)) {
+                Column {
+                    items.forEachIndexed { i, g ->
+                        val perValue = g.weightGram * pricePerGram
+                        val growth = if (g.buyPrice > 0L)
+                            ((perValue - g.buyPrice).toFloat() / g.buyPrice.toFloat()) * 100f
+                        else 0f
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(13.dp))
-                                .background(sw.warning.copy(alpha = 0.18f)),
-                        ) { Icon(Icons.Outlined.Diamond, null, tint = sw.warning, modifier = Modifier.size(22.dp)) }
-                        Spacer(Modifier.size(width = 12.dp, height = 1.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                if (g.serial != null)
-                                    stringResource(R.string.gold_item_title_with_serial_format, g.weightGram, g.serial)
-                                else stringResource(R.string.gold_item_title_format, g.weightGram),
-                                color = sw.ink,
-                                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-                            Text(stringResource(R.string.gold_item_buy_date_format, g.purchaseDate.toAbsoluteId()),
-                                color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                                .fillMaxWidth()
+                                .clickable { onItemClick(g.id) }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                        ) {
+                            // 56×56 r16 chip with warningSoft bg per proto.
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(sw.warningSoft),
+                            ) {
+                                Icon(Icons.Outlined.Diamond, null,
+                                    tint = sw.warning, modifier = Modifier.size(26.dp))
+                            }
+                            Spacer(Modifier.size(width = 12.dp, height = 1.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    if (g.serial != null)
+                                        stringResource(R.string.gold_item_title_with_serial_format, g.weightGram, g.serial)
+                                    else stringResource(R.string.gold_item_title_format, g.weightGram),
+                                    color = sw.ink,
+                                    style = SwType.LabelStrong.copy(fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold))
+                                Text(stringResource(R.string.gold_item_buy_date_format,
+                                    g.purchaseDate.toAbsoluteId()),
+                                    color = sw.inkMuted,
+                                    style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                RupiahText(value = perValue,
+                                    style = SwType.Amount.copy(fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFeatureSettings = "tnum"))
+                                if (g.buyPrice > 0L) {
+                                    val pos = growth >= 0f
+                                    Text(
+                                        (if (pos) "+" else "−") +
+                                            "%.1f".format(kotlin.math.abs(growth)) + "%",
+                                        color = if (pos) sw.success else sw.danger,
+                                        style = SwType.LabelSmall.copy(fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFeatureSettings = "tnum"),
+                                    )
+                                }
+                            }
                         }
-                        RupiahText(value = g.weightGram * pricePerGram, short = true,
-                            style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                        if (i < items.lastIndex) {
+                            Box(Modifier.fillMaxWidth().height(1.dp)
+                                .padding(start = 84.dp)
+                                .background(sw.border))
+                        }
                     }
                 }
             }
