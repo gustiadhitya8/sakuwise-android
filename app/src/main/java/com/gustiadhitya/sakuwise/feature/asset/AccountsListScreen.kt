@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -116,35 +117,68 @@ fun AccountsListScreen(
                                     .clickable { onAccountClick(ab.account.id) }
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
                             ) {
+                                // 56×56 r16 chip per proto 16-assets-accounts-list.png.
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
-                                        .size(44.dp)
-                                        .clip(RoundedCornerShape(13.dp))
+                                        .size(56.dp)
+                                        .clip(RoundedCornerShape(16.dp))
                                         .background(sw.primaryContainer),
                                 ) {
                                     Icon(ab.account.type.icon(), null,
-                                        tint = sw.onPrimaryContainer, modifier = Modifier.size(22.dp))
+                                        tint = sw.onPrimaryContainer, modifier = Modifier.size(24.dp))
                                 }
                                 Spacer(Modifier.size(width = 12.dp, height = 1.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(ab.account.name, color = sw.ink,
-                                        style = SwType.LabelStrong.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold))
-                                    Text(ab.account.type.displayName(), color = sw.inkMuted,
-                                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                                        style = SwType.LabelStrong.copy(fontSize = 17.sp,
+                                            fontWeight = FontWeight.Bold))
+                                    val sub = ab.lastReconcileDate?.let {
+                                        stringResource(
+                                            R.string.accounts_row_sub_rekon_format,
+                                            ab.account.type.displayName(),
+                                            it.toString(),
+                                        )
+                                    } ?: ab.account.type.displayName()
+                                    Text(sub, color = sw.inkMuted,
+                                        style = SwType.LabelSmall.copy(fontSize = 12.sp))
                                 }
-                                RupiahText(value = ab.balance, short = true,
-                                    style = SwType.Amount.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                                RupiahText(value = ab.balance,
+                                    style = SwType.Amount.copy(fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFeatureSettings = "tnum"))
                                 Spacer(Modifier.size(width = 6.dp, height = 1.dp))
                                 Icon(Icons.Outlined.ChevronRight, null,
                                     tint = sw.inkSubtle, modifier = Modifier.size(18.dp))
                             }
                             if (divider) {
                                 Box(Modifier.fillMaxWidth().height(1.dp)
-                                    .padding(start = 72.dp)
+                                    .padding(start = 84.dp)
                                     .background(sw.border))
                             }
                         }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                // Info banner per proto.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(sw.infoSoft)
+                        .padding(14.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.Top) {
+                        Icon(
+                            Icons.Outlined.Info, null,
+                            tint = sw.info, modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.size(width = 10.dp, height = 1.dp))
+                        Text(
+                            stringResource(R.string.accounts_list_hint),
+                            color = sw.ink,
+                            style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
+                        )
                     }
                 }
             }

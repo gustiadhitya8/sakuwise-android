@@ -16,7 +16,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-data class AccountWithBalance(val account: Account, val balance: Long)
+data class AccountWithBalance(
+    val account: Account,
+    val balance: Long,
+    /** Latest reconciliation date — used by the row subtitle. Null when the
+     *  account has never been reconciled (subtitle falls back to type name). */
+    val lastReconcileDate: java.time.LocalDate? = null,
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -27,9 +33,18 @@ class AccountsListViewModel @Inject constructor(
 
     val accounts: StateFlow<List<AccountWithBalance>> = observeAccounts().flatMapLatest { list ->
         if (list.isEmpty()) flowOf(emptyList()) else {
-            combine(list.map { acc -> accountRepo.observeBalance(acc.id).map { acc to it } }) { arr ->
-                arr.map { (a, bal) -> AccountWithBalance(a, bal) }
-            }
+            combine(list.map { acc ->
+                combine(
+                    accountRepo.observeBalance(acc.id),
+                    accountRepo.observeSnapshots(acc.id),
+                ) { bal, snaps ->
+                    AccountWithBalance(
+                        account = acc,
+                        balance = bal,
+                        lastReconcileDate = snaps.maxByOrNull { it.date }?.date,
+                    )
+                }
+            }) { it.toList() }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 }

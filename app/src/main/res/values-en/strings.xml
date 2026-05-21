@@ -408,6 +408,8 @@
     <string name="txn_field_account_balance_format">Balance: %1$s</string>
     <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · No telemetry</string>
     <string name="settings_footer_line2">Made in Indonesia 🌱</string>
+    <string name="accounts_row_sub_rekon_format">%1$s · reconciled %2$s</string>
+    <string name="accounts_list_hint"><![CDATA[<b>Tap an account</b> to view detail, snapshot history, and reconciliation.]]></string>
     <string name="reminder_notif_title">Sakuwise bill due</string>
     <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
