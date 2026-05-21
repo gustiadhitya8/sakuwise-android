@@ -102,12 +102,21 @@ internal fun GoldAsset.toEntity() = AssetGoldEntity(
 )
 
 internal fun AssetLandEntity.toDomain() = LandAsset(
-    id, name, location, sertifikatId, sizeM2, buyPrice, currentValue, note,
-    AssetStatus.fromCode(status), soldEpochDay?.let(LocalDate::ofEpochDay), soldPrice,
+    id = id, name = name, location = location, sertifikatId = sertifikatId,
+    sizeM2 = sizeM2, buyPrice = buyPrice, currentValue = currentValue, note = note,
+    status = AssetStatus.fromCode(status),
+    soldDate = soldEpochDay?.let(LocalDate::ofEpochDay), soldPrice = soldPrice,
+    // Legacy rows migrated in with epoch day 0 — surface today instead of
+    // "1970" so the UI looks sane until the user edits to set a real date.
+    purchaseDate = if (purchaseEpochDay <= 0L) LocalDate.now()
+        else LocalDate.ofEpochDay(purchaseEpochDay),
 )
 internal fun LandAsset.toEntity() = AssetLandEntity(
-    id, name, location, sertifikatId, sizeM2, buyPrice, currentValue, note, null,
-    status.code(), soldDate?.toEpochDay(), soldPrice,
+    id = id, name = name, location = location, sertifikatId = sertifikatId,
+    sizeM2 = sizeM2, buyPrice = buyPrice, currentValue = currentValue, note = note,
+    photoBlob = null,
+    status = status.code(), soldEpochDay = soldDate?.toEpochDay(), soldPrice = soldPrice,
+    purchaseEpochDay = purchaseDate.toEpochDay(),
 )
 
 internal fun LandTaxPaymentEntity.toDomain() = LandTaxPayment(

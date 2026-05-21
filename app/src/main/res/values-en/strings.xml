@@ -604,6 +604,8 @@
     <string name="gold_edit_edit_title">Edit Gold</string>
     <string name="gold_edit_weight_label">Weight (grams)</string>
     <string name="gold_edit_buy_price_label">Total purchase price</string>
+    <string name="gold_edit_date_label">Purchase date</string>
+    <string name="land_edit_date_label">Purchase date</string>
     <string name="gold_edit_serial_label">Serial number (optional)</string>
     <string name="gold_edit_serial_placeholder">E.g. ANTAM-12345</string>
     <string name="gold_edit_note_label">Note (optional)</string>

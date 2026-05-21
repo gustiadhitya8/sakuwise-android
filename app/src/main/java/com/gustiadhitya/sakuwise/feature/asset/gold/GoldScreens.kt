@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.outlined.TrendingDown
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Diamond
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
@@ -710,11 +711,29 @@ fun GoldEditScreen(
         SwField(value = state.buyPrice, onValueChange = viewModel::setBuyPrice,
             label = stringResource(R.string.gold_edit_buy_price_label), prefix = "Rp", rupiah = true,
             keyboardType = KeyboardType.Number)
+        // Purchase date — backdating lets the user log gold they bought last
+        // year. allowFuture = false because future-dated purchases would
+        // confuse the "since-buy" profit chip on the detail screen.
+        var datePickerOpen by remember { mutableStateOf(false) }
+        com.gustiadhitya.sakuwise.feature.transaction.ui.FieldButton(
+            label = stringResource(R.string.gold_edit_date_label),
+            value = state.date.toAbsoluteId(),
+            leadingIcon = Icons.Outlined.CalendarToday,
+            onClick = { datePickerOpen = true },
+        )
         SwField(value = state.serial, onValueChange = viewModel::setSerial,
             label = stringResource(R.string.gold_edit_serial_label),
             placeholder = stringResource(R.string.gold_edit_serial_placeholder))
         SwField(value = state.note, onValueChange = viewModel::setNote,
             label = stringResource(R.string.gold_edit_note_label))
+
+        if (datePickerOpen) {
+            com.gustiadhitya.sakuwise.feature.transaction.ui.DatePickerSheet(
+                selected = state.date,
+                onPick = viewModel::setDate,
+                onDismiss = { datePickerOpen = false },
+            )
+        }
     }
 }
 

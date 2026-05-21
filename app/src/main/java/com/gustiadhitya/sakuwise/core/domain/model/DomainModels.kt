@@ -164,6 +164,11 @@ data class LandAsset(
     val status: AssetStatus,
     val soldDate: LocalDate?,
     val soldPrice: Long?,
+    // When the user acquired this property. Backdate-friendly so users can
+    // log land bought years ago. Defaults to today for rows that pre-date
+    // this field (handled at the mapper boundary via the migration's
+    // default value of 0 epoch-day, which gets coerced to today on read).
+    val purchaseDate: LocalDate = LocalDate.now(),
 )
 
 data class LandTaxPayment(

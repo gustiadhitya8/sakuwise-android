@@ -34,6 +34,10 @@ data class AssetLandEntity(
     val status: String,         // "held" | "sold"
     val soldEpochDay: Long?,
     val soldPrice: Long?,
+    // Defaults to 0 in the DB schema (epoch day 0 = 1970-01-01) so pre-
+    // migration rows have a stable value. The mapper coerces 0 → today on
+    // read so the UI doesn't render "1970" for legacy entries.
+    val purchaseEpochDay: Long = 0L,
 ) {
     override fun equals(other: Any?): Boolean = (other as? AssetLandEntity)?.id == id
     override fun hashCode(): Int = id.hashCode()

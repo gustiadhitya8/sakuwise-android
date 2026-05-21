@@ -44,7 +44,7 @@ object DatabaseModule {
             return Room.databaseBuilder(ctx, SakuwiseDatabase::class.java, "sakuwise.db")
                 .openHelperFactory(factory)
                 .addCallback(seedCallback())
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 // Keep destructive fallback as a safety net for any other
                 // schema drift not yet covered by a Migration. Real launches
                 // should remove this once we trust the migration chain.
@@ -74,6 +74,20 @@ object DatabaseModule {
                     total INTEGER NOT NULL
                 )
                 """.trimIndent(),
+            )
+        }
+    }
+
+    /**
+     * v2 → v3 — adds `purchaseEpochDay` to `asset_land` so users can backdate
+     * property purchases (e.g. "field bought 6 months ago"). NOT NULL with
+     * DEFAULT 0 so existing rows migrate without manual fill; the mapper
+     * coerces epoch-day 0 to today on read.
+     */
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "ALTER TABLE asset_land ADD COLUMN purchaseEpochDay INTEGER NOT NULL DEFAULT 0",
             )
         }
     }

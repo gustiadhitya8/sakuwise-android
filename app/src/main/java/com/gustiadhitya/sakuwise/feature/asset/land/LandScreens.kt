@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Landscape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -123,6 +124,7 @@ class LandEditViewModel @Inject constructor(private val repo: LandRepository) : 
                 sertifikat = l.sertifikatId, size = l.sizeM2.toString(),
                 buyPrice = l.buyPrice.toString(),
                 currentValue = l.currentValue?.toString() ?: "",
+                purchaseDate = l.purchaseDate,
                 loaded = true,
             )
         }
@@ -140,6 +142,7 @@ class LandEditViewModel @Inject constructor(private val repo: LandRepository) : 
                     currentValue = s.currentValue.toLongOrNull(),
                     note = null, status = AssetStatus.Held,
                     soldDate = null, soldPrice = null,
+                    purchaseDate = s.purchaseDate,
                 ),
             )
             onDone()
@@ -150,7 +153,9 @@ class LandEditViewModel @Inject constructor(private val repo: LandRepository) : 
 data class LandEditState(
     val id: String? = null, val name: String = "", val location: String = "",
     val sertifikat: String = "", val size: String = "", val buyPrice: String = "",
-    val currentValue: String = "", val loaded: Boolean = false,
+    val currentValue: String = "",
+    val purchaseDate: LocalDate = LocalDate.now(),
+    val loaded: Boolean = false,
 )
 
 @Composable
@@ -584,10 +589,29 @@ fun LandEditScreen(
             label = stringResource(R.string.land_field_size), suffix = "m²", keyboardType = KeyboardType.Number)
         SwField(s.buyPrice, { v -> viewModel.set { it.copy(buyPrice = v.filter { c -> c.isDigit() }) } },
             label = stringResource(R.string.land_field_buy_price), prefix = "Rp", rupiah = true, keyboardType = KeyboardType.Number)
+        // Purchase date — placed right after buy price since it's part of
+        // "when/how much I acquired this". Backdate-friendly (allowFuture=
+        // false in the picker by default) so users can log property they
+        // bought months or years ago.
+        var datePickerOpen by remember { mutableStateOf(false) }
+        com.gustiadhitya.sakuwise.feature.transaction.ui.FieldButton(
+            label = stringResource(R.string.land_edit_date_label),
+            value = s.purchaseDate.toAbsoluteId(),
+            leadingIcon = Icons.Outlined.CalendarToday,
+            onClick = { datePickerOpen = true },
+        )
         SwField(s.currentValue, { v -> viewModel.set { it.copy(currentValue = v.filter { c -> c.isDigit() }) } },
             label = stringResource(R.string.land_edit_current_value_label), prefix = "Rp", rupiah = true,
             keyboardType = KeyboardType.Number,
             hint = stringResource(R.string.land_edit_current_value_hint))
+
+        if (datePickerOpen) {
+            com.gustiadhitya.sakuwise.feature.transaction.ui.DatePickerSheet(
+                selected = s.purchaseDate,
+                onPick = { picked -> viewModel.set { it.copy(purchaseDate = picked) } },
+                onDismiss = { datePickerOpen = false },
+            )
+        }
     }
 }
 

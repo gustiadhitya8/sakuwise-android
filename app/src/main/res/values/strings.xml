@@ -604,6 +604,8 @@
     <string name="gold_edit_edit_title">Edit Emas</string>
     <string name="gold_edit_weight_label">Berat (gram)</string>
     <string name="gold_edit_buy_price_label">Harga beli total</string>
+    <string name="gold_edit_date_label">Tanggal beli</string>
+    <string name="land_edit_date_label">Tanggal beli</string>
     <string name="gold_edit_serial_label">Nomor seri (opsional)</string>
     <string name="gold_edit_serial_placeholder">Mis. ANTAM-12345</string>
     <string name="gold_edit_note_label">Catatan (opsional)</string>
