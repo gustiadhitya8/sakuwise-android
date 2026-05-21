@@ -205,7 +205,7 @@ fun GoldListScreen(
                 .background(sw.warning)
                 .padding(18.dp),
         ) {
-            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
+            Box(modifier = Modifier.matchParentSize()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,
@@ -481,7 +481,7 @@ fun GoldDetailScreen(
         ) {
             // Diamond watermark on its own matchParentSize+clipToBounds layer
             // so the 140dp icon doesn't push the card taller than its content.
-            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
+            Box(modifier = Modifier.matchParentSize()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_gold),
                     contentDescription = null,

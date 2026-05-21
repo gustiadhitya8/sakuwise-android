@@ -183,7 +183,11 @@ fun DepositListScreen(
             // 140dp icon doesn't inflate the card height — it draws into
             // whatever space the visible Column needs, clipped by the card
             // edges. Mirrors the prototype's `position: absolute` behaviour.
-            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
+            // matchParentSize keeps this layer from inflating the card height,
+            // but NO clipToBounds — the icon should draw freely into the card's
+            // padding area and be clipped only by the outer rounded shape, the
+            // way `overflow: hidden` + `position: absolute` work in the proto.
+            Box(modifier = Modifier.matchParentSize()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_deposit),
                     contentDescription = null,

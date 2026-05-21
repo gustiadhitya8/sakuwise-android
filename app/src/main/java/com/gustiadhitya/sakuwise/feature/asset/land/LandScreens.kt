@@ -186,7 +186,7 @@ fun LandListScreen(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
                 .background(sw.info).padding(18.dp),
         ) {
-            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
+            Box(modifier = Modifier.matchParentSize()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
                     contentDescription = null,
@@ -320,7 +320,7 @@ fun LandDetailScreen(
         val pctProfit = if (l.buyPrice > 0) (profit.toFloat() / l.buyPrice.toFloat()) * 100f else 0f
         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
             .background(sw.info).padding(18.dp)) {
-            Box(modifier = Modifier.matchParentSize().clipToBounds()) {
+            Box(modifier = Modifier.matchParentSize()) {
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(com.gustiadhitya.sakuwise.R.drawable.ic_asset_land),
                     contentDescription = null,
