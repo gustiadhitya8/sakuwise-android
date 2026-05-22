@@ -166,7 +166,6 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
             SwCard {
                 Column {
                 val income = state.plan?.expectedIncome ?: 0L
-                val totalPlan = state.allocations.sumOf { it.plan }
                 val totalUsed = state.allocations.sumOf { it.used }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -206,15 +205,11 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(Modifier.weight(1f))
                         Spacer(Modifier.width(28.dp))
-                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
-                            Text("Alokasi", color = sw.inkMuted,
-                                style = SwType.Caption.copy(fontSize = 10.sp))
-                        }
-                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                        Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                             Text("Rencana", color = sw.inkMuted,
                                 style = SwType.Caption.copy(fontSize = 10.sp))
                         }
-                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                        Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                             Text("Aktual", color = sw.inkMuted,
                                 style = SwType.Caption.copy(fontSize = 10.sp))
                         }
@@ -252,23 +247,15 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                                         fontFeatureSettings = "tnum"),
                                 )
                             }
-                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                                 RupiahText(
                                     value = allocAmount, short = true,
-                                    style = SwType.Amount.copy(fontSize = 12.sp,
-                                        fontFeatureSettings = "tnum"),
-                                    color = sw.inkSubtle,
-                                )
-                            }
-                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
-                                RupiahText(
-                                    value = row.plan, short = true,
                                     style = SwType.Amount.copy(fontSize = 12.sp,
                                         fontFeatureSettings = "tnum"),
                                     color = sw.inkMuted,
                                 )
                             }
-                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                                 RupiahText(
                                     value = row.used, short = true,
                                     style = SwType.Amount.copy(fontSize = 12.sp,
@@ -282,7 +269,8 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                     Spacer(Modifier.height(6.dp))
                     Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
                     Spacer(Modifier.height(6.dp))
-                    val leftoverPlan = income - totalPlan
+                    val totalAllocAmount = state.allocations.sumOf { income * it.allocation.targetPct / 100L }
+                    val leftoverPlan = income - totalAllocAmount
                     val leftoverActual = income - totalUsed
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -296,8 +284,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                             modifier = Modifier.weight(1f),
                         )
                         Spacer(Modifier.width(28.dp))
-                        Spacer(Modifier.width(62.dp))
-                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                        Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                             RupiahText(
                                 value = leftoverPlan, short = true,
                                 style = SwType.Amount.copy(fontSize = 12.sp,
@@ -306,7 +293,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                                 color = sw.inkMuted,
                             )
                         }
-                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                        Box(Modifier.width(76.dp), contentAlignment = Alignment.CenterEnd) {
                             RupiahText(
                                 value = leftoverActual, short = true,
                                 style = SwType.Amount.copy(fontSize = 12.sp,
