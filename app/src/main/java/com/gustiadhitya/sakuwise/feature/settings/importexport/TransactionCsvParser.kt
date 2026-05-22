@@ -96,10 +96,10 @@ object TransactionCsvParser {
     // Generates a UTF-8 BOM CSV template with bilingual headers and two example rows.
     fun template(): ByteArray {
         val lines = listOf(
-            "Tanggal,Tipe,Kategori,Item,Jumlah,Catatan",
-            "20260503,Expense,Bulanan Gusti,Makan,45000,ShopeeFood: Egg Roll",
-            "20260503,Expense,Bulanan Gusti,Kopi,18000,Lawson: Caffe Latte",
-            "20260501,Income,,,5000000,Gaji Mei",
+            "Tanggal;Tipe;Kategori;Item;Jumlah;Catatan",
+            "20260503;Expense;Bulanan Gusti;Makan;45000;ShopeeFood: Egg Roll, Basgor, Nugger",
+            "20260503;Expense;Bulanan Gusti;Kopi;18000;Lawson: Caffe Latte",
+            "20260501;Income;;;5000000;Gaji Mei",
         )
         return ("﻿" + lines.joinToString("\n")).toByteArray(Charsets.UTF_8)
     }
@@ -130,7 +130,7 @@ object TransactionCsvParser {
                         inQuotes = false
                     }
                 }
-                ch == ',' && !inQuotes -> { result.add(sb.toString()); sb.clear() }
+                ch == ';' && !inQuotes -> { result.add(sb.toString()); sb.clear() }
                 else -> sb.append(ch)
             }
             i++

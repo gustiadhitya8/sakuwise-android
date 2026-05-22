@@ -84,10 +84,10 @@ class ExportTransactionsUseCase @Inject constructor(
         FileOutputStream(file).use { fos ->
             OutputStreamWriter(fos, Charsets.UTF_8).use { w ->
                 w.write("﻿") // BOM so Excel opens without encoding dialog
-                w.write(headers.joinToString(",") { csv(it) })
+                w.write(headers.joinToString(";") { csv(it) })
                 w.write("\n")
                 for (row in rows) {
-                    w.write(row.joinToString(",") { csv(it) })
+                    w.write(row.joinToString(";") { csv(it) })
                     w.write("\n")
                 }
             }
@@ -95,7 +95,7 @@ class ExportTransactionsUseCase @Inject constructor(
     }
 
     private fun csv(s: String): String {
-        if (s.none { it == ',' || it == '"' || it == '\n' || it == '\r' }) return s
+        if (s.none { it == ';' || it == '"' || it == '\n' || it == '\r' }) return s
         return "\"${s.replace("\"", "\"\"")}\""
     }
 }

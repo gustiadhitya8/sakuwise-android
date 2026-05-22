@@ -71,7 +71,7 @@ fun ImportTransactionScreen(
     SimpleSettingsScreen(title = "Import Transaksi", onBack = onBack) {
 
         Text(
-            "Import transaksi dari file CSV. Format: Tanggal, Tipe, Kategori, Item, Jumlah, Catatan.",
+            "Import transaksi dari file CSV (delimiter titik koma). Format: Tanggal;Tipe;Kategori;Item;Jumlah;Catatan.",
             color = sw.inkMuted,
             style = SwType.LabelSmall.copy(fontSize = 13.sp),
         )
