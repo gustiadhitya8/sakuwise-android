@@ -550,34 +550,54 @@ fun DepositDetailScreen(
 @Composable
 private fun InlineSnapshotChart(snapshots: List<DepositSnapshot>, lineColor: Color) {
     if (snapshots.size < 2) return
-    Canvas(modifier = Modifier.fillMaxWidth().height(110.dp)) {
-        val maxV = snapshots.maxOf { it.balance }.toFloat()
-        val minV = snapshots.minOf { it.balance }.toFloat()
-        val range = (maxV - minV).coerceAtLeast(1f)
-        val w = size.width; val h = size.height
-        val xs = snapshots.indices.map { it * w / (snapshots.size - 1) }
-        val ys = snapshots.map { h - ((it.balance - minV) / range) * h * 0.85f - h * 0.05f }
-        val area = Path().apply {
-            moveTo(xs[0], h)
-            for (i in xs.indices) lineTo(xs[i], ys[i])
-            lineTo(xs.last(), h); close()
+    val sw = SwTheme.colors
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Canvas(modifier = Modifier.fillMaxWidth().height(110.dp)) {
+            val maxV = snapshots.maxOf { it.balance }.toFloat()
+            val minV = snapshots.minOf { it.balance }.toFloat()
+            val range = (maxV - minV).coerceAtLeast(1f)
+            val w = size.width; val h = size.height
+            val xs = snapshots.indices.map { it * w / (snapshots.size - 1) }
+            val ys = snapshots.map { h - ((it.balance - minV) / range) * h * 0.85f - h * 0.05f }
+            val area = Path().apply {
+                moveTo(xs[0], h)
+                for (i in xs.indices) lineTo(xs[i], ys[i])
+                lineTo(xs.last(), h); close()
+            }
+            drawPath(area, brush = Brush.verticalGradient(
+                listOf(lineColor.copy(alpha = 0.22f), Color.Transparent),
+            ))
+            val line = Path().apply {
+                moveTo(xs[0], ys[0])
+                for (i in 1 until xs.size) lineTo(xs[i], ys[i])
+            }
+            drawPath(line, color = lineColor,
+                style = Stroke(width = 2.2f * density, cap = StrokeCap.Round))
+            for (i in xs.indices) {
+                val isLast = i == xs.size - 1
+                drawCircle(
+                    color = lineColor,
+                    radius = if (isLast) 4f * density else 2.5f * density,
+                    center = Offset(xs[i], ys[i]),
+                )
+            }
         }
-        drawPath(area, brush = Brush.verticalGradient(
-            listOf(lineColor.copy(alpha = 0.22f), Color.Transparent),
-        ))
-        val line = Path().apply {
-            moveTo(xs[0], ys[0])
-            for (i in 1 until xs.size) lineTo(xs[i], ys[i])
+        // X-axis month labels — same approach as NetWorthTrendCard. Pick
+        // first / middle / last (or all if ≤4 points) so labels don't crowd.
+        val fmt = java.time.format.DateTimeFormatter.ofPattern("MMM yy", java.util.Locale.getDefault())
+        val indices = when {
+            snapshots.size <= 4 -> snapshots.indices.toList()
+            else -> listOf(0, snapshots.size / 2, snapshots.size - 1)
         }
-        drawPath(line, color = lineColor,
-            style = Stroke(width = 2.2f * density, cap = StrokeCap.Round))
-        for (i in xs.indices) {
-            val isLast = i == xs.size - 1
-            drawCircle(
-                color = lineColor,
-                radius = if (isLast) 4f * density else 2.5f * density,
-                center = Offset(xs[i], ys[i]),
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            indices.forEach { i ->
+                Text(snapshots[i].date.format(fmt),
+                    color = sw.inkSubtle,
+                    style = SwType.LabelSmall.copy(fontSize = 10.sp, fontFeatureSettings = "tnum"))
+            }
         }
     }
 }
