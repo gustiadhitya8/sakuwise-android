@@ -143,7 +143,7 @@ fun ExpenseFormScreen(
             subtitle = planSubtitle,
             leadingContent = {
                 com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip(
-                    bg = heroBg.copy(alpha = if (alloc == null) 1f else 0.18f),
+                    bg = if (alloc == null) sw.surface else heroBg.copy(alpha = 0.18f),
                     fg = if (alloc == null) sw.inkMuted else heroBg,
                 ) {
                     Text(
