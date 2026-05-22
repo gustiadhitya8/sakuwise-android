@@ -7,8 +7,11 @@ import java.time.format.DateTimeFormatter
 data class ImportRow(
     val date: LocalDate,
     val type: TxnType,
-    val note: String?,
+    val kategori: String?,   // raw Category/Kategori column — for plan item lookup + display
+    val item: String?,       // raw Item column — for plan item lookup + display
+    val note: String?,       // raw Note/Catatan column — stored as transaction note
     val amount: Long,
+    val planItemId: String? = null, // resolved in ViewModel after DB lookup
 )
 
 data class ParseResult(
@@ -29,22 +32,26 @@ object TransactionCsvParser {
     )
 
     fun parse(csvText: String): ParseResult {
-        // Strip BOM if present
         val text = csvText.trimStart('﻿')
         val lines = text.lines().filter { it.isNotBlank() }
         if (lines.isEmpty()) return ParseResult(emptyList(), 0, listOf("File kosong"))
 
         val headerRow = parseCsvLine(lines.first()).map { it.trim().lowercase() }
-        val dateIdx    = headerRow.indexOfFirst { it == "date" }
-        val typeIdx    = headerRow.indexOfFirst { it == "type" }
-        val categoryIdx= headerRow.indexOfFirst { it == "category" }
-        val amountIdx  = headerRow.indexOfFirst { it == "amount" }
-        val catatanIdx = headerRow.indexOfFirst { it == "note" || it == "catatan" }
+
+        // Bilingual column lookup — Indonesian first, English alias second
+        fun col(vararg names: String) = headerRow.indexOfFirst { it in names }
+
+        val dateIdx     = col("tanggal", "date")
+        val typeIdx     = col("tipe", "type")
+        val kategoriIdx = col("kategori", "category")
+        val itemIdx     = col("item")
+        val amountIdx   = col("jumlah", "amount")
+        val noteIdx     = col("catatan", "note")
 
         if (dateIdx < 0 || typeIdx < 0 || amountIdx < 0) {
             return ParseResult(
                 emptyList(), 0,
-                listOf("Header tidak valid. Kolom wajib: Date, Type, Amount"),
+                listOf("Header tidak valid. Kolom wajib: Tanggal, Tipe, Jumlah (atau Date, Type, Amount)"),
             )
         }
 
@@ -56,13 +63,11 @@ object TransactionCsvParser {
             val lineNo = i + 2
             val cols = parseCsvLine(line)
 
-            // Amount
             val amountRaw = cols.getOrNull(amountIdx)?.trim()
             if (amountRaw.isNullOrBlank()) { skipped++; continue }
             val amount = parseAmount(amountRaw)
             if (amount == null || amount <= 0) { skipped++; continue }
 
-            // Date
             val dateRaw = cols.getOrNull(dateIdx)?.trim() ?: ""
             val date = parseDate(dateRaw)
             if (date == null) {
@@ -70,27 +75,35 @@ object TransactionCsvParser {
                 skipped++; continue
             }
 
-            // Type
             val typeRaw = cols.getOrNull(typeIdx)?.trim()?.lowercase() ?: ""
             val type = when (typeRaw) {
-                "income"   -> TxnType.Income
-                "expense"  -> TxnType.Expense
-                "transfer" -> TxnType.Transfer
-                else       -> { skipped++; continue }
+                "income", "pemasukan"   -> TxnType.Income
+                "expense", "pengeluaran" -> TxnType.Expense
+                "transfer"              -> TxnType.Transfer
+                else -> { skipped++; continue }
             }
 
-            // Note = merge Category + Catatan
-            val category = if (categoryIdx >= 0) cols.getOrNull(categoryIdx)?.trim()?.ifBlank { null } else null
-            val catatan  = if (catatanIdx  >= 0) cols.getOrNull(catatanIdx )?.trim()?.ifBlank { null } else null
-            val note = listOfNotNull(category, catatan).joinToString(" – ").ifBlank { null }
+            val kategori = if (kategoriIdx >= 0) cols.getOrNull(kategoriIdx)?.trim()?.ifBlank { null } else null
+            val item     = if (itemIdx     >= 0) cols.getOrNull(itemIdx    )?.trim()?.ifBlank { null } else null
+            val note     = if (noteIdx     >= 0) cols.getOrNull(noteIdx    )?.trim()?.ifBlank { null } else null
 
-            rows.add(ImportRow(date, type, note, amount))
+            rows.add(ImportRow(date, type, kategori, item, note, amount))
         }
 
         return ParseResult(rows, skipped, errors)
     }
 
-    // Handle "22000", "1300000", "Rp27.000.000", "1,300,000"
+    // Generates a UTF-8 BOM CSV template with bilingual headers and two example rows.
+    fun template(): ByteArray {
+        val lines = listOf(
+            "Tanggal,Tipe,Kategori,Item,Jumlah,Catatan",
+            "20260503,Expense,Bulanan Gusti,Makan,45000,ShopeeFood: Egg Roll",
+            "20260503,Expense,Bulanan Gusti,Kopi,18000,Lawson: Caffe Latte",
+            "20260501,Income,,,5000000,Gaji Mei",
+        )
+        return ("﻿" + lines.joinToString("\n")).toByteArray(Charsets.UTF_8)
+    }
+
     private fun parseAmount(s: String): Long? =
         s.replace(Regex("[RpIDR ,.]"), "").trim().toLongOrNull()
 
@@ -101,7 +114,6 @@ object TransactionCsvParser {
         return null
     }
 
-    // RFC-4180-ish CSV parser: handles quoted fields with embedded commas/quotes
     private fun parseCsvLine(line: String): List<String> {
         val result = mutableListOf<String>()
         val sb = StringBuilder()
@@ -113,7 +125,7 @@ object TransactionCsvParser {
                 ch == '"' && !inQuotes -> inQuotes = true
                 ch == '"' && inQuotes  -> {
                     if (i + 1 < line.length && line[i + 1] == '"') {
-                        sb.append('"'); i++ // escaped quote
+                        sb.append('"'); i++
                     } else {
                         inQuotes = false
                     }

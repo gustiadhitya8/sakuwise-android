@@ -1,5 +1,6 @@
 package com.gustiadhitya.sakuwise.feature.settings.importexport
 
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -20,9 +21,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.UploadFile
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -35,7 +38,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +61,7 @@ fun ImportTransactionScreen(
     val sw      = SwTheme.colors
     val state   by viewModel.state.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
+    val context = LocalContext.current
     var selectedAccountId by remember { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -65,19 +71,39 @@ fun ImportTransactionScreen(
     SimpleSettingsScreen(title = "Import Transaksi", onBack = onBack) {
 
         Text(
-            "Import transaksi dari file CSV. Format kolom: Date, Type, Category, Amount, Note.",
+            "Import transaksi dari file CSV. Format: Tanggal, Tipe, Kategori, Item, Jumlah, Catatan.",
             color = sw.inkMuted,
             style = SwType.LabelSmall.copy(fontSize = 13.sp),
         )
         Spacer(Modifier.height(16.dp))
 
         when (val s = state) {
-            // ── Idle ────────────────────────────────────────────────
+            // ── Idle ──────────────────────────────────────────────────
             is ImportUiState.Idle -> {
                 SwButton(
                     text = "Pilih File CSV",
                     onClick = { launcher.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain", "*/*")) },
                     leading = { Icon(Icons.Outlined.FileOpen, null, tint = sw.onPrimary, modifier = Modifier.size(18.dp)) },
+                )
+                Spacer(Modifier.height(10.dp))
+                SwButton(
+                    text = "Unduh Template CSV",
+                    onClick = {
+                        runCatching {
+                            val uri = viewModel.shareTemplate()
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/csv"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(
+                                Intent.createChooser(intent, "Simpan Template").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        }
+                    },
+                    variant = SwButtonVariant.Outline,
+                    leading = { Icon(Icons.Outlined.Download, null, tint = sw.primary, modifier = Modifier.size(18.dp)) },
                 )
                 Spacer(Modifier.height(16.dp))
                 SwCard {
@@ -85,16 +111,23 @@ fun ImportTransactionScreen(
                         Text("Format CSV yang diperlukan:", color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
                         Spacer(Modifier.height(4.dp))
-                        FormatHintRow("Date", "YYYYMMDD")
-                        FormatHintRow("Type", "Income / Expense / Transfer")
-                        FormatHintRow("Category", "Optional — category name")
-                        FormatHintRow("Amount", "Number only, no Rp or dots")
-                        FormatHintRow("Note", "Optional — description")
+                        FormatHintRow("Tanggal", "YYYYMMDD  (mis. 20260503)")
+                        FormatHintRow("Tipe", "Expense / Income / Transfer")
+                        FormatHintRow("Kategori", "Nama kategori di Plan (opsional)")
+                        FormatHintRow("Item", "Nama item di bawah Kategori (opsional)")
+                        FormatHintRow("Jumlah", "Angka saja, tanpa Rp atau titik")
+                        FormatHintRow("Catatan", "Deskripsi tambahan (opsional)")
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Header bisa bahasa Indonesia atau English (Date/Tanggal, dll.).",
+                            color = sw.inkSubtle,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                        )
                     }
                 }
             }
 
-            // ── Parsing ─────────────────────────────────────────────
+            // ── Parsing ───────────────────────────────────────────────
             is ImportUiState.Parsing -> {
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     contentAlignment = Alignment.Center) {
@@ -103,11 +136,10 @@ fun ImportTransactionScreen(
                 }
                 Text("Membaca file…", color = sw.inkMuted,
                     style = SwType.Body.copy(fontSize = 13.sp),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             }
 
-            // ── Preview ─────────────────────────────────────────────
+            // ── Preview ───────────────────────────────────────────────
             is ImportUiState.Preview -> {
                 // Summary chip
                 Row(
@@ -123,6 +155,26 @@ fun ImportTransactionScreen(
                         if (s.skipped > 0)
                             Text("${s.skipped} baris dilewati (amount kosong/tidak valid)",
                                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                    }
+                }
+
+                // Unresolved plan items warning
+                if (s.unresolvedItems > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                            .background(sw.warningSoft).padding(12.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Icon(Icons.Outlined.Warning, null, tint = sw.warning, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Text("${s.unresolvedItems} baris tidak cocok dengan item di Plan",
+                                color = sw.warning,
+                                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
+                            Text("Transaksi tetap diimpor, tapi tidak terhubung ke anggaran Plan. Pastikan nama Kategori dan Item sama persis.",
+                                color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                        }
                     }
                 }
 
@@ -190,7 +242,6 @@ fun ImportTransactionScreen(
 
                 SwCard(padding = PaddingValues(0.dp)) {
                     Column {
-                        // Header
                         PreviewHeaderRow()
                         s.rows.take(10).forEach { row -> PreviewDataRow(row) }
                         if (s.rows.size > 10) {
@@ -214,12 +265,10 @@ fun ImportTransactionScreen(
                     leading = { Icon(Icons.Outlined.UploadFile, null, tint = sw.onPrimary, modifier = Modifier.size(18.dp)) },
                 )
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Pilih File Lain", onClick = {
-                    viewModel.reset()
-                }, variant = SwButtonVariant.Ghost)
+                SwButton(text = "Pilih File Lain", onClick = { viewModel.reset() }, variant = SwButtonVariant.Ghost)
             }
 
-            // ── Importing ───────────────────────────────────────────
+            // ── Importing ─────────────────────────────────────────────
             is ImportUiState.Importing -> {
                 val progress = if (s.total > 0) s.done.toFloat() / s.total else 0f
                 Spacer(Modifier.height(8.dp))
@@ -234,7 +283,7 @@ fun ImportTransactionScreen(
                     color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
             }
 
-            // ── Done ────────────────────────────────────────────────
+            // ── Done ──────────────────────────────────────────────────
             is ImportUiState.Done -> {
                 Box(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
@@ -264,7 +313,7 @@ fun ImportTransactionScreen(
                 SwButton(text = "Selesai", onClick = onBack, variant = SwButtonVariant.Ghost)
             }
 
-            // ── Error ───────────────────────────────────────────────
+            // ── Error ─────────────────────────────────────────────────
             is ImportUiState.Err -> {
                 Box(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
@@ -299,7 +348,7 @@ private fun FormatHintRow(col: String, desc: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(col, color = sw.primary,
             style = SwType.LabelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.width(80.dp))
+            modifier = Modifier.width(72.dp))
         Text(desc, color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp))
     }
 }
@@ -313,11 +362,8 @@ private fun PreviewHeaderRow() {
     ) {
         Text("Tanggal", color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.width(72.dp))
-        Text("Tipe", color = sw.inkSubtle,
-            style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.width(56.dp))
-        Text("Catatan", color = sw.inkSubtle,
+            modifier = Modifier.width(60.dp))
+        Text("Kategori · Item", color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.weight(1f))
         Text("Jumlah", color = sw.inkSubtle,
@@ -329,22 +375,30 @@ private fun PreviewHeaderRow() {
 private fun PreviewDataRow(row: ImportRow) {
     val sw = SwTheme.colors
     val dtFmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM")
-    val typeColor = if (row.type == com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income) sw.success else sw.danger
-    val typeLabel = if (row.type == com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income) "Masuk" else "Keluar"
+    val linked = row.planItemId != null
+    val categoryLabel = when {
+        row.kategori != null && row.item != null -> "${row.kategori} · ${row.item}"
+        row.kategori != null -> row.kategori
+        row.note != null -> row.note
+        else -> "—"
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp),
     ) {
         Text(row.date.format(dtFmt), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.width(72.dp))
-        Text(typeLabel, color = typeColor,
-            style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.width(56.dp))
-        Text(row.note ?: "—", color = sw.ink,
-            style = SwType.Caption.copy(fontSize = 11.sp),
-            modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(row.amount.toRupiahShort(), color = sw.ink,
+            modifier = Modifier.width(60.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(categoryLabel, color = sw.ink,
+                style = SwType.Caption.copy(fontSize = 11.sp),
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (!linked && row.kategori != null) {
+                Text("tidak terhubung ke Plan", color = sw.warning,
+                    style = SwType.Caption.copy(fontSize = 10.sp))
+            }
+        }
+        Text(row.amount.toRupiahShort(), color = if (row.type == com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income) sw.success else sw.ink,
             style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold))
     }
 }
