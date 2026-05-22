@@ -27,7 +27,9 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DriveFileMove
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
@@ -75,6 +77,8 @@ import com.gustiadhitya.sakuwise.core.domain.model.AllocationId
 import com.gustiadhitya.sakuwise.core.domain.model.PlanItem
 import com.gustiadhitya.sakuwise.core.domain.model.Recurrence
 import com.gustiadhitya.sakuwise.core.ui.RupiahText
+import com.gustiadhitya.sakuwise.feature.plan.viewmodel.AllocationRow
+import com.gustiadhitya.sakuwise.feature.plan.viewmodel.CategoryRow
 import com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanViewModel
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -105,6 +109,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         val isLast: Boolean,
     )
     var itemActions by remember { mutableStateOf<ItemActionsTarget?>(null) }
+    var moveItemTarget by remember { mutableStateOf<PlanItem?>(null) }
     var actionSheetOpen by remember { mutableStateOf(false) }
     var incomeSheetOpen by remember { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
@@ -518,7 +523,24 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                 viewModel.movePlanItemDown(target.item)
                 itemActions = null
             },
+            onMove = {
+                moveItemTarget = target.item
+                itemActions = null
+            },
             onDismiss = { itemActions = null },
+        )
+    }
+    if (moveItemTarget != null) {
+        val item = moveItemTarget!!
+        MoveItemSheet(
+            itemName = item.name,
+            currentCategoryId = item.categoryId,
+            allocations = state.allocations,
+            onMove = { targetCategoryId ->
+                viewModel.movePlanItemToCategory(item, targetCategoryId)
+                moveItemTarget = null
+            },
+            onDismiss = { moveItemTarget = null },
         )
     }
     if (renameCategoryTarget != null) {
@@ -953,12 +975,65 @@ private fun ItemActionSheet(
     onEdit: () -> Unit,
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit,
+    onMove: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     SwPickerSheet(title = itemName, onDismiss = onDismiss) {
         ActionSheetRow(icon = Icons.Outlined.Edit, label = "Ubah item", onClick = onEdit)
         if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = "Pindah ke atas", onClick = onMoveUp)
         if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = "Pindah ke bawah", onClick = onMoveDown)
+        ActionSheetRow(icon = Icons.Outlined.DriveFileMove, label = "Pindah ke kategori lain", onClick = onMove)
+    }
+}
+
+@Composable
+private fun MoveItemSheet(
+    itemName: String,
+    currentCategoryId: String,
+    allocations: List<AllocationRow>,
+    onMove: (targetCategoryId: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    SwPickerSheet(title = "Pindahkan \"$itemName\" ke…", onDismiss = onDismiss) {
+        allocations.forEach { allocRow ->
+            val allocId = com.gustiadhitya.sakuwise.core.domain.model.AllocationId.fromName(allocRow.allocation.name)
+            val allocColor = when (allocId) {
+                com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Needs  -> sw.primary
+                com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants  -> sw.accent
+                com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Invest -> sw.info
+            }
+            val eligibleCats = allocRow.categories.filter { it.category.id != currentCategoryId }
+            if (eligibleCats.isNotEmpty()) {
+                // Allocation label as section divider
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
+                ) {
+                    Box(Modifier.size(7.dp).clip(androidx.compose.foundation.shape.CircleShape).background(allocColor))
+                    Spacer(Modifier.width(6.dp))
+                    Text(allocId.displayName(), color = sw.inkSubtle,
+                        style = SwType.SectionLabel.copy(fontSize = 11.sp))
+                }
+                eligibleCats.forEach { catRow: CategoryRow ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .clickable { onMove(catRow.category.id) }
+                            .padding(horizontal = 12.dp, vertical = 14.dp),
+                    ) {
+                        Icon(Icons.Outlined.Folder, null,
+                            tint = allocColor, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text(catRow.category.name, color = sw.ink,
+                            style = SwType.LabelStrong.copy(fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold))
+                    }
+                }
+            }
+        }
     }
 }
 

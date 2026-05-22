@@ -280,6 +280,16 @@ class PlanViewModel @Inject constructor(
         }
     }
 
+    fun movePlanItemToCategory(item: PlanItem, targetCategoryId: String) {
+        viewModelScope.launch {
+            val targetItems = planRepo.observePlanItems(targetCategoryId).first()
+            val newSortOrder = (targetItems.maxOfOrNull { it.sortOrder } ?: -1) + 1
+            planRepo.upsertPlanItem(
+                item.copy(categoryId = targetCategoryId, sortOrder = newSortOrder),
+            )
+        }
+    }
+
     fun applyStarterTemplateToCurrentPlan() {
         viewModelScope.launch {
             // First-launch path: if no Plan entity exists for the current period,
