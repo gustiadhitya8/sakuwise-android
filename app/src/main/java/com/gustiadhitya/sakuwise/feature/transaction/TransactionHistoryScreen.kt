@@ -1,6 +1,7 @@
 package com.gustiadhitya.sakuwise.feature.transaction
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,15 +17,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -75,8 +83,15 @@ fun TransactionHistoryScreen(
     val net = monthIncome - monthExpense
 
     var sortMode by remember { mutableStateOf(AssetSort.DATE_DESC) }
-    val sorted = remember(transactions, sortMode) {
-        transactions.sortedWith(
+    var query by remember { mutableStateOf("") }
+    val sorted = remember(transactions, sortMode, query) {
+        transactions
+            .filter { t ->
+                query.isEmpty() ||
+                    t.note?.contains(query, ignoreCase = true) == true ||
+                    t.amount.toString().contains(query)
+            }
+            .sortedWith(
             when (sortMode) {
                 AssetSort.DATE_DESC -> compareByDescending<Transaction> { it.date }.thenByDescending { it.createdAt }
                 AssetSort.DATE_ASC -> compareBy<Transaction> { it.date }.thenBy { it.createdAt }
@@ -192,6 +207,41 @@ fun TransactionHistoryScreen(
                 FilterChip(label = "Masuk", selected = typeFilter == TxnType.Income, onClick = { viewModel.setTypeFilter(TxnType.Income) })
                 FilterChip(label = "Keluar", selected = typeFilter == TxnType.Expense, onClick = { viewModel.setTypeFilter(TxnType.Expense) })
                 FilterChip(label = "Transfer", selected = typeFilter == TxnType.Transfer, onClick = { viewModel.setTypeFilter(TxnType.Transfer) })
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // Search bar
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SwSpace.pageH)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(sw.surface)
+                    .border(1.dp, sw.border, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+            ) {
+                Icon(Icons.Outlined.Search, null, tint = sw.inkMuted, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                BasicTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    singleLine = true,
+                    textStyle = SwType.Body.copy(fontSize = 14.sp, color = sw.ink),
+                    cursorBrush = SolidColor(sw.primary),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    decorationBox = { inner ->
+                        if (query.isEmpty()) Text("Cari transaksi...", color = sw.inkMuted, style = SwType.Body.copy(fontSize = 14.sp))
+                        inner()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+                if (query.isNotEmpty()) {
+                    Spacer(Modifier.width(8.dp))
+                    Icon(Icons.Outlined.Close, null, tint = sw.inkMuted,
+                        modifier = Modifier.size(16.dp).clickable { query = "" })
+                }
             }
 
             Spacer(Modifier.height(12.dp))

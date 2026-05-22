@@ -181,6 +181,7 @@ private fun DashboardContent(
         DashboardHero(
             income = state.incomeMonth,
             expense = state.expenseMonth,
+            expectedIncome = state.expectedIncome,
             period = state.period,
             hide = hide,
             onToggleHide = onToggleHide,
@@ -451,12 +452,15 @@ private fun DashboardGreeting(name: String, period: PlanPeriod?, onPeriodTap: ()
 private fun DashboardHero(
     income: Long,
     expense: Long,
+    expectedIncome: Long,
     period: PlanPeriod?,
     hide: Boolean,
     onToggleHide: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    val remaining = income - expense
+    // Budget-first: use the higher of actual income vs planned income so that
+    // SISA ANGGARAN shows the full planned budget even before salary arrives.
+    val remaining = maxOf(income, expectedIncome) - expense
     val daysLeft = period?.daysLeft?.coerceAtLeast(1) ?: 1
     val dailyLeft = remaining / daysLeft
 

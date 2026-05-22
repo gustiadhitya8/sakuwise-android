@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.horizontalScroll
@@ -17,15 +18,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.NorthEast
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerDefaults
@@ -137,6 +148,45 @@ private fun FilterPill(label: String, active: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
+private fun SearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String = "Cari...") {
+    val sw = SwTheme.colors
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(sw.bg)
+            .border(1.dp, sw.border, RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Icon(Icons.Outlined.Search, null, tint = sw.inkMuted, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.size(width = 8.dp, height = 1.dp))
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            textStyle = SwType.Body.copy(fontSize = 14.sp, color = sw.ink),
+            cursorBrush = SolidColor(sw.primary),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            decorationBox = { inner ->
+                if (query.isEmpty()) {
+                    Text(placeholder, color = sw.inkMuted, style = SwType.Body.copy(fontSize = 14.sp))
+                }
+                inner()
+            },
+            modifier = Modifier.weight(1f),
+        )
+        if (query.isNotEmpty()) {
+            Spacer(Modifier.size(width = 8.dp, height = 1.dp))
+            Icon(
+                Icons.Outlined.Close, null, tint = sw.inkMuted,
+                modifier = Modifier.size(16.dp).clickable { onQueryChange("") },
+            )
+        }
+    }
+}
+
+@Composable
 fun AccountPickerSheet(
     accounts: List<Account>,
     selectedId: String?,
@@ -145,9 +195,17 @@ fun AccountPickerSheet(
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
+    var query by remember { mutableStateOf("") }
     SwPickerSheet(title = stringResource(R.string.picker_choose_account), onDismiss = onDismiss) {
-        LazyColumn {
-            items(accounts.filter { it.id != excludeId }) { acc ->
+        SearchField(query = query, onQueryChange = { query = it }, placeholder = "Cari akun...")
+        Spacer(Modifier.height(8.dp))
+        val visible = accounts.filter { it.id != excludeId && (query.isEmpty() || it.name.contains(query, ignoreCase = true)) }
+        if (visible.isEmpty()) {
+            Text("Tidak ada akun yang cocok.", color = sw.inkMuted,
+                style = SwType.LabelSmall.copy(fontSize = 13.sp), modifier = Modifier.padding(vertical = 8.dp))
+        }
+        LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+            items(visible) { acc ->
                 val isSelected = acc.id == selectedId
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -245,51 +303,50 @@ fun PlanItemPickerSheet(
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    // Active allocation filter chip — Semua / Needs / Wants / Investment.
-    // The selection scrolls horizontally to handle small viewports.
-    val filterState = androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf<AllocationId?>(null)
-    }
+    var query by remember { mutableStateOf("") }
+    val filterState = remember { mutableStateOf<AllocationId?>(null) }
     val filter = filterState.value
     SwPickerSheet(title = stringResource(R.string.picker_choose_plan_item), onDismiss = onDismiss) {
         if (grouped.isEmpty()) {
-            Text(
-                stringResource(R.string.picker_no_plan_items),
-                color = sw.inkMuted, style = SwType.Body,
-            )
+            Text(stringResource(R.string.picker_no_plan_items), color = sw.inkMuted, style = SwType.Body)
             return@SwPickerSheet
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(androidx.compose.foundation.rememberScrollState())
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            FilterPill(
-                label = stringResource(R.string.plan_filter_all),
-                active = filter == null,
-                onClick = { filterState.value = null },
-            )
-            listOf(
-                AllocationId.Needs to stringResource(R.string.plan_filter_needs),
-                AllocationId.Wants to stringResource(R.string.plan_filter_wants),
-                AllocationId.Invest to stringResource(R.string.plan_filter_invest),
-            ).forEach { (alloc, label) ->
-                FilterPill(label = label, active = filter == alloc, onClick = { filterState.value = alloc })
+        SearchField(query = query, onQueryChange = { query = it; filterState.value = null }, placeholder = "Cari item atau kategori...")
+        Spacer(Modifier.height(8.dp))
+        // Hide allocation filter chips while searching — query already cross-cuts all allocations
+        if (query.isEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(androidx.compose.foundation.rememberScrollState())
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilterPill(label = stringResource(R.string.plan_filter_all), active = filter == null, onClick = { filterState.value = null })
+                listOf(
+                    AllocationId.Needs to stringResource(R.string.plan_filter_needs),
+                    AllocationId.Wants to stringResource(R.string.plan_filter_wants),
+                    AllocationId.Invest to stringResource(R.string.plan_filter_invest),
+                ).forEach { (alloc, label) ->
+                    FilterPill(label = label, active = filter == alloc, onClick = { filterState.value = alloc })
+                }
             }
         }
-        val visible = if (filter == null) grouped
-        else grouped.filter { AllocationId.fromName(it.allocationName) == filter }
+        val visible = grouped.filter { item ->
+            val matchesFilter = query.isNotEmpty() || filter == null || AllocationId.fromName(item.allocationName) == filter
+            val matchesQuery = query.isEmpty() || item.name.contains(query, ignoreCase = true) || item.categoryName.contains(query, ignoreCase = true)
+            matchesFilter && matchesQuery
+        }
         if (visible.isEmpty()) {
             Text(
-                stringResource(R.string.picker_no_plan_items_for_filter),
+                if (query.isNotEmpty()) "Tidak ada item yang cocok untuk \"$query\"."
+                else stringResource(R.string.picker_no_plan_items_for_filter),
                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp),
                 modifier = Modifier.padding(vertical = 8.dp),
             )
             return@SwPickerSheet
         }
-        LazyColumn {
+        LazyColumn(modifier = Modifier.heightIn(max = 420.dp)) {
             visible.groupBy { it.allocationName }.forEach { (alloc, items) ->
                 item(key = "header-$alloc") {
                     Text(AllocationId.fromName(alloc).displayName().uppercase(),

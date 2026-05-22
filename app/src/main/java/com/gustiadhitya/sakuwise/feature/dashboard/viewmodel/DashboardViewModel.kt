@@ -43,6 +43,7 @@ data class DashboardUiState(
     val period: PlanPeriod? = null,
     val incomeMonth: Long = 0L,
     val expenseMonth: Long = 0L,
+    val expectedIncome: Long = 0L,
     val recentTransactions: List<Transaction> = emptyList(),
     val accounts: List<Account> = emptyList(),
     val accountsTotal: Long = 0L,
@@ -76,12 +77,16 @@ class DashboardViewModel @Inject constructor(
         computePlanPeriod(planStartDay = prefs.planPeriodStartDay)
     }
 
-    /** Per-allocation plan/used aggregated by summing all categories+items under each. */
-    private val allocationsFlow = observeCurrentPlan().flatMapLatest { plan ->
-        if (plan == null) flowOf(emptyList()) else {
+    private data class PlanData(val allocations: List<AllocationProgress>, val expectedIncome: Long)
+
+    /** Allocations + expectedIncome from the current plan, bundled so we stay within combine(8). */
+    private val planDataFlow = observeCurrentPlan().flatMapLatest { plan ->
+        if (plan == null) flowOf(PlanData(emptyList(), 0L)) else {
             planRepo.observeAllocations(plan.id).flatMapLatest { allocs ->
-                if (allocs.isEmpty()) flowOf(emptyList())
-                else combine(allocs.map { a -> allocationProgressFlow(a) }) { it.toList() }
+                if (allocs.isEmpty()) flowOf(PlanData(emptyList(), plan.expectedIncome))
+                else combine(allocs.map { a -> allocationProgressFlow(a) }) { rows ->
+                    PlanData(rows.toList(), plan.expectedIncome)
+                }
             }
         }
     }
@@ -117,7 +122,7 @@ class DashboardViewModel @Inject constructor(
         accountRepo.observeTotalBalance(),
         observeRecent(6),
         periodFlow,
-        allocationsFlow,
+        planDataFlow,
         topCategoriesFlow,
     ) { args ->
         val prefs = args[0] as com.gustiadhitya.sakuwise.core.datastore.UserPreferences
@@ -129,8 +134,7 @@ class DashboardViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         val txns = args[4] as List<Transaction>
         val period = args[5] as PlanPeriod
-        @Suppress("UNCHECKED_CAST")
-        val allocs = args[6] as List<AllocationProgress>
+        val planData = args[6] as PlanData
         @Suppress("UNCHECKED_CAST")
         val tops = args[7] as List<com.gustiadhitya.sakuwise.core.domain.repository.TopExpenseCategory>
         DashboardUiState(
@@ -138,10 +142,11 @@ class DashboardViewModel @Inject constructor(
             period = period,
             incomeMonth = totals.first,
             expenseMonth = totals.second,
+            expectedIncome = planData.expectedIncome,
             recentTransactions = txns,
             accounts = accounts,
             accountsTotal = accountsTotal,
-            allocations = allocs,
+            allocations = planData.allocations,
             topCategories = tops.map { TopCategorySpend(name = it.name, amount = it.total) },
             backupOverdueDays = computeOverdueDays(prefs.lastBackupTimestamp),
             notificationsLastSeenAt = prefs.notificationsLastSeenAt,
