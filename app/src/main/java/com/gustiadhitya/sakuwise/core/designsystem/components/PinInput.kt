@@ -39,6 +39,7 @@ import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 fun PinInput(
     value: String,
     onChange: (String) -> Unit,
+    onComplete: (() -> Unit)? = null,
     length: Int = 6,
     modifier: Modifier = Modifier,
 ) {
@@ -87,6 +88,7 @@ fun PinInput(
             onValueChange = { raw ->
                 val digits = raw.filter { it.isDigit() }.take(length)
                 onChange(digits)
+                if (digits.length == length) onComplete?.invoke()
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),

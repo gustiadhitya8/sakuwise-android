@@ -201,9 +201,14 @@ private fun ChangePinSheet(
     ) {
         when (step) {
             PinStep.Current -> {
-                SecretField(currentIsPassphrase, current) {
+                SecretField(currentIsPassphrase, current, onChange = {
                     current = if (currentIsPassphrase) it else it.take(6)
-                }
+                }, onComplete = {
+                    if (!currentIsPassphrase) {
+                        if (verifyCurrent(current)) { step = PinStep.New; error = null }
+                        else error = errWrong
+                    }
+                })
                 if (error != null) {
                     Spacer(Modifier.height(6.dp))
                     Text(error!!, color = sw.danger,
@@ -216,9 +221,11 @@ private fun ChangePinSheet(
                 })
             }
             PinStep.New -> {
-                SecretField(newIsPassphrase, newPin) {
+                SecretField(newIsPassphrase, newPin, onChange = {
                     newPin = if (newIsPassphrase) it else it.take(6)
-                }
+                }, onComplete = {
+                    if (!newIsPassphrase && newOk(newPin)) { step = PinStep.Confirm; error = null }
+                })
                 if (newIsPassphrase && newPin.isNotEmpty() && newPin.length < newMinLen) {
                     Spacer(Modifier.height(6.dp))
                     Text(stringResource(R.string.passphrase_min_hint_format, newMinLen),
@@ -231,9 +238,13 @@ private fun ChangePinSheet(
                 })
             }
             PinStep.Confirm -> {
-                SecretField(newIsPassphrase, confirm) {
+                SecretField(newIsPassphrase, confirm, onChange = {
                     confirm = if (newIsPassphrase) it else it.take(6)
-                }
+                }, onComplete = {
+                    if (!newIsPassphrase && newOk(confirm)) {
+                        if (confirm == newPin) onSave(newPin) else error = errMismatch
+                    }
+                })
                 if (error != null) {
                     Spacer(Modifier.height(6.dp))
                     Text(error!!, color = sw.danger,
@@ -250,9 +261,14 @@ private fun ChangePinSheet(
 }
 
 @Composable
-private fun SecretField(usePassphrase: Boolean, value: String, onChange: (String) -> Unit) {
+private fun SecretField(
+    usePassphrase: Boolean,
+    value: String,
+    onChange: (String) -> Unit,
+    onComplete: (() -> Unit)? = null,
+) {
     if (!usePassphrase) {
-        PinInput(value = value, onChange = onChange)
+        PinInput(value = value, onChange = onChange, onComplete = onComplete)
     } else {
         com.gustiadhitya.sakuwise.core.designsystem.components.SwField(
             value = value,

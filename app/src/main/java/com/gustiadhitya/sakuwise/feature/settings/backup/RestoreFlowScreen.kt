@@ -130,7 +130,23 @@ fun RestoreFlowScreen(
         Text(stringResource(R.string.restore_pin_label), color = sw.inkMuted,
             style = SwType.Caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
         Spacer(Modifier.height(6.dp))
-        PinInput(value = pin, onChange = { pin = it.take(6) })
+        PinInput(
+            value = pin,
+            onChange = { pin = it.take(6) },
+            onComplete = {
+                val uri = selectedUri ?: return@PinInput
+                if (inProgress) return@PinInput
+                inProgress = true; error = null
+                val tmp = java.io.File(ctx.cacheDir, "restore-tmp.sakuwise")
+                ctx.contentResolver.openInputStream(uri)?.use { input ->
+                    java.io.FileOutputStream(tmp).use { out -> input.copyTo(out) }
+                }
+                vm.restoreFromFile(
+                    file = tmp, pin = pin.toCharArray(),
+                    onError = { msg -> inProgress = false; error = msg },
+                )
+            },
+        )
         Spacer(Modifier.height(12.dp))
 
         if (error != null) {

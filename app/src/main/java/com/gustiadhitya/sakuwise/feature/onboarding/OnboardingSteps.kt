@@ -198,6 +198,7 @@ fun OnbIdentityScreen(
         PinInput(
             value = state.pin,
             onChange = { onChange(state.copy(pin = it.take(6))) },
+            onComplete = { if (state.nickname.isNotBlank()) onNext() },
         )
         Text(
             stringResource(R.string.onb_step2_pin_hint),

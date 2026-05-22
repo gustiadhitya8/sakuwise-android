@@ -94,6 +94,7 @@ fun LockScreen(
             )
             Spacer(Modifier.height(40.dp))
             val usePassphrase = prefs.usePassphrase
+            val pinWrong = stringResource(R.string.lock_pin_wrong)
             if (usePassphrase) {
                 com.gustiadhitya.sakuwise.core.designsystem.components.SwField(
                     value = pin,
@@ -103,7 +104,14 @@ fun LockScreen(
                     password = true,
                 )
             } else {
-                PinInput(value = pin, onChange = { pin = it.take(6) })
+                PinInput(
+                    value = pin,
+                    onChange = { pin = it.take(6) },
+                    onComplete = {
+                        if (!hasPin) { lockVm.setPin(pin); onUnlock(); return@PinInput }
+                        if (lockVm.verifyPin(pin)) onUnlock() else { error = pinWrong; pin = "" }
+                    },
+                )
             }
             Spacer(Modifier.height(12.dp))
             if (error != null) {
@@ -111,11 +119,8 @@ fun LockScreen(
                     style = SwType.LabelSmall.copy(fontSize = 12.sp))
                 Spacer(Modifier.height(8.dp))
             }
-            // First-launch path: no credential stored yet — first valid input sets it.
-            // Otherwise verify against the stored Argon2id hash.
             val pinSixDigits = stringResource(R.string.lock_pin_six_digits)
             val passShortFmt = stringResource(R.string.passphrase_min_hint_format, 8)
-            val pinWrong = stringResource(R.string.lock_pin_wrong)
             val minOk = if (usePassphrase) pin.length >= 8 else pin.length == 6
             SwButton(
                 text = if (hasPin) stringResource(R.string.lock_unlock)

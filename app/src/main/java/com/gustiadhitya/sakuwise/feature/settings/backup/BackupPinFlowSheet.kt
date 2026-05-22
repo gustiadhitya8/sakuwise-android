@@ -80,6 +80,10 @@ fun BackupPinFlowSheet(
                     onChange = { v ->
                         if (stage == PinStage.Enter) pin = v.take(6) else pin2 = v.take(6)
                     },
+                    onComplete = {
+                        if (stage == PinStage.Enter) stage = PinStage.Confirm
+                        else if (pin == pin2) onSubmitPin(pin.toCharArray())
+                    },
                 )
                 Spacer(Modifier.height(12.dp))
                 if (state.errorMessage != null) {
