@@ -142,16 +142,22 @@ fun ExpenseFormScreen(
             required = true,
             subtitle = planSubtitle,
             leadingContent = {
-                com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip(
-                    bg = if (alloc == null) sw.surface else heroBg.copy(alpha = 0.18f),
-                    fg = if (alloc == null) sw.inkMuted else heroBg,
-                ) {
-                    Text(
-                        state.planItemName?.firstOrNull()?.uppercase() ?: "?",
-                        color = androidx.compose.material3.LocalContentColor.current,
-                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold),
-                    )
+                if (alloc == null) {
+                    com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
+                        Icon(Icons.Outlined.Checklist, null, modifier = Modifier.size(16.dp))
+                    }
+                } else {
+                    com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip(
+                        bg = heroBg.copy(alpha = 0.18f),
+                        fg = heroBg,
+                    ) {
+                        Text(
+                            state.planItemName?.firstOrNull()?.uppercase() ?: "?",
+                            color = androidx.compose.material3.LocalContentColor.current,
+                            style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold),
+                        )
+                    }
                 }
             },
             onClick = { picker = ExpensePicker.PlanItem },
