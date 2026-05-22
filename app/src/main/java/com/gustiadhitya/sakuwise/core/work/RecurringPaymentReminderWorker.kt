@@ -59,7 +59,7 @@ class RecurringPaymentReminderWorker(
             }
         }
 
-        private fun uniqueName(planItemId: String) = "reminder-$planItemId"
+        fun uniqueName(planItemId: String) = "reminder-$planItemId"
 
         /**
          * Schedule a monthly reminder. `dayOfMonth` (1..28) and `hourOfDay`

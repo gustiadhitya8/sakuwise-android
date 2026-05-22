@@ -136,8 +136,8 @@ class PlanViewModel @Inject constructor(
 
     fun addPlanItem(categoryId: String, name: String, amount: Long, recurrence: Recurrence) {
         viewModelScope.launch {
-            val items = planRepo.observePlanItems(categoryId)
-            val sortOrder = items.let { 0 } // we can't easily collect synchronously; default to 0
+            val existing = planRepo.observePlanItems(categoryId).first()
+            val sortOrder = (existing.maxOfOrNull { it.sortOrder } ?: -1) + 1
             planRepo.upsertPlanItem(
                 PlanItem(
                     id = UUID.randomUUID().toString(),
@@ -220,6 +220,63 @@ class PlanViewModel @Inject constructor(
         if (trimmed.isEmpty() || trimmed == category.name) return
         viewModelScope.launch {
             planRepo.upsertCategory(category.copy(name = trimmed))
+        }
+    }
+
+    fun moveCategoryUp(category: Category) {
+        viewModelScope.launch {
+            val siblings = planRepo.observeCategories(category.allocationId).first()
+                .sortedBy { it.sortOrder }
+                .mapIndexed { i, cat -> cat.copy(sortOrder = i) }
+            val idx = siblings.indexOfFirst { it.id == category.id }
+            if (idx <= 0) return@launch
+            val prev = siblings[idx - 1]
+            val curr = siblings[idx]
+            planRepo.upsertCategory(curr.copy(sortOrder = prev.sortOrder))
+            planRepo.upsertCategory(prev.copy(sortOrder = curr.sortOrder))
+        }
+    }
+
+    fun moveCategoryDown(category: Category) {
+        viewModelScope.launch {
+            val siblings = planRepo.observeCategories(category.allocationId).first()
+                .sortedBy { it.sortOrder }
+                .mapIndexed { i, cat -> cat.copy(sortOrder = i) }
+            val idx = siblings.indexOfFirst { it.id == category.id }
+            if (idx < 0 || idx >= siblings.size - 1) return@launch
+            val next = siblings[idx + 1]
+            val curr = siblings[idx]
+            planRepo.upsertCategory(curr.copy(sortOrder = next.sortOrder))
+            planRepo.upsertCategory(next.copy(sortOrder = curr.sortOrder))
+        }
+    }
+
+    fun movePlanItemUp(item: PlanItem) {
+        viewModelScope.launch {
+            // Normalize to unique indices first — guards against all-zero sortOrders
+            val siblings = planRepo.observePlanItems(item.categoryId).first()
+                .sortedBy { it.sortOrder }
+                .mapIndexed { i, pi -> pi.copy(sortOrder = i) }
+            val idx = siblings.indexOfFirst { it.id == item.id }
+            if (idx <= 0) return@launch
+            val prev = siblings[idx - 1]
+            val curr = siblings[idx]
+            planRepo.upsertPlanItem(curr.copy(sortOrder = prev.sortOrder))
+            planRepo.upsertPlanItem(prev.copy(sortOrder = curr.sortOrder))
+        }
+    }
+
+    fun movePlanItemDown(item: PlanItem) {
+        viewModelScope.launch {
+            val siblings = planRepo.observePlanItems(item.categoryId).first()
+                .sortedBy { it.sortOrder }
+                .mapIndexed { i, pi -> pi.copy(sortOrder = i) }
+            val idx = siblings.indexOfFirst { it.id == item.id }
+            if (idx < 0 || idx >= siblings.size - 1) return@launch
+            val next = siblings[idx + 1]
+            val curr = siblings[idx]
+            planRepo.upsertPlanItem(curr.copy(sortOrder = next.sortOrder))
+            planRepo.upsertPlanItem(next.copy(sortOrder = curr.sortOrder))
         }
     }
 

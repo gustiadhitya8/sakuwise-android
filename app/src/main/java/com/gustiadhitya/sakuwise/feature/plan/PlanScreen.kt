@@ -33,7 +33,11 @@ import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.MonetizationOn
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
@@ -72,6 +76,8 @@ import com.gustiadhitya.sakuwise.core.domain.model.PlanItem
 import com.gustiadhitya.sakuwise.core.domain.model.Recurrence
 import com.gustiadhitya.sakuwise.core.ui.RupiahText
 import com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanViewModel
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.gustiadhitya.sakuwise.feature.transaction.ui.SwPickerSheet
 
 @Composable
@@ -84,12 +90,21 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
     var addCategoryToAlloc by remember { mutableStateOf<String?>(null) }
     var editItem by remember { mutableStateOf<PlanItem?>(null) }
     var deleteCategoryConfirm by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var categoryActions by remember {
-        mutableStateOf<com.gustiadhitya.sakuwise.core.domain.model.Category?>(null)
-    }
+    data class CategoryActionsTarget(
+        val category: com.gustiadhitya.sakuwise.core.domain.model.Category,
+        val isFirst: Boolean,
+        val isLast: Boolean,
+    )
+    var categoryActions by remember { mutableStateOf<CategoryActionsTarget?>(null) }
     var renameCategoryTarget by remember {
         mutableStateOf<com.gustiadhitya.sakuwise.core.domain.model.Category?>(null)
     }
+    data class ItemActionsTarget(
+        val item: PlanItem,
+        val isFirst: Boolean,
+        val isLast: Boolean,
+    )
+    var itemActions by remember { mutableStateOf<ItemActionsTarget?>(null) }
     var actionSheetOpen by remember { mutableStateOf(false) }
     var incomeSheetOpen by remember { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
@@ -147,79 +162,165 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         }
         Spacer(Modifier.height(10.dp))
 
-        // Per prototype screens-plan.jsx:53-70 — Pemasukan Diharapkan card BEFORE
-        // the filter chips. Layout: section label + amount on the left, large
-        // primaryContainer Edit pill on the right, SwBar, then a "Terpakai X /
-        // dari Y" footer row.
         Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
             SwCard {
                 Column {
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier.fillMaxWidth(),
+                val income = state.plan?.expectedIncome ?: 0L
+                val totalPlan = state.allocations.sumOf { it.plan }
+                val totalUsed = state.allocations.sumOf { it.used }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.plan_expected_income),
+                        color = sw.inkSubtle,
+                        style = SwType.Caption.copy(fontSize = 11.sp),
+                        modifier = Modifier.weight(1f),
+                    )
+                    RupiahText(
+                        value = income,
+                        style = SwType.Amount.copy(fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFeatureSettings = "tnum"),
+                        color = sw.ink,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(26.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(sw.primaryContainer)
+                            .clickable { incomeSheetOpen = true },
                     ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.plan_expected_income),
-                                color = sw.inkSubtle,
-                                style = SwType.SectionLabel.copy(fontSize = 11.sp))
-                            Spacer(Modifier.height(6.dp))
-                            RupiahText(
-                                value = state.plan?.expectedIncome ?: 0L,
-                                // Proto size=26 weight=700; SwType.AmountL is
-                                // already in that ballpark — pin explicitly so
-                                // it doesn't drift if AmountL tweaks later.
-                                style = SwType.AmountL.copy(fontSize = 26.sp,
-                                    fontWeight = FontWeight.Bold),
-                                color = sw.ink,
-                            )
+                        Icon(Icons.Outlined.Edit, "Ubah pemasukan",
+                            tint = sw.onPrimaryContainer,
+                            modifier = Modifier.size(13.dp))
+                    }
+                }
+                if (state.allocations.isNotEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+                    Spacer(Modifier.height(6.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.width(28.dp))
+                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            Text("Alokasi", color = sw.inkMuted,
+                                style = SwType.Caption.copy(fontSize = 10.sp))
                         }
-                        // Big primaryContainer edit pill (32×32 r10) per proto
-                        // line 60. Was previously a tiny inline 14sp icon.
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(sw.primaryContainer)
-                                .clickable { incomeSheetOpen = true },
-                        ) {
-                            Icon(Icons.Outlined.Edit, "Ubah pemasukan",
-                                tint = sw.onPrimaryContainer,
-                                modifier = Modifier.size(16.dp))
+                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            Text("Rencana", color = sw.inkMuted,
+                                style = SwType.Caption.copy(fontSize = 10.sp))
+                        }
+                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            Text("Aktual", color = sw.inkMuted,
+                                style = SwType.Caption.copy(fontSize = 10.sp))
                         }
                     }
-                    Spacer(Modifier.height(14.dp))
-                    val totalUsed = state.allocations.sumOf { it.used }
-                    val totalPlan = state.allocations.sumOf { it.plan }.coerceAtLeast(1L)
-                    SwBar(used = totalUsed, plan = totalPlan)
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.plan_used_prefix), color = sw.inkMuted,
-                                style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                            RupiahText(value = totalUsed, short = true,
-                                style = SwType.Amount.copy(fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFeatureSettings = "tnum"),
-                                color = sw.ink)
+                    Spacer(Modifier.height(4.dp))
+                    state.allocations.forEach { row ->
+                        val a = row.allocation
+                        val allocId = AllocationId.fromName(a.name)
+                        val dotColor = when (allocId) {
+                            AllocationId.Needs -> sw.primary
+                            AllocationId.Wants -> sw.accent
+                            AllocationId.Invest -> sw.info
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.plan_of_prefix), color = sw.inkMuted,
-                                style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                            RupiahText(value = totalPlan, short = true,
+                        val allocAmount = income * a.targetPct / 100L
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 3.dp),
+                        ) {
+                            Box(Modifier.size(7.dp).clip(CircleShape).background(dotColor))
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                allocId.displayName(),
+                                color = sw.ink,
+                                style = SwType.Caption.copy(fontSize = 12.sp),
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                            )
+                            Box(Modifier.width(28.dp), contentAlignment = Alignment.CenterEnd) {
+                                Text(
+                                    "${a.targetPct}%",
+                                    color = sw.inkSubtle,
+                                    style = SwType.Caption.copy(fontSize = 10.sp,
+                                        fontFeatureSettings = "tnum"),
+                                )
+                            }
+                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                                RupiahText(
+                                    value = allocAmount, short = true,
+                                    style = SwType.Amount.copy(fontSize = 12.sp,
+                                        fontFeatureSettings = "tnum"),
+                                    color = sw.inkSubtle,
+                                )
+                            }
+                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                                RupiahText(
+                                    value = row.plan, short = true,
+                                    style = SwType.Amount.copy(fontSize = 12.sp,
+                                        fontFeatureSettings = "tnum"),
+                                    color = sw.inkMuted,
+                                )
+                            }
+                            Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                                RupiahText(
+                                    value = row.used, short = true,
+                                    style = SwType.Amount.copy(fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontFeatureSettings = "tnum"),
+                                    color = sw.ink,
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+                    Spacer(Modifier.height(6.dp))
+                    val leftoverPlan = income - totalPlan
+                    val leftoverActual = income - totalUsed
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            "Sisa",
+                            color = sw.ink,
+                            style = SwType.Caption.copy(fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier.weight(1f),
+                        )
+                        Spacer(Modifier.width(28.dp))
+                        Spacer(Modifier.width(62.dp))
+                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            RupiahText(
+                                value = leftoverPlan, short = true,
                                 style = SwType.Amount.copy(fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.SemiBold,
                                     fontFeatureSettings = "tnum"),
-                                color = sw.ink)
+                                color = sw.inkMuted,
+                            )
+                        }
+                        Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
+                            RupiahText(
+                                value = leftoverActual, short = true,
+                                style = SwType.Amount.copy(fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFeatureSettings = "tnum"),
+                                color = if (leftoverActual >= 0L) sw.success else sw.danger,
+                            )
                         }
                     }
                 }
+                } // Column
             }
         }
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(12.dp))
 
         // Filter chips moved below the income card per prototype.
         Row(
@@ -257,15 +358,10 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                     AllocationId.Invest -> sw.info
                 }
                 val allocLabel = allocId.displayName()
-                val allocUsed = row.categories.sumOf { it.used }
-                val allocPlan = row.categories.sumOf { it.plan }
-                // Allocation header per screens-plan.jsx:86-95: dot + name +
-                // pct% on the left, used / plan on the right (tnum, used bolded
-                // ink). Was missing the right-side totals before.
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(top = 18.dp, bottom = 10.dp,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp,
                         start = 4.dp, end = 4.dp),
                 ) {
                     Box(Modifier.size(8.dp).clip(CircleShape).background(allocColor))
@@ -273,22 +369,8 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold))
                     Text("${a.targetPct}%", color = sw.inkSubtle,
                         style = SwType.LabelSmall.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"))
-                    Spacer(Modifier.weight(1f))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RupiahText(value = allocUsed, short = true,
-                            style = SwType.Amount.copy(fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFeatureSettings = "tnum"),
-                            color = sw.ink)
-                        Text(" / ", color = sw.inkMuted,
-                            style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                        RupiahText(value = allocPlan, short = true,
-                            style = SwType.Amount.copy(fontSize = 12.sp,
-                                fontFeatureSettings = "tnum"),
-                            color = sw.inkMuted)
-                    }
                 }
-                row.categories.forEach { cat ->
+                row.categories.forEachIndexed { catIdx, cat ->
                     val isOpen = expanded[cat.category.id] != false
                     CategoryCard(
                         name = cat.category.name,
@@ -297,8 +379,21 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         items = cat.items,
                         expanded = isOpen,
                         onToggle = { expanded[cat.category.id] = !isOpen },
-                        onCategoryActions = { categoryActions = cat.category },
+                        onCategoryActions = {
+                            categoryActions = CategoryActionsTarget(
+                                category = cat.category,
+                                isFirst = catIdx == 0,
+                                isLast = catIdx == row.categories.size - 1,
+                            )
+                        },
                         onEditItem = { pi -> editItem = pi.item },
+                        onItemActions = { pi, isFirst, isLast ->
+                            itemActions = ItemActionsTarget(
+                                item = pi.item,
+                                isFirst = isFirst,
+                                isLast = isLast,
+                            )
+                        },
                         onAddItem = { addToCategory = cat.category.id },
                     )
                     Spacer(Modifier.height(8.dp))
@@ -379,18 +474,49 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         )
     }
     if (categoryActions != null) {
-        val cat = categoryActions!!
+        val target = categoryActions!!
         CategoryActionSheet(
-            categoryName = cat.name,
+            categoryName = target.category.name,
+            isFirst = target.isFirst,
+            isLast = target.isLast,
             onEdit = {
-                renameCategoryTarget = cat
+                renameCategoryTarget = target.category
+                categoryActions = null
+            },
+            onMoveUp = {
+                viewModel.moveCategoryUp(target.category)
+                categoryActions = null
+            },
+            onMoveDown = {
+                viewModel.moveCategoryDown(target.category)
                 categoryActions = null
             },
             onDelete = {
-                deleteCategoryConfirm = cat.id to cat.name
+                deleteCategoryConfirm = target.category.id to target.category.name
                 categoryActions = null
             },
             onDismiss = { categoryActions = null },
+        )
+    }
+    if (itemActions != null) {
+        val target = itemActions!!
+        ItemActionSheet(
+            itemName = target.item.name,
+            isFirst = target.isFirst,
+            isLast = target.isLast,
+            onEdit = {
+                editItem = target.item
+                itemActions = null
+            },
+            onMoveUp = {
+                viewModel.movePlanItemUp(target.item)
+                itemActions = null
+            },
+            onMoveDown = {
+                viewModel.movePlanItemDown(target.item)
+                itemActions = null
+            },
+            onDismiss = { itemActions = null },
         )
     }
     if (renameCategoryTarget != null) {
@@ -410,8 +536,15 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
     // posts the next reminder ≥1 day out.
     val requestNotifPerm = rememberNotificationPermissionRequester(onResult = {})
     if (addToCategory != null) {
+        val addAllocRow = state.allocations.firstOrNull { a ->
+            a.categories.any { it.category.id == addToCategory }
+        }
+        val income = state.plan?.expectedIncome ?: 0L
         EditPlanItemSheet(
             existing = null,
+            allocationName = addAllocRow?.let { AllocationId.fromName(it.allocation.name).displayName() } ?: "",
+            allocationBudget = income * (addAllocRow?.allocation?.targetPct ?: 0) / 100L,
+            allocationPlanTotal = addAllocRow?.plan ?: 0L,
             onSave = { _, name, amount, recurrence ->
                 viewModel.addPlanItem(addToCategory!!, name, amount, recurrence)
                 if (recurrence != Recurrence.OneOff) requestNotifPerm()
@@ -422,8 +555,15 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         )
     }
     if (editItem != null) {
+        val editAllocRow = state.allocations.firstOrNull { a ->
+            a.categories.any { cat -> cat.items.any { it.item.id == editItem?.id } }
+        }
+        val income = state.plan?.expectedIncome ?: 0L
         EditPlanItemSheet(
             existing = editItem,
+            allocationName = editAllocRow?.let { AllocationId.fromName(it.allocation.name).displayName() } ?: "",
+            allocationBudget = income * (editAllocRow?.allocation?.targetPct ?: 0) / 100L,
+            allocationPlanTotal = editAllocRow?.plan ?: 0L,
             onSave = { item, name, amount, recurrence ->
                 val wasRecurring = item!!.recurrence != Recurrence.OneOff
                 viewModel.updatePlanItem(
@@ -657,6 +797,7 @@ private fun CategoryCard(
     expanded: Boolean, onToggle: () -> Unit,
     onCategoryActions: () -> Unit,
     onEditItem: (com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow) -> Unit,
+    onItemActions: (com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow, Boolean, Boolean) -> Unit,
     onAddItem: () -> Unit,
 ) {
     val sw = SwTheme.colors
@@ -725,7 +866,7 @@ private fun CategoryCard(
                 // '4px 16px 12px', borderTop 1px c.border).
                 Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
-                    items.forEach { pi ->
+                    items.forEachIndexed { idx, pi ->
                         PlanItemRowProto(
                             name = pi.item.name,
                             plan = pi.item.plannedAmount,
@@ -733,6 +874,9 @@ private fun CategoryCard(
                             allocColor = allocColor,
                             recurrence = pi.item.recurrence,
                             onClick = { onEditItem(pi) },
+                            onLongClick = {
+                                onItemActions(pi, idx == 0, idx == items.size - 1)
+                            },
                         )
                     }
                     AddItemLink(onClick = onAddItem, primary = sw.primary)
@@ -782,40 +926,61 @@ private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
 @Composable
 private fun CategoryActionSheet(
     categoryName: String,
+    isFirst: Boolean,
+    isLast: Boolean,
     onEdit: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
     SwPickerSheet(title = categoryName, onDismiss = onDismiss) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = onEdit)
-                .padding(horizontal = 12.dp, vertical = 14.dp),
-        ) {
-            Icon(Icons.Outlined.Edit, null, tint = sw.ink, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
-            Text(stringResource(R.string.plan_category_action_edit),
-                color = sw.ink,
-                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = onDelete)
-                .padding(horizontal = 12.dp, vertical = 14.dp),
-        ) {
-            Icon(Icons.Outlined.Delete, null, tint = sw.danger, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
-            Text(stringResource(R.string.plan_category_action_delete),
-                color = sw.danger,
-                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-        }
+        ActionSheetRow(icon = Icons.Outlined.Edit, label = stringResource(R.string.plan_category_action_edit), onClick = onEdit)
+        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = "Pindah ke atas", onClick = onMoveUp)
+        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = "Pindah ke bawah", onClick = onMoveDown)
+        ActionSheetRow(icon = Icons.Outlined.Delete, label = stringResource(R.string.plan_category_action_delete), danger = true, onClick = onDelete)
+    }
+}
+
+@Composable
+private fun ItemActionSheet(
+    itemName: String,
+    isFirst: Boolean,
+    isLast: Boolean,
+    onEdit: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    SwPickerSheet(title = itemName, onDismiss = onDismiss) {
+        ActionSheetRow(icon = Icons.Outlined.Edit, label = "Ubah item", onClick = onEdit)
+        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = "Pindah ke atas", onClick = onMoveUp)
+        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = "Pindah ke bawah", onClick = onMoveDown)
+    }
+}
+
+@Composable
+private fun ActionSheetRow(
+    icon: ImageVector,
+    label: String,
+    danger: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    val tint = if (danger) sw.danger else sw.ink
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 14.dp),
+    ) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(label, color = tint,
+            style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
     }
 }
 
@@ -862,18 +1027,20 @@ private fun ConfirmDeleteCategorySheet(
 // No indent guide line, just name + recurrence chip + used/plan + thin bar,
 // with a 33%-alpha bottom divider between rows (matches `border-bottom:
 // `${c.border}55``). Padding 10dp top/bottom.
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PlanItemRowProto(
     name: String, plan: Long, used: Long,
     allocColor: Color,
     recurrence: Recurrence,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
 ) {
     val sw = SwTheme.colors
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(vertical = 10.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1002,6 +1169,9 @@ private fun ActionRow(
 @Composable
 private fun EditPlanItemSheet(
     existing: PlanItem?,
+    allocationName: String = "",
+    allocationBudget: Long = 0L,
+    allocationPlanTotal: Long = 0L,
     onSave: (PlanItem?, String, Long, Recurrence) -> Unit,
     onDelete: ((PlanItem) -> Unit)?,
     onDismiss: () -> Unit,
@@ -1018,6 +1188,48 @@ private fun EditPlanItemSheet(
         ),
         onDismiss = onDismiss,
     ) {
+        if (allocationBudget > 0L) {
+            val plannedExcludingThis = allocationPlanTotal - (existing?.plannedAmount ?: 0L)
+            val sisa = allocationBudget - plannedExcludingThis
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(sw.surface)
+                    .border(1.dp, sw.border, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    Text("Alokasi $allocationName", color = sw.inkMuted,
+                        style = SwType.Caption.copy(fontSize = 10.sp), maxLines = 1)
+                    Spacer(Modifier.height(2.dp))
+                    RupiahText(value = allocationBudget, short = true,
+                        style = SwType.Amount.copy(fontSize = 13.sp, fontFeatureSettings = "tnum"),
+                        color = sw.ink)
+                }
+                Box(Modifier.width(1.dp).height(32.dp).background(sw.border))
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    Text("Terencana", color = sw.inkMuted,
+                        style = SwType.Caption.copy(fontSize = 10.sp))
+                    Spacer(Modifier.height(2.dp))
+                    RupiahText(value = plannedExcludingThis, short = true,
+                        style = SwType.Amount.copy(fontSize = 13.sp, fontFeatureSettings = "tnum"),
+                        color = sw.inkMuted)
+                }
+                Box(Modifier.width(1.dp).height(32.dp).background(sw.border))
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    Text("Sisa", color = sw.inkMuted,
+                        style = SwType.Caption.copy(fontSize = 10.sp))
+                    Spacer(Modifier.height(2.dp))
+                    RupiahText(value = sisa, short = true,
+                        style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                            fontFeatureSettings = "tnum"),
+                        color = if (sisa >= 0L) sw.success else sw.danger)
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+        }
         SwField(value = name, onValueChange = { name = it },
             label = stringResource(R.string.plan_item_name_label),
             placeholder = stringResource(R.string.plan_item_name_placeholder))
@@ -1072,12 +1284,22 @@ private fun EditPlanItemSheet(
         // work for this plan item.
         if (existing != null && rec != Recurrence.OneOff) {
             val ctx = androidx.compose.ui.platform.LocalContext.current
-            val scheduledMsg = stringResource(R.string.reminder_toast_scheduled)
             val canceledMsg = stringResource(R.string.reminder_toast_canceled)
             val deniedMsg = stringResource(R.string.reminder_toast_denied)
             var showWhenSheet by remember { mutableStateOf(false) }
             var pendingDay by remember { mutableStateOf(1) }
             var pendingHour by remember { mutableStateOf(9) }
+
+            // Observe WorkManager state to know if reminder is currently active.
+            val workInfos by WorkManager.getInstance(ctx)
+                .getWorkInfosForUniqueWorkFlow(
+                    com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.uniqueName(existing.id)
+                )
+                .collectAsState(initial = emptyList())
+            val isActive = workInfos.any {
+                it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING
+            }
+
             val requestNotif = com.gustiadhitya.sakuwise.core.common.rememberNotificationPermissionRequester { granted ->
                 if (granted) {
                     com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.scheduleMonthly(
@@ -1097,24 +1319,58 @@ private fun EditPlanItemSheet(
                     android.widget.Toast.makeText(ctx, deniedMsg, android.widget.Toast.LENGTH_LONG).show()
                 }
             }
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SwButton(
-                    text = stringResource(R.string.plan_item_schedule_reminder),
-                    onClick = { showWhenSheet = true },
-                    variant = SwButtonVariant.Outline,
-                    modifier = Modifier.weight(1f),
-                )
-                SwButton(
-                    text = stringResource(R.string.plan_item_cancel_reminder),
-                    onClick = {
-                        com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.cancelFor(ctx, existing.id)
-                        android.widget.Toast.makeText(ctx, canceledMsg, android.widget.Toast.LENGTH_SHORT).show()
-                    },
-                    variant = SwButtonVariant.Ghost,
-                    modifier = Modifier.weight(1f),
-                )
+
+            Spacer(Modifier.height(12.dp))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
+            Spacer(Modifier.height(12.dp))
+
+            val bgColor = if (isActive) sw.success.copy(alpha = 0.12f) else sw.surface
+            val borderColor = if (isActive) sw.success.copy(alpha = 0.4f) else sw.border
+            val iconTint = if (isActive) sw.success else sw.inkMuted
+            val bellIcon = if (isActive) Icons.Outlined.Notifications else Icons.Outlined.NotificationsNone
+            val label = if (isActive) "Pengingat Aktif" else stringResource(R.string.plan_item_schedule_reminder)
+            val sub = if (isActive) "Ketuk untuk ubah jadwal" else "Ketuk untuk atur jadwal notifikasi"
+            val labelColor = if (isActive) sw.success else sw.ink
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(bgColor)
+                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                    .clickable { showWhenSheet = true }
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+            ) {
+                Icon(bellIcon, null, tint = iconTint, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(label, color = labelColor,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
+                    Text(sub, color = sw.inkMuted,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                }
+                if (isActive) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(sw.danger.copy(alpha = 0.1f))
+                            .clickable {
+                                com.gustiadhitya.sakuwise.core.work.RecurringPaymentReminderWorker.cancelFor(ctx, existing.id)
+                                android.widget.Toast.makeText(ctx, canceledMsg, android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                    ) {
+                        Icon(Icons.Outlined.Close, null,
+                            tint = sw.danger, modifier = Modifier.size(16.dp))
+                    }
+                } else {
+                    Icon(Icons.Outlined.ChevronRight, null,
+                        tint = sw.inkMuted, modifier = Modifier.size(18.dp))
+                }
             }
+            Spacer(Modifier.height(4.dp))
             if (showWhenSheet) {
                 ReminderWhenSheet(
                     initialDay = pendingDay,
@@ -1127,9 +1383,6 @@ private fun EditPlanItemSheet(
                     onDismiss = { showWhenSheet = false },
                 )
             }
-            // Suppress unused warning for scheduledMsg — kept for now in case
-            // we replace the formatted toast above with the plain one again.
-            @Suppress("UNUSED_VARIABLE") val _u = scheduledMsg
         }
         if (existing != null && onDelete != null) {
             Spacer(Modifier.height(8.dp))
