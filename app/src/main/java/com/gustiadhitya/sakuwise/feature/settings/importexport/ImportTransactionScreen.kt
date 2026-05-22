@@ -85,7 +85,7 @@ fun ImportTransactionScreen(
                         Text("Format CSV yang diperlukan:", color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
                         Spacer(Modifier.height(4.dp))
-                        FormatHintRow("Date", "DD/MM/YYYY")
+                        FormatHintRow("Date", "YYYYMMDD")
                         FormatHintRow("Type", "Income / Expense / Transfer")
                         FormatHintRow("Category", "Opsional — nama kategori")
                         FormatHintRow("Amount", "Angka saja, tanpa Rp atau titik")

@@ -25,7 +25,7 @@ class ExportTransactionsUseCase @Inject constructor(
     private val transactionRepo: TransactionRepository,
     private val accountRepo: AccountRepository,
 ) {
-    private val dateFmt  = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    private val dateFmt  = DateTimeFormatter.ofPattern("yyyyMMdd")
     private val monthFmt = DateTimeFormatter.ofPattern("MMM-yyyy")
 
     suspend operator fun invoke(

@@ -20,11 +20,12 @@ data class ParseResult(
 object TransactionCsvParser {
 
     private val DATE_FORMATS = listOf(
+        DateTimeFormatter.ofPattern("yyyyMMdd"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd"),
         DateTimeFormatter.ofPattern("d/M/yyyy"),
         DateTimeFormatter.ofPattern("dd/MM/yyyy"),
         DateTimeFormatter.ofPattern("d/MM/yyyy"),
         DateTimeFormatter.ofPattern("dd/M/yyyy"),
-        DateTimeFormatter.ofPattern("yyyy-MM-dd"),
     )
 
     fun parse(csvText: String): ParseResult {
