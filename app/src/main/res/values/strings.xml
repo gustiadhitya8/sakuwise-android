@@ -832,7 +832,10 @@
     <!-- AUDIT-CC2: externalized sheet/dialog titles (PLAN-7 EN walkthrough prep) -->
     <string name="sheet_plan_month_picker_title">Pilih Periode</string>
     <string name="sheet_plan_add_category_title">Tambah Kategori</string>
+    <string name="sheet_plan_edit_category_title">Ubah Kategori</string>
     <string name="sheet_plan_delete_category_title">Hapus Kategori?</string>
+    <string name="plan_category_action_edit">Ubah nama kategori</string>
+    <string name="plan_category_action_delete">Hapus kategori</string>
     <string name="sheet_plan_expected_income_title">Pemasukan Diharapkan</string>
     <string name="sheet_plan_reset_title">Reset Plan?</string>
     <string name="sheet_picker_debt_title">Pilih hutang</string>

@@ -214,6 +214,15 @@ class PlanViewModel @Inject constructor(
         }
     }
 
+    /** Rename an existing category (id + allocationId + items are preserved). */
+    fun renameCategory(category: Category, newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isEmpty() || trimmed == category.name) return
+        viewModelScope.launch {
+            planRepo.upsertCategory(category.copy(name = trimmed))
+        }
+    }
+
     fun applyStarterTemplateToCurrentPlan() {
         viewModelScope.launch {
             // First-launch path: if no Plan entity exists for the current period,

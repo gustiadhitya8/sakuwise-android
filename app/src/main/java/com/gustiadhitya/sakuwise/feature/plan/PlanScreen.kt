@@ -84,6 +84,12 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
     var addCategoryToAlloc by remember { mutableStateOf<String?>(null) }
     var editItem by remember { mutableStateOf<PlanItem?>(null) }
     var deleteCategoryConfirm by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var categoryActions by remember {
+        mutableStateOf<com.gustiadhitya.sakuwise.core.domain.model.Category?>(null)
+    }
+    var renameCategoryTarget by remember {
+        mutableStateOf<com.gustiadhitya.sakuwise.core.domain.model.Category?>(null)
+    }
     var actionSheetOpen by remember { mutableStateOf(false) }
     var incomeSheetOpen by remember { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
@@ -291,7 +297,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         items = cat.items,
                         expanded = isOpen,
                         onToggle = { expanded[cat.category.id] = !isOpen },
-                        onDeleteCategory = { deleteCategoryConfirm = cat.category.id to cat.category.name },
+                        onCategoryActions = { categoryActions = cat.category },
                         onEditItem = { pi -> editItem = pi.item },
                         onAddItem = { addToCategory = cat.category.id },
                     )
@@ -370,6 +376,32 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                 deleteCategoryConfirm = null
             },
             onDismiss = { deleteCategoryConfirm = null },
+        )
+    }
+    if (categoryActions != null) {
+        val cat = categoryActions!!
+        CategoryActionSheet(
+            categoryName = cat.name,
+            onEdit = {
+                renameCategoryTarget = cat
+                categoryActions = null
+            },
+            onDelete = {
+                deleteCategoryConfirm = cat.id to cat.name
+                categoryActions = null
+            },
+            onDismiss = { categoryActions = null },
+        )
+    }
+    if (renameCategoryTarget != null) {
+        val cat = renameCategoryTarget!!
+        EditCategorySheet(
+            initialName = cat.name,
+            onSave = { newName ->
+                viewModel.renameCategory(cat, newName)
+                renameCategoryTarget = null
+            },
+            onDismiss = { renameCategoryTarget = null },
         )
     }
     // POST_NOTIFICATIONS: prompt lazily when a recurring plan item is saved.
@@ -623,7 +655,7 @@ private fun CategoryCard(
     allocColor: Color,
     items: List<com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow>,
     expanded: Boolean, onToggle: () -> Unit,
-    onDeleteCategory: () -> Unit,
+    onCategoryActions: () -> Unit,
     onEditItem: (com.gustiadhitya.sakuwise.feature.plan.viewmodel.PlanItemRow) -> Unit,
     onAddItem: () -> Unit,
 ) {
@@ -632,14 +664,15 @@ private fun CategoryCard(
     val pct = if (plan > 0) ((used.toFloat() / plan.toFloat()) * 100f).toInt() else 0
     SwCard(padding = PaddingValues(0.dp)) {
         Column(Modifier.fillMaxWidth()) {
-            // Header (whole row tap = toggle, long-press = delete)
+            // Header (whole row tap = toggle, long-press = action sheet
+            // with Edit + Delete options).
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
                         onClick = onToggle,
-                        onLongClick = onDeleteCategory,
+                        onLongClick = onCategoryActions,
                     )
                     .padding(horizontal = 16.dp, vertical = 14.dp),
             ) {
@@ -736,6 +769,70 @@ private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
         SwButton(text = stringResource(R.string.action_save),
             onClick = { onSave(name.trim()) },
             enabled = name.isNotBlank())
+        Spacer(Modifier.height(8.dp))
+        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+    }
+}
+
+/**
+ * Long-press on a Plan category opens this sheet so the user can pick
+ * between renaming or deleting — previously long-press jumped straight
+ * to the delete confirmation with no edit path.
+ */
+@Composable
+private fun CategoryActionSheet(
+    categoryName: String,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    SwPickerSheet(title = categoryName, onDismiss = onDismiss) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = onEdit)
+                .padding(horizontal = 12.dp, vertical = 14.dp),
+        ) {
+            Icon(Icons.Outlined.Edit, null, tint = sw.ink, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(stringResource(R.string.plan_category_action_edit),
+                color = sw.ink,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = onDelete)
+                .padding(horizontal = 12.dp, vertical = 14.dp),
+        ) {
+            Icon(Icons.Outlined.Delete, null, tint = sw.danger, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(stringResource(R.string.plan_category_action_delete),
+                color = sw.danger,
+                style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
+        }
+    }
+}
+
+@Composable
+private fun EditCategorySheet(
+    initialName: String,
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by remember { mutableStateOf(initialName) }
+    SwPickerSheet(title = stringResource(R.string.sheet_plan_edit_category_title), onDismiss = onDismiss) {
+        SwField(value = name, onValueChange = { name = it },
+            label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
+        Spacer(Modifier.height(16.dp))
+        SwButton(text = stringResource(R.string.action_save),
+            onClick = { onSave(name.trim()) },
+            enabled = name.isNotBlank() && name.trim() != initialName)
         Spacer(Modifier.height(8.dp))
         SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
