@@ -125,7 +125,7 @@ class PlanViewModel @Inject constructor(
                 CategoryRow(
                     category = cat,
                     items = list,
-                    plan = cat.plannedAmount ?: list.sumOf { it.item.plannedAmount },
+                    plan = list.sumOf { it.item.plannedAmount },
                     used = list.sumOf { it.used },
                 )
             }
