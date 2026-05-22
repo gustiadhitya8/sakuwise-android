@@ -585,6 +585,11 @@
     <string name="gold_kind_label">Gold type</string>
     <string name="gold_kind_physical">Physical</string>
     <string name="gold_kind_digital">Digital</string>
+    <string name="sort_date_newest">Date · newest first</string>
+    <string name="sort_date_oldest">Date · oldest first</string>
+    <string name="sort_amount_high">Amount · highest first</string>
+    <string name="sort_amount_low">Amount · lowest first</string>
+    <string name="sort_action_cd">Sort</string>
     <string name="gold_price_tip">Tip: Monthly updates are enough. Gold prices don\'t fluctuate wildly day-to-day, and Sakuwise stores this as a snapshot — recallable anytime.</string>
     <string name="gold_detail_default_title">Gold Detail</string>
     <string name="gold_field_weight">Weight</string>

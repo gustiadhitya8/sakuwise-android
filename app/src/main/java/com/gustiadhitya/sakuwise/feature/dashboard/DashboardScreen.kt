@@ -794,11 +794,36 @@ private fun DashboardRecentTxns(
     onEditTxn: (Transaction) -> Unit = {},
 ) {
     val sw = SwTheme.colors
+    var sortMode by remember {
+        mutableStateOf(com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC)
+    }
+    val sortedTxns = remember(txns, sortMode) {
+        txns.sortedWith(
+            when (sortMode) {
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC ->
+                    compareByDescending<Transaction> { it.date }.thenByDescending { it.createdAt }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_ASC ->
+                    compareBy<Transaction> { it.date }.thenBy { it.createdAt }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_DESC ->
+                    compareByDescending { it.amount }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_ASC ->
+                    compareBy { it.amount }
+            },
+        )
+    }
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
-        // Section header is plain — the old "All" trailing chevron previously
-        // mis-routed to the Plan tab. Users now edit/delete by tapping a row
-        // directly; a dedicated "All transactions" screen is a future feature.
-        SwSectionLabel(text = stringResource(R.string.dashboard_recent_txns))
+        SwSectionLabel(
+            text = stringResource(R.string.dashboard_recent_txns),
+            trailing = if (txns.isNotEmpty()) {
+                {
+                    com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                        options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                        selected = sortMode,
+                        onPick = { sortMode = it },
+                    )
+                }
+            } else null,
+        )
         if (txns.isEmpty()) {
             SwCard {
                 Text(
@@ -810,8 +835,8 @@ private fun DashboardRecentTxns(
         } else {
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
-                    txns.forEachIndexed { i, t ->
-                        val divider = i < txns.size - 1
+                    sortedTxns.forEachIndexed { i, t ->
+                        val divider = i < sortedTxns.size - 1
                         val tone = when (t.type) {
                             TxnType.Income -> sw.success
                             TxnType.Transfer -> sw.info

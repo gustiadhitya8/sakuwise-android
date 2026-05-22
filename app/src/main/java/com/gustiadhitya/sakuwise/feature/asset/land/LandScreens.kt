@@ -175,9 +175,32 @@ fun LandListScreen(
     val landGrowthPct: Float? =
         if (totalBuy > 0L && landProfit != 0L) (landProfit.toFloat() / totalBuy.toFloat()) * 100f
         else null
+    var sortMode by remember {
+        mutableStateOf(com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC)
+    }
+    val sortedItems = remember(items, sortMode) {
+        items.sortedWith(
+            when (sortMode) {
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC ->
+                    compareByDescending { it.purchaseDate }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_ASC ->
+                    compareBy { it.purchaseDate }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_DESC ->
+                    compareByDescending { it.currentValue ?: it.buyPrice }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_ASC ->
+                    compareBy { it.currentValue ?: it.buyPrice }
+            },
+        )
+    }
     SimpleSettingsScreen(
         title = stringResource(R.string.land_title), onBack = onBack,
         actions = {
+            com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                selected = sortMode,
+                onPick = { sortMode = it },
+                modifier = Modifier.padding(end = 8.dp),
+            )
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
@@ -247,7 +270,7 @@ fun LandListScreen(
             // Single SwCard with rows per proto.
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
-                    items.forEachIndexed { i, l ->
+                    sortedItems.forEachIndexed { i, l ->
                         val value = l.currentValue ?: l.buyPrice
                         val growth = if (l.buyPrice > 0L)
                             ((value - l.buyPrice).toFloat() / l.buyPrice.toFloat()) * 100f
@@ -298,7 +321,7 @@ fun LandListScreen(
                                 }
                             }
                         }
-                        if (i < items.lastIndex) {
+                        if (i < sortedItems.lastIndex) {
                             Box(Modifier.fillMaxWidth().height(1.dp)
                                 .padding(start = 84.dp)
                                 .background(sw.border))

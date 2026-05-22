@@ -585,6 +585,11 @@
     <string name="gold_kind_label">Jenis Emas</string>
     <string name="gold_kind_physical">Fisik</string>
     <string name="gold_kind_digital">Digital</string>
+    <string name="sort_date_newest">Tanggal · terbaru dulu</string>
+    <string name="sort_date_oldest">Tanggal · terlama dulu</string>
+    <string name="sort_amount_high">Jumlah · terbesar dulu</string>
+    <string name="sort_amount_low">Jumlah · terkecil dulu</string>
+    <string name="sort_action_cd">Urutkan</string>
     <string name="gold_price_tip">Tip: Update bulanan saja sudah cukup. Harga emas tidak fluktuasi liar harian, dan Sakuwise menyimpan harga ini sebagai snapshot — bisa di-recall kapan saja.</string>
     <string name="gold_detail_default_title">Detail Emas</string>
     <string name="gold_field_weight">Berat</string>

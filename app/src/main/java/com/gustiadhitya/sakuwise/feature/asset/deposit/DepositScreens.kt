@@ -86,6 +86,7 @@ data class DepositListRow(
     val latestBalance: Long,
     val firstBalance: Long,
     val snapshotCount: Int,
+    val latestSnapshotDate: LocalDate?,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,6 +104,7 @@ class DepositListViewModel @Inject constructor(private val repo: DepositReposito
                         latestBalance = latest?.balance ?: 0L,
                         firstBalance = snaps.minByOrNull { it.date }?.balance ?: 0L,
                         snapshotCount = snaps.size,
+                        latestSnapshotDate = latest?.date,
                     )
                 }
             },
@@ -183,9 +185,32 @@ fun DepositListScreen(
     val depGrowthPct: Float? =
         if (baseline > 0L && baseline != total) ((total - baseline).toFloat() / baseline.toFloat()) * 100f
         else null
+    var sortMode by remember {
+        mutableStateOf(com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC)
+    }
+    val sortedItems = remember(items, sortMode) {
+        items.sortedWith(
+            when (sortMode) {
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC ->
+                    compareByDescending<DepositListRow> { it.latestSnapshotDate ?: LocalDate.MIN }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_ASC ->
+                    compareBy { it.latestSnapshotDate ?: LocalDate.MAX }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_DESC ->
+                    compareByDescending { it.latestBalance }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_ASC ->
+                    compareBy { it.latestBalance }
+            },
+        )
+    }
     SimpleSettingsScreen(
         title = stringResource(R.string.deposit_title), onBack = onBack,
         actions = {
+            com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                selected = sortMode,
+                onPick = { sortMode = it },
+                modifier = Modifier.padding(end = 8.dp),
+            )
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
                     .background(sw.accent).clickable(onClick = onAdd)) {
@@ -268,7 +293,7 @@ fun DepositListScreen(
         } else {
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
-                    items.forEachIndexed { i, row ->
+                    sortedItems.forEachIndexed { i, row ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -316,7 +341,7 @@ fun DepositListScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontFeatureSettings = "tnum"))
                         }
-                        if (i < items.lastIndex) {
+                        if (i < sortedItems.lastIndex) {
                             Box(Modifier.fillMaxWidth().height(1.dp)
                                 .padding(start = 84.dp)
                                 .background(sw.border))
@@ -342,12 +367,32 @@ fun DepositDetailScreen(
         Text(stringResource(R.string.loading), color = sw.inkMuted, style = SwType.Body)
     }
     val latest = snapshots.lastOrNull()
+    var snapSort by remember {
+        mutableStateOf(com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC)
+    }
+    val sortedSnapshots = remember(snapshots, snapSort) {
+        snapshots.sortedWith(
+            when (snapSort) {
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC ->
+                    compareByDescending<DepositSnapshot> { it.date }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_ASC ->
+                    compareBy { it.date }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_DESC ->
+                    compareByDescending { it.balance }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_ASC ->
+                    compareBy { it.balance }
+            },
+        )
+    }
     SimpleSettingsScreen(
         title = d.name, onBack = onBack,
         actions = {
-            // Proto Deposito detail has no top-right action. Keep the edit
-            // affordance reachable via long-press of any snapshot row would
-            // be invisible, so render a tiny pencil-equivalent transparently.
+            com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                selected = snapSort,
+                onPick = { snapSort = it },
+                modifier = Modifier.padding(end = 8.dp),
+            )
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onEdit)) {
@@ -446,9 +491,8 @@ fun DepositDetailScreen(
             SwCard { Text(stringResource(R.string.deposit_snapshot_empty), color = sw.inkMuted, style = SwType.Body) }
         } else SwCard(padding = PaddingValues(0.dp)) {
             Column {
-                val reversed = snapshots.reversed()
-                reversed.forEachIndexed { idx, s ->
-                    val prev = reversed.getOrNull(idx + 1)
+                sortedSnapshots.forEachIndexed { idx, s ->
+                    val prev = sortedSnapshots.getOrNull(idx + 1)
                     val diff = if (prev != null) s.balance - prev.balance else 0L
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
@@ -478,7 +522,7 @@ fun DepositDetailScreen(
                             style = SwType.Amount.copy(fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum"))
                     }
-                    if (idx < reversed.lastIndex) {
+                    if (idx < sortedSnapshots.lastIndex) {
                         Box(Modifier.fillMaxWidth().height(1.dp).background(sw.border))
                     }
                 }

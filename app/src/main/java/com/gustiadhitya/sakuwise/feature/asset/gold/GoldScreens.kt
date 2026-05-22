@@ -194,10 +194,33 @@ fun GoldListScreen(
     val totalValue = items.filter { it.status == AssetStatus.Held }.sumOf { it.valueAt(priceFor(it)) }
     val totalBuy = items.filter { it.status == AssetStatus.Held }.sumOf { it.buyPrice }
     val profit = totalValue - totalBuy
+    var sortMode by remember {
+        mutableStateOf(com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC)
+    }
+    val sortedItems = remember(items, sortMode, prefs.goldPriceGlobal, prefs.goldPriceDigital) {
+        items.sortedWith(
+            when (sortMode) {
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_DESC ->
+                    compareByDescending { it.purchaseDate }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.DATE_ASC ->
+                    compareBy { it.purchaseDate }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_DESC ->
+                    compareByDescending { it.valueAt(priceFor(it)) }
+                com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort.AMOUNT_ASC ->
+                    compareBy { it.valueAt(priceFor(it)) }
+            },
+        )
+    }
 
     SimpleSettingsScreen(
         title = stringResource(R.string.gold_title), onBack = onBack,
         actions = {
+            com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                selected = sortMode,
+                onPick = { sortMode = it },
+                modifier = Modifier.padding(end = 8.dp),
+            )
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -324,7 +347,7 @@ fun GoldListScreen(
             // Single SwCard with all rows + dividers — proto pattern.
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
-                    items.forEachIndexed { i, g ->
+                    sortedItems.forEachIndexed { i, g ->
                         val perValue = g.valueAt(priceFor(g))
                         val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
                         val growth = if (g.buyPrice > 0L)
@@ -383,7 +406,7 @@ fun GoldListScreen(
                                 }
                             }
                         }
-                        if (i < items.lastIndex) {
+                        if (i < sortedItems.lastIndex) {
                             Box(Modifier.fillMaxWidth().height(1.dp)
                                 .padding(start = 84.dp)
                                 .background(sw.border))
