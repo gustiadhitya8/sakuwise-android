@@ -33,7 +33,9 @@ sealed interface ImportUiState {
         val rows: List<ImportRow>,
         val skipped: Int,
         val errors: List<String>,
-        val unresolvedItems: Int,   // rows where (kategori, item) didn't match any plan item
+        val unresolvedItems: Int,    // rows where (kategori, item) didn't match any plan item
+        val unresolvedAccounts: Int, // rows where accountName set but no matching account found
+        val needsFallbackAccount: Boolean, // true when any row has no resolvedAccountId
     ) : ImportUiState
     data class Importing(val done: Int, val total: Int) : ImportUiState
     data class Done(val imported: Int, val skipped: Int, val duplicates: Int = 0) : ImportUiState
@@ -89,20 +91,33 @@ class ImportTransactionViewModel @Inject constructor(
                     } else row
                 }
 
-                val unresolvedItems = resolved.count {
-                    it.kategori != null && it.item != null && it.planItemId == null
+                // Resolve accountName → accountId
+                val allAccounts = accountRepo.observeAll().first()
+                val accountByName = allAccounts.associateBy { it.name.trim().lowercase() }
+                val withAccounts = resolved.map { row ->
+                    if (row.accountName != null) {
+                        row.copy(resolvedAccountId = accountByName[row.accountName.trim().lowercase()]?.id)
+                    } else row
                 }
 
-                parsed.copy(rows = resolved) to unresolvedItems
+                val unresolvedItems    = withAccounts.count { it.kategori != null && it.item != null && it.planItemId == null }
+                val unresolvedAccounts = withAccounts.count { it.accountName != null && it.resolvedAccountId == null }
+                val needsFallback      = withAccounts.any { it.resolvedAccountId == null }
+
+                parsed.copy(rows = withAccounts) to Triple(unresolvedItems, unresolvedAccounts, needsFallback)
             }.fold(
-                onSuccess = { (result, unresolved) ->
+                onSuccess = { (result, counts) ->
+                    val (unresolvedItems, unresolvedAccounts, needsFallback) = counts
                     _state.value = when {
                         result.rows.isEmpty() && result.errors.isNotEmpty() ->
                             ImportUiState.Err(result.errors.first())
                         result.rows.isEmpty() ->
                             ImportUiState.Err("Tidak ada baris valid ditemukan di file ini")
                         else ->
-                            ImportUiState.Preview(result.rows, result.skipped, result.errors, unresolved)
+                            ImportUiState.Preview(
+                                result.rows, result.skipped, result.errors,
+                                unresolvedItems, unresolvedAccounts, needsFallback,
+                            )
                     }
                 },
                 onFailure = { e ->
@@ -112,32 +127,38 @@ class ImportTransactionViewModel @Inject constructor(
         }
     }
 
-    fun importRows(rows: List<ImportRow>, accountId: String) {
+    /** [fallbackAccountId] is used for rows that have no resolved account from the Akun column. */
+    fun importRows(rows: List<ImportRow>, fallbackAccountId: String?) {
         val parseSkipped = (_state.value as? ImportUiState.Preview)?.skipped ?: 0
         _state.value = ImportUiState.Importing(0, rows.size)
         viewModelScope.launch {
             var dupeSkipped = 0
             var imported = 0
             withContext(Dispatchers.IO) {
-                // Dedup: load existing transactions for the date range
                 val minDate = rows.minOf { it.date }
                 val maxDate = rows.maxOf { it.date }
                 val existing = transactionRepo.observeBetween(minDate, maxDate).first()
 
-                // Dedup key: prefer (date, amount, type, planItemId) when planItemId is set,
-                // else (date, amount, type, note)
+                // Include account in dedup key so same transaction on different wallets isn't deduplicated
                 val existingKeys = existing.map { t ->
+                    val acct = t.sourceAccountId
                     if (t.planItemId != null)
-                        "${t.date}|${t.amount}|${t.type}|pid:${t.planItemId}"
+                        "$acct|${t.date}|${t.amount}|${t.type}|pid:${t.planItemId}"
                     else
-                        "${t.date}|${t.amount}|${t.type}|note:${t.note?.trim()?.lowercase()}"
+                        "$acct|${t.date}|${t.amount}|${t.type}|note:${t.note?.trim()?.lowercase()}"
                 }.toHashSet()
 
                 rows.forEachIndexed { i, row ->
+                    val accountId = row.resolvedAccountId ?: fallbackAccountId ?: run {
+                        // No account to assign — skip rather than corrupt data
+                        dupeSkipped++
+                        _state.value = ImportUiState.Importing(i + 1, rows.size)
+                        return@forEachIndexed
+                    }
                     val key = if (row.planItemId != null)
-                        "${row.date}|${row.amount}|${row.type}|pid:${row.planItemId}"
+                        "$accountId|${row.date}|${row.amount}|${row.type}|pid:${row.planItemId}"
                     else
-                        "${row.date}|${row.amount}|${row.type}|note:${row.note?.trim()?.lowercase()}"
+                        "$accountId|${row.date}|${row.amount}|${row.type}|note:${row.note?.trim()?.lowercase()}"
 
                     if (key in existingKeys) {
                         dupeSkipped++

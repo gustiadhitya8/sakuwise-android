@@ -117,6 +117,7 @@ fun ImportTransactionScreen(
                         FormatHintRow("Item", "Nama item di bawah Kategori (opsional)")
                         FormatHintRow("Jumlah", "Angka saja, tanpa Rp atau titik")
                         FormatHintRow("Catatan", "Deskripsi tambahan (opsional)")
+                        FormatHintRow("Akun", "Nama akun/dompet (opsional)")
                         Spacer(Modifier.height(4.dp))
                         Text(
                             "Header bisa bahasa Indonesia atau English (Date/Tanggal, dll.).",
@@ -161,21 +162,15 @@ fun ImportTransactionScreen(
                 // Unresolved plan items warning
                 if (s.unresolvedItems > 0) {
                     Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                            .background(sw.warningSoft).padding(12.dp),
-                        verticalAlignment = Alignment.Top,
-                    ) {
-                        Icon(Icons.Outlined.Warning, null, tint = sw.warning, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text("${s.unresolvedItems} baris tidak cocok dengan item di Plan",
-                                color = sw.warning,
-                                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
-                            Text("Transaksi tetap diimpor, tapi tidak terhubung ke anggaran Plan. Pastikan nama Kategori dan Item sama persis.",
-                                color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
-                        }
-                    }
+                    WarningChip("${s.unresolvedItems} baris tidak cocok dengan item di Plan",
+                        "Transaksi tetap diimpor, tapi tidak terhubung ke anggaran Plan. Pastikan nama Kategori dan Item sama persis.")
+                }
+
+                // Unresolved account names warning
+                if (s.unresolvedAccounts > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    WarningChip("${s.unresolvedAccounts} nama akun tidak ditemukan",
+                        "Baris tersebut akan menggunakan Akun Cadangan di bawah. Pastikan nama akun sama persis dengan yang ada di aplikasi.")
                 }
 
                 if (s.errors.isNotEmpty()) {
@@ -197,43 +192,51 @@ fun ImportTransactionScreen(
 
                 Spacer(Modifier.height(14.dp))
 
-                // Account picker
-                Text("PILIH AKUN TUJUAN", color = sw.inkSubtle,
-                    style = SwType.SectionLabel.copy(fontSize = 11.sp),
-                    modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
+                // Fallback account picker — shown when some rows have no resolved account
+                if (s.needsFallbackAccount) {
+                    val label = if (s.unresolvedAccounts > 0) "AKUN CADANGAN" else "PILIH AKUN TUJUAN"
+                    val sub   = if (s.unresolvedAccounts > 0)
+                        "Digunakan untuk baris tanpa kolom Akun atau yang tidak cocok"
+                    else "Semua transaksi akan masuk ke akun ini"
+                    Text(label, color = sw.inkSubtle,
+                        style = SwType.SectionLabel.copy(fontSize = 11.sp),
+                        modifier = Modifier.padding(start = 4.dp, bottom = 2.dp))
+                    Text(sub, color = sw.inkMuted,
+                        style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                        modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
 
-                if (accounts.isEmpty()) {
-                    Text("Belum ada akun. Buat akun terlebih dahulu.", color = sw.danger,
-                        style = SwType.LabelSmall.copy(fontSize = 12.sp))
-                } else {
-                    SwCard(padding = PaddingValues(0.dp)) {
-                        Column {
-                            accounts.forEach { acc ->
-                                val selected = selectedAccountId == acc.id
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.fillMaxWidth().clickable { selectedAccountId = acc.id }
-                                        .padding(horizontal = 16.dp, vertical = 14.dp),
-                                ) {
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier.size(20.dp).clip(CircleShape)
-                                            .background(if (selected) sw.primary else sw.track)
-                                            .border(2.dp, if (selected) sw.primary else sw.border, CircleShape),
+                    if (accounts.isEmpty()) {
+                        Text("Belum ada akun. Buat akun terlebih dahulu.", color = sw.danger,
+                            style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                    } else {
+                        SwCard(padding = PaddingValues(0.dp)) {
+                            Column {
+                                accounts.forEach { acc ->
+                                    val selected = selectedAccountId == acc.id
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth().clickable { selectedAccountId = acc.id }
+                                            .padding(horizontal = 16.dp, vertical = 14.dp),
                                     ) {
-                                        if (selected) Box(Modifier.size(8.dp).clip(CircleShape).background(sw.onPrimary))
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.size(20.dp).clip(CircleShape)
+                                                .background(if (selected) sw.primary else sw.track)
+                                                .border(2.dp, if (selected) sw.primary else sw.border, CircleShape),
+                                        ) {
+                                            if (selected) Box(Modifier.size(8.dp).clip(CircleShape).background(sw.onPrimary))
+                                        }
+                                        Spacer(Modifier.width(12.dp))
+                                        Text(acc.name, color = sw.ink,
+                                            style = SwType.LabelStrong.copy(fontSize = 14.sp,
+                                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal))
                                     }
-                                    Spacer(Modifier.width(12.dp))
-                                    Text(acc.name, color = sw.ink,
-                                        style = SwType.LabelStrong.copy(fontSize = 14.sp,
-                                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal))
                                 }
                             }
                         }
                     }
+                    Spacer(Modifier.height(14.dp))
                 }
-
-                Spacer(Modifier.height(14.dp))
 
                 // Preview table (first 10)
                 Text("PRATINJAU (${minOf(s.rows.size, 10)} dari ${s.rows.size})", color = sw.inkSubtle,
@@ -255,13 +258,11 @@ fun ImportTransactionScreen(
 
                 Spacer(Modifier.height(16.dp))
 
+                val canImport = !s.needsFallbackAccount || selectedAccountId != null
                 SwButton(
                     text = "Import ${s.rows.size} Transaksi",
-                    onClick = {
-                        val accId = selectedAccountId ?: return@SwButton
-                        viewModel.importRows(s.rows, accId)
-                    },
-                    enabled = selectedAccountId != null,
+                    onClick = { viewModel.importRows(s.rows, selectedAccountId) },
+                    enabled = canImport,
                     leading = { Icon(Icons.Outlined.UploadFile, null, tint = sw.onPrimary, modifier = Modifier.size(18.dp)) },
                 )
                 Spacer(Modifier.height(8.dp))
@@ -343,6 +344,24 @@ fun ImportTransactionScreen(
 }
 
 @Composable
+private fun WarningChip(title: String, body: String) {
+    val sw = SwTheme.colors
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+            .background(sw.warningSoft).padding(12.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(Icons.Outlined.Warning, null, tint = sw.warning, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Column {
+            Text(title, color = sw.warning,
+                style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
+            Text(body, color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
+        }
+    }
+}
+
+@Composable
 private fun FormatHintRow(col: String, desc: String) {
     val sw = SwTheme.colors
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -360,12 +379,15 @@ private fun PreviewHeaderRow() {
         modifier = Modifier.fillMaxWidth().background(sw.surface)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text("Tanggal", color = sw.inkSubtle,
+        Text("Tgl", color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.width(60.dp))
+            modifier = Modifier.width(44.dp))
         Text("Kategori · Item", color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.weight(1f))
+        Text("Akun", color = sw.inkSubtle,
+            style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.width(56.dp))
         Text("Jumlah", color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold))
     }
@@ -375,30 +397,37 @@ private fun PreviewHeaderRow() {
 private fun PreviewDataRow(row: ImportRow) {
     val sw = SwTheme.colors
     val dtFmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM")
-    val linked = row.planItemId != null
     val categoryLabel = when {
         row.kategori != null && row.item != null -> "${row.kategori} · ${row.item}"
         row.kategori != null -> row.kategori
         row.note != null -> row.note
         else -> "—"
     }
+    val accountResolved = row.resolvedAccountId != null
+    val accountLabel = row.accountName ?: "—"
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp),
     ) {
         Text(row.date.format(dtFmt), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.width(60.dp))
+            modifier = Modifier.width(44.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(categoryLabel, color = sw.ink,
                 style = SwType.Caption.copy(fontSize = 11.sp),
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (!linked && row.kategori != null) {
-                Text("tidak terhubung ke Plan", color = sw.warning,
+            if (row.kategori != null && row.planItemId == null) {
+                Text("tidak cocok Plan", color = sw.warning,
                     style = SwType.Caption.copy(fontSize = 10.sp))
             }
         }
-        Text(row.amount.toRupiahShort(), color = if (row.type == com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income) sw.success else sw.ink,
+        Text(accountLabel,
+            color = if (!accountResolved && row.accountName != null) sw.warning else sw.inkSubtle,
+            style = SwType.Caption.copy(fontSize = 10.sp),
+            modifier = Modifier.width(56.dp),
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(row.amount.toRupiahShort(),
+            color = if (row.type == com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income) sw.success else sw.ink,
             style = SwType.Caption.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold))
     }
 }

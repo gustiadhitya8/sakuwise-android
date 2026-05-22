@@ -7,11 +7,13 @@ import java.time.format.DateTimeFormatter
 data class ImportRow(
     val date: LocalDate,
     val type: TxnType,
-    val kategori: String?,   // raw Category/Kategori column — for plan item lookup + display
-    val item: String?,       // raw Item column — for plan item lookup + display
-    val note: String?,       // raw Note/Catatan column — stored as transaction note
+    val kategori: String?,          // raw Category/Kategori column — for plan item lookup + display
+    val item: String?,              // raw Item column — for plan item lookup + display
+    val note: String?,              // raw Note/Catatan column — stored as transaction note
     val amount: Long,
-    val planItemId: String? = null, // resolved in ViewModel after DB lookup
+    val accountName: String?,       // raw Akun/Account column — resolved in ViewModel
+    val planItemId: String? = null,        // resolved in ViewModel after DB lookup
+    val resolvedAccountId: String? = null, // resolved in ViewModel after account lookup
 )
 
 data class ParseResult(
@@ -47,6 +49,7 @@ object TransactionCsvParser {
         val itemIdx     = col("item")
         val amountIdx   = col("jumlah", "amount")
         val noteIdx     = col("catatan", "note")
+        val akunIdx     = col("akun", "account")
 
         if (dateIdx < 0 || typeIdx < 0 || amountIdx < 0) {
             return ParseResult(
@@ -86,8 +89,9 @@ object TransactionCsvParser {
             val kategori = if (kategoriIdx >= 0) cols.getOrNull(kategoriIdx)?.trim()?.ifBlank { null } else null
             val item     = if (itemIdx     >= 0) cols.getOrNull(itemIdx    )?.trim()?.ifBlank { null } else null
             val note     = if (noteIdx     >= 0) cols.getOrNull(noteIdx    )?.trim()?.ifBlank { null } else null
+            val akun     = if (akunIdx     >= 0) cols.getOrNull(akunIdx    )?.trim()?.ifBlank { null } else null
 
-            rows.add(ImportRow(date, type, kategori, item, note, amount))
+            rows.add(ImportRow(date, type, kategori, item, note, amount, akun))
         }
 
         return ParseResult(rows, skipped, errors)
@@ -96,10 +100,10 @@ object TransactionCsvParser {
     // Generates a UTF-8 BOM CSV template with bilingual headers and two example rows.
     fun template(): ByteArray {
         val lines = listOf(
-            "Tanggal;Tipe;Kategori;Item;Jumlah;Catatan",
-            "20260503;Expense;Bulanan Gusti;Makan;45000;ShopeeFood: Egg Roll, Basgor, Nugger",
-            "20260503;Expense;Bulanan Gusti;Kopi;18000;Lawson: Caffe Latte",
-            "20260501;Income;;;5000000;Gaji Mei",
+            "Tanggal;Tipe;Kategori;Item;Jumlah;Catatan;Akun",
+            "20260503;Expense;Bulanan Gusti;Makan;45000;ShopeeFood: Egg Roll, Basgor, Nugger;BCA",
+            "20260503;Expense;Bulanan Gusti;Kopi;18000;Lawson: Caffe Latte;Gopay",
+            "20260501;Income;;;5000000;Gaji Mei;BCA",
         )
         return ("﻿" + lines.joinToString("\n")).toByteArray(Charsets.UTF_8)
     }
