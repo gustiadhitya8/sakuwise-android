@@ -20,6 +20,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE planItemId = :planItemId ORDER BY dateEpochDay DESC")
     fun observeForPlanItem(planItemId: String): Flow<List<TransactionEntity>>
 
+    @Query("SELECT * FROM transactions WHERE dateEpochDay >= :start AND dateEpochDay <= :end ORDER BY dateEpochDay DESC, createdAt DESC")
+    fun observeBetween(start: Long, end: Long): Flow<List<TransactionEntity>>
+
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getById(id: String): TransactionEntity?
 

@@ -65,6 +65,7 @@ interface TransactionRepository {
     fun observeExpenseBetween(start: LocalDate, end: LocalDate): Flow<Long>
     fun observeIncomeCategories(): Flow<List<IncomeCategory>>
     fun observeTopExpenseCategories(start: LocalDate, end: LocalDate, limit: Int): Flow<List<TopExpenseCategory>>
+    fun observeBetween(start: LocalDate, end: LocalDate): Flow<List<Transaction>>
 }
 
 data class TopExpenseCategory(val name: String, val total: Long)

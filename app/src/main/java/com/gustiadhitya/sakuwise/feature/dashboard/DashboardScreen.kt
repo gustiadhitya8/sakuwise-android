@@ -90,6 +90,7 @@ fun DashboardScreen(
     // Tapping a row in "Recent Transactions" opens the matching edit form.
     // Default is a no-op so previews/tests don't crash; the host wires it.
     onEditTxn: (Transaction) -> Unit = {},
+    onOpenHistory: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -102,6 +103,7 @@ fun DashboardScreen(
         onMarkNotificationsSeen = viewModel::markNotificationsSeen,
         onToggleHide = viewModel::toggleBalancesHidden,
         onEditTxn = onEditTxn,
+        onOpenHistory = onOpenHistory,
     )
 }
 
@@ -115,6 +117,7 @@ private fun DashboardContent(
     onMarkNotificationsSeen: () -> Unit = {},
     onToggleHide: () -> Unit = {},
     onEditTxn: (Transaction) -> Unit = {},
+    onOpenHistory: () -> Unit = {},
 ) {
     val sw = SwTheme.colors
     val hide = state.balancesHidden
@@ -203,6 +206,7 @@ private fun DashboardContent(
             txns = state.recentTransactions,
             accountNameLookup = { id -> state.accounts.firstOrNull { it.id == id }?.name },
             onEditTxn = onEditTxn,
+            onOpenHistory = onOpenHistory,
         )
         if (state.backupOverdueDays > 30 || state.backupOverdueDays == Int.MAX_VALUE) {
             DashboardBanner(overdueDays = state.backupOverdueDays, onTap = onBackupTap)
@@ -792,6 +796,7 @@ private fun DashboardRecentTxns(
     txns: List<Transaction>,
     accountNameLookup: (String) -> String?,
     onEditTxn: (Transaction) -> Unit = {},
+    onOpenHistory: () -> Unit = {},
 ) {
     val sw = SwTheme.colors
     var sortMode by remember {
@@ -814,15 +819,24 @@ private fun DashboardRecentTxns(
     Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
         SwSectionLabel(
             text = stringResource(R.string.dashboard_recent_txns),
-            trailing = if (txns.isNotEmpty()) {
-                {
-                    com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
-                        options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
-                        selected = sortMode,
-                        onPick = { sortMode = it },
+            trailing = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        "Lihat semua",
+                        style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                        color = sw.primary,
+                        modifier = Modifier.clickable { onOpenHistory() },
                     )
+                    if (txns.isNotEmpty()) {
+                        Spacer(Modifier.width(8.dp))
+                        com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu(
+                            options = com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions(),
+                            selected = sortMode,
+                            onPick = { sortMode = it },
+                        )
+                    }
                 }
-            } else null,
+            },
         )
         if (txns.isEmpty()) {
             SwCard {

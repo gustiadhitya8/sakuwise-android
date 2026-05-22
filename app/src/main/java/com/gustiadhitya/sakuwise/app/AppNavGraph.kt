@@ -54,6 +54,7 @@ import com.gustiadhitya.sakuwise.feature.transaction.AddTxnPickerSheet
 import com.gustiadhitya.sakuwise.feature.transaction.ExpenseFormScreen
 import com.gustiadhitya.sakuwise.feature.transaction.IncomeFormScreen
 import com.gustiadhitya.sakuwise.feature.transaction.TransferFormScreen
+import com.gustiadhitya.sakuwise.feature.transaction.TransactionHistoryScreen
 import com.gustiadhitya.sakuwise.feature.transaction.ocr.OcrCaptureScreen
 import com.gustiadhitya.sakuwise.feature.transaction.viewmodel.TxnFormViewModel
 import dagger.hilt.EntryPoint
@@ -113,6 +114,7 @@ private sealed class FullScreenOverlay {
     data class Income(val txnId: String? = null) : FullScreenOverlay()
     data class Transfer(val txnId: String? = null) : FullScreenOverlay()
     data object Ocr : FullScreenOverlay()
+    data object TransactionHistory : FullScreenOverlay()
 }
 
 @Composable
@@ -168,6 +170,7 @@ private fun MainShell() {
                             meInitialRoute = com.gustiadhitya.sakuwise.feature.settings.SettingsRoute.Backup
                             active = SwTab.Me
                         },
+                        onOpenHistory = { overlay = FullScreenOverlay.TransactionHistory },
                         onEditTxn = { txn ->
                             txnFormVm.resetForNewEntry()
                             overlay = when (txn.type) {
@@ -250,6 +253,21 @@ private fun MainShell() {
                                 photoBlob = draft.photoBlob,
                             )
                             overlay = FullScreenOverlay.Expense()
+                        },
+                    )
+                    is FullScreenOverlay.TransactionHistory -> TransactionHistoryScreen(
+                        onClose = { overlay = null },
+                        onEditTxn = { txn ->
+                            txnFormVm.resetForNewEntry()
+                            overlay = when (txn.type) {
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Expense ->
+                                    FullScreenOverlay.Expense(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Income ->
+                                    FullScreenOverlay.Income(txnId = txn.id)
+                                com.gustiadhitya.sakuwise.core.domain.model.TxnType.Transfer ->
+                                    FullScreenOverlay.Transfer(txnId = txn.id)
+                                else -> FullScreenOverlay.TransactionHistory
+                            }
                         },
                     )
                     null -> Unit

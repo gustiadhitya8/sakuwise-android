@@ -46,6 +46,8 @@ class TransactionRepositoryImpl @Inject constructor(
         dao.observeTopExpenseCategories(start.toEpochDay(), end.toEpochDay(), limit).map { rows ->
             rows.map { TopExpenseCategory(name = it.categoryName, total = it.total) }
         }
+    override fun observeBetween(start: LocalDate, end: LocalDate) =
+        dao.observeBetween(start.toEpochDay(), end.toEpochDay()).map { l -> l.map { it.toDomain() } }
 }
 
 class GoldRepositoryImpl @Inject constructor(private val dao: GoldDao) : GoldRepository {
