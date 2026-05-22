@@ -98,12 +98,11 @@ fun ExpenseFormScreen(
         com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Needs -> sw.primary
         com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> sw.accent
         com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Invest -> sw.info
-        null -> sw.surface
+        null -> sw.primary
     }
     val heroFg = when (alloc) {
         // Mint (accent) needs the fixed-dark token for contrast per proto.
         com.gustiadhitya.sakuwise.core.domain.model.AllocationId.Wants -> sw.fixedDarkOnMint
-        null -> sw.ink
         else -> sw.onPrimary
     }
     val allocName: String? = alloc?.let { a ->
