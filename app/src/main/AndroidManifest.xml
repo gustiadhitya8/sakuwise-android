@@ -30,6 +30,7 @@
         <activity
             android:name=".app.MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard|smallestScreenSize"
             android:theme="@style/Theme.Sakuwise">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
