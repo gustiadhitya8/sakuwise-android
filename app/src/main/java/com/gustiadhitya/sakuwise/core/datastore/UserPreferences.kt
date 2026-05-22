@@ -36,7 +36,11 @@ data class UserPreferences(
     val needsPct: Int,
     val wantsPct: Int,
     val investPct: Int,
+    /** Per-gram price for PHYSICAL gold (ANTAM / UBS / etc.). */
     val goldPriceGlobal: Long,
+    /** Per-gram price for DIGITAL gold (Pegadaian / Pluang / apps). Separate
+     *  from physical because the spread is usually wider on digital. */
+    val goldPriceDigital: Long,
     val lastBackupTimestamp: Long,
     // REQ-2 Google Drive (AppData scope) backup
     val driveBackupEnabled: Boolean,
@@ -64,6 +68,7 @@ data class UserPreferences(
             wantsPct = 30,
             investPct = 20,
             goldPriceGlobal = 1_050_000L, // sample default — user can change in Settings
+            goldPriceDigital = 1_050_000L,
             lastBackupTimestamp = 0L,
             driveBackupEnabled = false,
             driveAccountEmail = null,
@@ -91,6 +96,7 @@ interface UserPreferencesRepository {
     suspend fun setPlanPeriodStartDay(day: Int)
     suspend fun setAllocationPercentages(needs: Int, wants: Int, invest: Int)
     suspend fun setGoldPriceGlobal(pricePerGram: Long)
+    suspend fun setGoldPriceDigital(pricePerGram: Long)
     suspend fun markBackupNow(epochMs: Long)
     suspend fun setDriveBackupEnabled(enabled: Boolean)
     suspend fun setDriveAccountEmail(email: String?)
@@ -115,6 +121,7 @@ internal object PrefKeys {
     val ALLOC_WANTS_PCT = intPreferencesKey("alloc_wants_pct")
     val ALLOC_INVEST_PCT = intPreferencesKey("alloc_invest_pct")
     val GOLD_PRICE_GLOBAL = longPreferencesKey("gold_price_global")
+    val GOLD_PRICE_DIGITAL = longPreferencesKey("gold_price_digital")
     val LAST_BACKUP_TIMESTAMP = longPreferencesKey("last_backup_timestamp")
     val DRIVE_BACKUP_ENABLED = booleanPreferencesKey("drive_backup_enabled")
     val DRIVE_ACCOUNT_EMAIL = stringPreferencesKey("drive_account_email")
@@ -144,6 +151,7 @@ class UserPreferencesRepositoryImpl(
             wantsPct = p[PrefKeys.ALLOC_WANTS_PCT] ?: d.wantsPct,
             investPct = p[PrefKeys.ALLOC_INVEST_PCT] ?: d.investPct,
             goldPriceGlobal = p[PrefKeys.GOLD_PRICE_GLOBAL] ?: d.goldPriceGlobal,
+            goldPriceDigital = p[PrefKeys.GOLD_PRICE_DIGITAL] ?: d.goldPriceDigital,
             lastBackupTimestamp = p[PrefKeys.LAST_BACKUP_TIMESTAMP] ?: d.lastBackupTimestamp,
             driveBackupEnabled = p[PrefKeys.DRIVE_BACKUP_ENABLED] ?: d.driveBackupEnabled,
             driveAccountEmail = p[PrefKeys.DRIVE_ACCOUNT_EMAIL] ?: d.driveAccountEmail,
@@ -211,6 +219,10 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun setGoldPriceGlobal(pricePerGram: Long) {
         dataStore.edit { it[PrefKeys.GOLD_PRICE_GLOBAL] = pricePerGram }
+    }
+
+    override suspend fun setGoldPriceDigital(pricePerGram: Long) {
+        dataStore.edit { it[PrefKeys.GOLD_PRICE_DIGITAL] = pricePerGram }
     }
 
     override suspend fun markBackupNow(epochMs: Long) {

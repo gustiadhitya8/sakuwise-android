@@ -122,7 +122,9 @@ class GoldEditViewModel @Inject constructor(private val repo: GoldRepository) : 
                 id = g.id,
                 weight = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram),
                 buyPrice = g.buyPrice.toString(), serial = g.serial.orEmpty(),
-                date = g.purchaseDate, note = g.note.orEmpty(), loaded = true,
+                date = g.purchaseDate, note = g.note.orEmpty(),
+                kind = g.kind,
+                loaded = true,
             )
         }
     }
@@ -131,6 +133,9 @@ class GoldEditViewModel @Inject constructor(private val repo: GoldRepository) : 
     fun setSerial(v: String) { _state.value = _state.value.copy(serial = v) }
     fun setDate(v: LocalDate) { _state.value = _state.value.copy(date = v) }
     fun setNote(v: String) { _state.value = _state.value.copy(note = v) }
+    fun setKind(k: com.gustiadhitya.sakuwise.core.domain.model.GoldKind) {
+        _state.value = _state.value.copy(kind = k)
+    }
     fun submit(onDone: () -> Unit) {
         val s = _state.value
         viewModelScope.launch {
@@ -139,6 +144,7 @@ class GoldEditViewModel @Inject constructor(private val repo: GoldRepository) : 
                     id = s.id ?: UUID.randomUUID().toString(),
                     purchaseDate = s.date,
                     weightMilliGram = com.gustiadhitya.sakuwise.core.common.parseGramsToMilliGrams(s.weight),
+                    kind = s.kind,
                     serial = s.serial.ifBlank { null },
                     buyPrice = s.buyPrice.toLongOrNull() ?: 0L,
                     note = s.note.ifBlank { null },
@@ -158,6 +164,8 @@ data class GoldEditState(
     val serial: String = "",
     val date: LocalDate = LocalDate.now(),
     val note: String = "",
+    val kind: com.gustiadhitya.sakuwise.core.domain.model.GoldKind =
+        com.gustiadhitya.sakuwise.core.domain.model.GoldKind.Physical,
     val loaded: Boolean = false,
 )
 
@@ -178,7 +186,12 @@ fun GoldListScreen(
     var showPriceSheet by remember { mutableStateOf(false) }
     val totalWeightMg = items.filter { it.status == AssetStatus.Held }.sumOf { it.weightMilliGram }
     val totalWeightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(totalWeightMg)
-    val totalValue = totalWeightMg * pricePerGram / 1000L
+    // Kind-aware total: digital and physical use separate per-gram prices
+    // because the local spread on each market is usually different.
+    fun priceFor(g: GoldAsset): Long =
+        if (g.kind == com.gustiadhitya.sakuwise.core.domain.model.GoldKind.Digital) prefs.goldPriceDigital
+        else prefs.goldPriceGlobal
+    val totalValue = items.filter { it.status == AssetStatus.Held }.sumOf { it.valueAt(priceFor(it)) }
     val totalBuy = items.filter { it.status == AssetStatus.Held }.sumOf { it.buyPrice }
     val profit = totalValue - totalBuy
 
@@ -277,9 +290,13 @@ fun GoldListScreen(
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.gold_price_card_title), color = sw.ink,
                     style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                val idFmt = java.text.NumberFormat.getInstance(java.util.Locale("id","ID"))
                 Text(
-                    stringResource(R.string.gold_price_card_sub_format,
-                        java.text.NumberFormat.getInstance(java.util.Locale("id","ID")).format(pricePerGram)),
+                    stringResource(
+                        R.string.gold_price_card_sub_dual_format,
+                        idFmt.format(prefs.goldPriceGlobal),
+                        idFmt.format(prefs.goldPriceDigital),
+                    ),
                     color = sw.inkMuted,
                     style = SwType.LabelSmall.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"),
                 )
@@ -308,7 +325,7 @@ fun GoldListScreen(
             SwCard(padding = PaddingValues(0.dp)) {
                 Column {
                     items.forEachIndexed { i, g ->
-                        val perValue = g.valueAt(pricePerGram)
+                        val perValue = g.valueAt(priceFor(g))
                         val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
                         val growth = if (g.buyPrice > 0L)
                             ((perValue - g.buyPrice).toFloat() / g.buyPrice.toFloat()) * 100f
@@ -379,9 +396,12 @@ fun GoldListScreen(
 
     if (showPriceSheet) {
         GoldPriceInlineSheet(
-            currentPrice = pricePerGram,
-            onSave = { newPrice ->
-                mutator.setGoldPrice(newPrice); showPriceSheet = false
+            physicalPrice = prefs.goldPriceGlobal,
+            digitalPrice = prefs.goldPriceDigital,
+            onSave = { newPhysical, newDigital ->
+                mutator.setGoldPrice(newPhysical)
+                mutator.setGoldPriceDigital(newDigital)
+                showPriceSheet = false
             },
             onDismiss = { showPriceSheet = false },
         )
@@ -390,12 +410,14 @@ fun GoldListScreen(
 
 @Composable
 private fun GoldPriceInlineSheet(
-    currentPrice: Long,
-    onSave: (Long) -> Unit,
+    physicalPrice: Long,
+    digitalPrice: Long,
+    onSave: (Long, Long) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    var raw by remember { mutableStateOf(currentPrice.toString()) }
+    var rawPhysical by remember { mutableStateOf(physicalPrice.toString()) }
+    var rawDigital by remember { mutableStateOf(digitalPrice.toString()) }
     SwPickerSheet(title = stringResource(R.string.gold_price_sheet_title), onDismiss = onDismiss) {
         Text(
             stringResource(R.string.gold_price_sheet_intro),
@@ -403,9 +425,17 @@ private fun GoldPriceInlineSheet(
         )
         Spacer(Modifier.height(12.dp))
         SwField(
-            value = if (raw == "0") "" else raw,
-            onValueChange = { raw = it.filter { c -> c.isDigit() } },
-            label = stringResource(R.string.gold_price_field_label),
+            value = if (rawPhysical == "0") "" else rawPhysical,
+            onValueChange = { rawPhysical = it.filter { c -> c.isDigit() } },
+            label = stringResource(R.string.gold_price_field_label_physical),
+            prefix = "Rp", rupiah = true, suffix = "/ gram",
+            keyboardType = KeyboardType.Number,
+        )
+        Spacer(Modifier.height(10.dp))
+        SwField(
+            value = if (rawDigital == "0") "" else rawDigital,
+            onValueChange = { rawDigital = it.filter { c -> c.isDigit() } },
+            label = stringResource(R.string.gold_price_field_label_digital),
             prefix = "Rp", rupiah = true, suffix = "/ gram",
             keyboardType = KeyboardType.Number,
         )
@@ -426,8 +456,11 @@ private fun GoldPriceInlineSheet(
         Spacer(Modifier.height(16.dp))
         SwButton(
             text = stringResource(R.string.action_save),
-            onClick = { onSave(raw.toLongOrNull() ?: 0L) },
-            enabled = (raw.toLongOrNull() ?: 0L) > 0,
+            onClick = {
+                onSave(rawPhysical.toLongOrNull() ?: 0L, rawDigital.toLongOrNull() ?: 0L)
+            },
+            enabled = (rawPhysical.toLongOrNull() ?: 0L) > 0 &&
+                (rawDigital.toLongOrNull() ?: 0L) > 0,
         )
     }
 }
@@ -471,7 +504,10 @@ fun GoldDetailScreen(
             Text(stringResource(R.string.loading), color = sw.inkMuted, style = SwType.Body)
             return@SimpleSettingsScreen
         }
-        val currentValue = g.valueAt(prefs.goldPriceGlobal)
+        val priceForKind =
+            if (g.kind == com.gustiadhitya.sakuwise.core.domain.model.GoldKind.Digital) prefs.goldPriceDigital
+            else prefs.goldPriceGlobal
+        val currentValue = g.valueAt(priceForKind)
         val profit = currentValue - g.buyPrice
         val weightLabel = com.gustiadhitya.sakuwise.core.common.formatMilliGrams(g.weightMilliGram)
         // Gold detail hero — same proto pattern (watermark bottom-right with
@@ -721,6 +757,42 @@ fun GoldEditScreen(
                 style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold)) }
         },
     ) {
+        // Gold type — Physical (ANTAM/UBS/bar) vs Digital (Pegadaian/Pluang).
+        // Each kind reads its own per-gram price set on the Emas list screen.
+        Text(stringResource(R.string.gold_kind_label), color = sw.inkMuted,
+            style = SwType.Caption.copy(fontSize = 12.sp),
+            modifier = Modifier.padding(bottom = 6.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            com.gustiadhitya.sakuwise.core.domain.model.GoldKind.entries.forEach { k ->
+                val selected = state.kind == k
+                val label = if (k == com.gustiadhitya.sakuwise.core.domain.model.GoldKind.Physical)
+                    stringResource(R.string.gold_kind_physical)
+                else stringResource(R.string.gold_kind_digital)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selected) sw.warningSoft else sw.surface)
+                        .border(
+                            1.5.dp,
+                            if (selected) sw.warning else sw.border,
+                            RoundedCornerShape(12.dp),
+                        )
+                        .clickable { viewModel.setKind(k) }
+                        .padding(horizontal = 12.dp),
+                ) {
+                    Text(label, color = if (selected) sw.warning else sw.ink,
+                        style = SwType.LabelStrong.copy(fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold))
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
         SwField(value = state.weight, onValueChange = viewModel::setWeight,
             label = stringResource(R.string.gold_edit_weight_label), suffix = "gram",
             keyboardType = KeyboardType.Number)

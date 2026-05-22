@@ -93,11 +93,13 @@ internal fun IncomeCategoryEntity.toDomain() = IncomeCategory(id, name, iconName
 internal fun IncomeCategory.toEntity() = IncomeCategoryEntity(id, name, iconName, sortOrder, isDefault)
 
 internal fun AssetGoldEntity.toDomain() = GoldAsset(
-    id, LocalDate.ofEpochDay(purchaseEpochDay), weightMilliGram, serial, buyPrice, note,
+    id, LocalDate.ofEpochDay(purchaseEpochDay), weightMilliGram,
+    com.gustiadhitya.sakuwise.core.domain.model.GoldKind.fromCode(kind),
+    serial, buyPrice, note,
     AssetStatus.fromCode(status), soldEpochDay?.let(LocalDate::ofEpochDay), soldPrice,
 )
 internal fun GoldAsset.toEntity() = AssetGoldEntity(
-    id, purchaseDate.toEpochDay(), weightMilliGram, serial, buyPrice, note, null,
+    id, purchaseDate.toEpochDay(), weightMilliGram, kind.code, serial, buyPrice, note, null,
     status.code(), soldDate?.toEpochDay(), soldPrice,
 )
 

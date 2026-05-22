@@ -12,6 +12,9 @@ data class AssetGoldEntity(
      *  totals across many pieces. Convert to grams with weightMilliGram / 1000.0
      *  only at display time. */
     val weightMilliGram: Long,
+    /** "physical" (default — ANTAM / UBS bar in hand) or "digital" (Pegadaian
+     *  / Pluang / app-held). Each kind reads its own per-gram global price. */
+    val kind: String,
     val serial: String?,
     val buyPrice: Long,
     val note: String?,

@@ -572,6 +572,7 @@
     <string name="gold_profit_format">Profit %1$sRp %2$d</string>
     <string name="gold_price_card_title">Harga Jual Emas Global</string>
     <string name="gold_price_card_sub_format">Rp %1$s / gram · update manual</string>
+    <string name="gold_price_card_sub_dual_format">Fisik Rp %1$s · Digital Rp %2$s / gram</string>
     <string name="gold_empty">Belum ada batch emas. Tap + untuk tambah pembelian pertama.</string>
     <string name="gold_item_title_format">%1$s gram</string>
     <string name="gold_item_title_with_serial_format">%1$s gram · %2$s</string>
@@ -579,6 +580,11 @@
     <string name="gold_price_sheet_title">Harga Emas Global</string>
     <string name="gold_price_sheet_intro">Update manual sesuai harga jual emas hari ini (Antam, Pegadaian, dll). Auto-fetch akan tersedia di V2.</string>
     <string name="gold_price_field_label">Harga per gram</string>
+    <string name="gold_price_field_label_physical">Harga Emas Fisik per gram</string>
+    <string name="gold_price_field_label_digital">Harga Emas Digital per gram</string>
+    <string name="gold_kind_label">Jenis Emas</string>
+    <string name="gold_kind_physical">Fisik</string>
+    <string name="gold_kind_digital">Digital</string>
     <string name="gold_price_tip">Tip: Update bulanan saja sudah cukup. Harga emas tidak fluktuasi liar harian, dan Sakuwise menyimpan harga ini sebagai snapshot — bisa di-recall kapan saja.</string>
     <string name="gold_detail_default_title">Detail Emas</string>
     <string name="gold_field_weight">Berat</string>

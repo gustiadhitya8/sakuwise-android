@@ -140,12 +140,25 @@ enum class AssetStatus { Held, Sold;
     }
 }
 
+enum class GoldKind(val code: String) {
+    Physical("physical"),
+    Digital("digital");
+
+    companion object {
+        fun fromCode(code: String): GoldKind = when (code) {
+            "digital" -> Digital
+            else -> Physical
+        }
+    }
+}
+
 data class GoldAsset(
     val id: String,
     val purchaseDate: LocalDate,
     /** Weight in milligrams (gram × 1000). Use [weightInGrams] for display
      *  and arithmetic that needs grams. */
     val weightMilliGram: Long,
+    val kind: GoldKind,
     val serial: String?,
     val buyPrice: Long,
     val note: String?,

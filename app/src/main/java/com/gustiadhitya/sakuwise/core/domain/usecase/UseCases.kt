@@ -679,7 +679,12 @@ class ComputeNetWorthUseCase @Inject constructor(
         combine(base, prefsRepo.prefs) { tuple, prefs ->
             val accountsTotal = tuple.b // already Room-tracked via observeTotalBalance subqueries
             val goldTotal = tuple.c.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
-                .sumOf { it.valueAt(prefs.goldPriceGlobal) }
+                .sumOf {
+                    val price =
+                        if (it.kind == com.gustiadhitya.sakuwise.core.domain.model.GoldKind.Digital) prefs.goldPriceDigital
+                        else prefs.goldPriceGlobal
+                    it.valueAt(price)
+                }
             val landTotal = tuple.d.filter { it.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held }
                 .sumOf { it.currentValue ?: it.buyPrice }
             val depositTotal = tuple.e.fold(0L) { sum, d ->

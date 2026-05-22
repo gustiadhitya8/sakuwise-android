@@ -31,6 +31,7 @@ class PrefMutatorViewModel @Inject constructor(
     fun setPeriodStart(day: Int) = fire { repo.setPlanPeriodStartDay(day) }
     fun setNickname(name: String) = fire { repo.setNickname(name) }
     fun setGoldPrice(price: Long) = fire { repo.setGoldPriceGlobal(price) }
+    fun setGoldPriceDigital(price: Long) = fire { repo.setGoldPriceDigital(price) }
     fun setAllocations(n: Int, w: Int, i: Int) = fire { repo.setAllocationPercentages(n, w, i) }
     fun replayOnboarding() = fire { repo.setOnboardingIncomplete() }
 }

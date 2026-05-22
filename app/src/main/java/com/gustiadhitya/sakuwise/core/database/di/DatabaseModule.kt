@@ -44,7 +44,7 @@ object DatabaseModule {
             return Room.databaseBuilder(ctx, SakuwiseDatabase::class.java, "sakuwise.db")
                 .openHelperFactory(factory)
                 .addCallback(seedCallback())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 // Keep destructive fallback as a safety net for any other
                 // schema drift not yet covered by a Migration. Real launches
                 // should remove this once we trust the migration chain.
@@ -132,6 +132,20 @@ object DatabaseModule {
             )
             db.execSQL("DROP TABLE asset_gold")
             db.execSQL("ALTER TABLE asset_gold_new RENAME TO asset_gold")
+        }
+    }
+
+    /**
+     * v4 → v5 — adds `kind` ("physical" | "digital") to asset_gold so users
+     * can keep ANTAM bars and Pegadaian / digital holdings in the same list
+     * but with separate per-gram global prices. Existing rows default to
+     * "physical" since the app shipped with one (implicitly physical) price.
+     */
+    private val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "ALTER TABLE asset_gold ADD COLUMN kind TEXT NOT NULL DEFAULT 'physical'",
+            )
         }
     }
 
