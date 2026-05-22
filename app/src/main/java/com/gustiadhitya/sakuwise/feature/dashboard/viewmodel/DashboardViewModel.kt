@@ -56,6 +56,7 @@ data class DashboardUiState(
      *  now() so the dot disappears. */
     val notificationsLastSeenAt: Long = 0L,
     val balancesHidden: Boolean = false,
+    val planItemNames: Map<String, String> = emptyMap(),
     val loading: Boolean = true,
 )
 
@@ -77,37 +78,45 @@ class DashboardViewModel @Inject constructor(
         computePlanPeriod(planStartDay = prefs.planPeriodStartDay)
     }
 
-    private data class PlanData(val allocations: List<AllocationProgress>, val expectedIncome: Long)
+    private data class PlanData(
+        val allocations: List<AllocationProgress>,
+        val expectedIncome: Long,
+        val planItemNames: Map<String, String> = emptyMap(),
+    )
 
-    /** Allocations + expectedIncome from the current plan, bundled so we stay within combine(8). */
+    /** Allocations + expectedIncome + planItemNames bundled so we stay within combine(8). */
     private val planDataFlow = observeCurrentPlan().flatMapLatest { plan ->
         if (plan == null) flowOf(PlanData(emptyList(), 0L)) else {
             planRepo.observeAllocations(plan.id).flatMapLatest { allocs ->
                 if (allocs.isEmpty()) flowOf(PlanData(emptyList(), plan.expectedIncome))
                 else combine(allocs.map { a -> allocationProgressFlow(a) }) { rows ->
-                    PlanData(rows.toList(), plan.expectedIncome)
+                    val allocations = rows.map { it.first }
+                    val names = rows.fold(emptyMap<String, String>()) { acc, (_, m) -> acc + m }
+                    PlanData(allocations, plan.expectedIncome, names)
                 }
             }
         }
     }
 
-    private fun allocationProgressFlow(alloc: Allocation) =
+    private fun allocationProgressFlow(alloc: Allocation): kotlinx.coroutines.flow.Flow<Pair<AllocationProgress, Map<String, String>>> =
         planRepo.observeCategories(alloc.id).flatMapLatest { cats ->
-            if (cats.isEmpty()) flowOf(AllocationProgress(alloc, 0L, 0L))
+            if (cats.isEmpty()) flowOf(Pair(AllocationProgress(alloc, 0L, 0L), emptyMap()))
             else combine(cats.map { cat -> categoryTotalFlow(cat) }) { catTotals ->
-                val plan = catTotals.sumOf { (p, _) -> p }
-                val used = catTotals.sumOf { (_, u) -> u }
-                AllocationProgress(alloc, plan, used)
+                val plan = catTotals.sumOf { it.first }
+                val used = catTotals.sumOf { it.second }
+                val names = catTotals.fold(emptyMap<String, String>()) { acc, t -> acc + t.third }
+                Pair(AllocationProgress(alloc, plan, used), names)
             }
         }
 
-    private fun categoryTotalFlow(cat: com.gustiadhitya.sakuwise.core.domain.model.Category) =
+    private fun categoryTotalFlow(cat: com.gustiadhitya.sakuwise.core.domain.model.Category): kotlinx.coroutines.flow.Flow<Triple<Long, Long, Map<String, String>>> =
         planRepo.observePlanItems(cat.id).flatMapLatest { items ->
-            if (items.isEmpty()) flowOf(Pair(cat.plannedAmount ?: 0L, 0L))
+            if (items.isEmpty()) flowOf(Triple(cat.plannedAmount ?: 0L, 0L, emptyMap()))
             else combine(items.map { pi -> planRepo.observePlanItemUsed(pi.id).map { pi to it } }) { arr ->
                 val planSum = cat.plannedAmount ?: arr.sumOf { (pi, _) -> pi.plannedAmount }
                 val usedSum = arr.sumOf { (_, u) -> u }
-                Pair(planSum, usedSum)
+                val names = arr.associate { (pi, _) -> pi.id to pi.name }
+                Triple(planSum, usedSum, names)
             }
         }
 
@@ -147,6 +156,7 @@ class DashboardViewModel @Inject constructor(
             accounts = accounts,
             accountsTotal = accountsTotal,
             allocations = planData.allocations,
+            planItemNames = planData.planItemNames,
             topCategories = tops.map { TopCategorySpend(name = it.name, amount = it.total) },
             backupOverdueDays = computeOverdueDays(prefs.lastBackupTimestamp),
             notificationsLastSeenAt = prefs.notificationsLastSeenAt,

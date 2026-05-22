@@ -26,12 +26,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowCircleDown
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
@@ -206,6 +209,7 @@ private fun DashboardContent(
         DashboardRecentTxns(
             txns = state.recentTransactions,
             accountNameLookup = { id -> state.accounts.firstOrNull { it.id == id }?.name },
+            planItemNameLookup = { id -> id?.let { state.planItemNames[it] } },
             onEditTxn = onEditTxn,
             onOpenHistory = onOpenHistory,
         )
@@ -799,6 +803,7 @@ private fun DashboardAccountsStrip(
 private fun DashboardRecentTxns(
     txns: List<Transaction>,
     accountNameLookup: (String) -> String?,
+    planItemNameLookup: (String?) -> String? = { null },
     onEditTxn: (Transaction) -> Unit = {},
     onOpenHistory: () -> Unit = {},
 ) {
@@ -865,26 +870,41 @@ private fun DashboardRecentTxns(
                             TxnType.Expense, TxnType.DebtOutflow -> RupiahSign.Negative
                             else -> RupiahSign.None
                         }
+                        val planItemName = if (t.type == TxnType.Expense || t.type == TxnType.DebtOutflow)
+                            planItemNameLookup(t.planItemId) else null
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                // Only Expense / Income / Transfer have edit forms.
-                                // Reconciliation + Debt rows stay non-clickable —
-                                // editing them via the same form would skip the
-                                // reconciliation snapshot / debt-balance side
-                                // effects that produced them.
                                 .let { m ->
                                     if (t.type == TxnType.Expense || t.type == TxnType.Income || t.type == TxnType.Transfer)
                                         m.clickable { onEditTxn(t) } else m
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                         ) {
-                            SwCategoryDot(
-                                name = t.note ?: t.type.code(),
-                                sizeDp = 38,
-                                color = if (tone == sw.ink) null else tone,
-                            )
+                            val iconBg = when (t.type) {
+                                TxnType.Income -> sw.success
+                                TxnType.Transfer -> sw.info
+                                else -> sw.danger
+                            }
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(iconBg.copy(alpha = 0.12f)),
+                            ) {
+                                Icon(
+                                    when (t.type) {
+                                        TxnType.Income -> Icons.Outlined.ArrowCircleUp
+                                        TxnType.Transfer -> Icons.Outlined.SyncAlt
+                                        else -> Icons.Outlined.ArrowCircleDown
+                                    },
+                                    null,
+                                    tint = iconBg,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
                             Spacer(Modifier.width(12.dp))
                             val fallbackLabel = stringResource(when (t.type) {
                                 TxnType.Income -> R.string.txntype_income
@@ -894,19 +914,39 @@ private fun DashboardRecentTxns(
                                 TxnType.DebtOutflow -> R.string.txntype_debt_outflow
                                 TxnType.Reconciliation -> R.string.txntype_reconciliation
                             })
+                            val displayTitle = t.note ?: planItemName ?: fallbackLabel
                             Column(Modifier.weight(1f)) {
-                                Text(t.note ?: fallbackLabel,
+                                Text(
+                                    displayTitle,
                                     color = sw.ink,
                                     style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Row(verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Text(t.date.toRelativeOrAbsolute(), color = sw.inkSubtle,
-                                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                ) {
+                                    // When note occupies the title, show planItemName at start of subtitle
+                                    if (t.note != null && planItemName != null) {
+                                        Text(
+                                            planItemName,
+                                            color = sw.primary,
+                                            style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                        )
+                                        Box(Modifier.size(2.dp).clip(CircleShape).background(sw.inkSubtle))
+                                    }
+                                    Text(
+                                        t.date.toRelativeOrAbsolute(), color = sw.inkSubtle,
+                                        style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                                    )
                                     Box(Modifier.size(2.dp).clip(CircleShape).background(sw.inkSubtle))
-                                    Text(accountNameLookup(t.sourceAccountId) ?: "—",
+                                    Text(
+                                        accountNameLookup(t.sourceAccountId) ?: "—",
                                         color = sw.inkSubtle,
-                                        style = SwType.LabelSmall.copy(fontSize = 11.sp))
+                                        style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                    )
                                 }
                             }
                             RupiahText(
