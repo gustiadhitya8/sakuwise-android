@@ -23,19 +23,27 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowCircleDown
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.SyncAlt
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +60,6 @@ import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toRelativeOrAbsolute
 import com.gustiadhitya.sakuwise.core.designsystem.components.AssetSort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
-import com.gustiadhitya.sakuwise.core.designsystem.components.SwCategoryDot
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwSectionLabel
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwSortMenu
 import com.gustiadhitya.sakuwise.core.designsystem.components.assetSortOptions
@@ -84,6 +92,7 @@ fun TransactionHistoryScreen(
 
     var sortMode by remember { mutableStateOf(AssetSort.DATE_DESC) }
     var query by remember { mutableStateOf("") }
+    var showMonthPicker by remember { mutableStateOf(false) }
     val sorted = remember(transactions, sortMode, query) {
         transactions
             .filter { t ->
@@ -138,13 +147,24 @@ fun TransactionHistoryScreen(
             IconButton(onClick = { viewModel.prevMonth() }) {
                 Icon(Icons.Outlined.ChevronLeft, contentDescription = "Bulan sebelumnya", tint = sw.ink)
             }
-            Text(
-                month.format(monthFmt).replaceFirstChar { it.uppercase() },
-                style = SwType.LabelStrong.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
-                color = sw.ink,
-                modifier = Modifier.weight(1f),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { showMonthPicker = true }
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+            ) {
+                Text(
+                    month.format(monthFmt).replaceFirstChar { it.uppercase() },
+                    style = SwType.LabelStrong.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+                    color = sw.ink,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.width(4.dp))
+                Icon(Icons.Outlined.ExpandMore, null, tint = sw.inkMuted, modifier = Modifier.size(16.dp))
+            }
             val canGoNext = month < nowMonth
             IconButton(
                 onClick = { viewModel.nextMonth() },
@@ -156,6 +176,14 @@ fun TransactionHistoryScreen(
                     tint = if (canGoNext) sw.ink else sw.inkMuted,
                 )
             }
+        }
+
+        if (showMonthPicker) {
+            MonthPickerDialog(
+                current = month,
+                onPick = { viewModel.setMonth(it) },
+                onDismiss = { showMonthPicker = false },
+            )
         }
 
         Column(
@@ -294,11 +322,29 @@ fun TransactionHistoryScreen(
                                         .let { m -> if (isEditable) m.clickable { onEditTxn(t) } else m }
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                 ) {
-                                    SwCategoryDot(
-                                        name = t.note ?: t.type.code(),
-                                        sizeDp = 38,
-                                        color = if (tone == sw.ink) null else tone,
-                                    )
+                                    val iconBg = when (t.type) {
+                                        TxnType.Income -> sw.success
+                                        TxnType.Transfer -> sw.info
+                                        else -> sw.danger
+                                    }
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(iconBg.copy(alpha = 0.12f)),
+                                    ) {
+                                        Icon(
+                                            when (t.type) {
+                                                TxnType.Income -> Icons.Outlined.ArrowCircleUp
+                                                TxnType.Transfer -> Icons.Outlined.SyncAlt
+                                                else -> Icons.Outlined.ArrowCircleDown
+                                            },
+                                            null,
+                                            tint = iconBg,
+                                            modifier = Modifier.size(20.dp),
+                                        )
+                                    }
                                     Spacer(Modifier.width(12.dp))
                                     val fallbackLabel = when (t.type) {
                                         TxnType.Income -> "Pemasukan"
@@ -418,4 +464,84 @@ private fun FilterChip(
             color = textColor,
         )
     }
+}
+
+@Composable
+private fun MonthPickerDialog(
+    current: YearMonth,
+    onPick: (YearMonth) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    var year by remember { mutableIntStateOf(current.year) }
+    val nowMonth = YearMonth.now()
+    val monthNames = listOf("Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Pilih Bulan", style = SwType.H3, color = sw.ink)
+        },
+        text = {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    IconButton(onClick = { year-- }) {
+                        Icon(Icons.Outlined.ChevronLeft, null, tint = sw.ink)
+                    }
+                    Text(
+                        year.toString(),
+                        style = SwType.LabelStrong.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                        color = sw.ink,
+                    )
+                    val canNextYear = year < nowMonth.year
+                    IconButton(onClick = { if (canNextYear) year++ }, enabled = canNextYear) {
+                        Icon(Icons.Outlined.ChevronRight, null, tint = if (canNextYear) sw.ink else sw.inkSubtle)
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                for (row in 0..2) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        for (col in 0..3) {
+                            val monthNum = row * 4 + col + 1
+                            val ym = YearMonth.of(year, monthNum)
+                            val enabled = ym <= nowMonth
+                            val selected = ym == current
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(3.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (selected) sw.primary else Color.Transparent)
+                                    .then(if (enabled) Modifier.clickable { onPick(ym); onDismiss() } else Modifier)
+                                    .padding(vertical = 10.dp),
+                            ) {
+                                Text(
+                                    monthNames[monthNum - 1],
+                                    color = when {
+                                        selected -> sw.onPrimary
+                                        enabled -> sw.ink
+                                        else -> sw.inkSubtle
+                                    },
+                                    style = SwType.LabelStrong.copy(fontSize = 12.sp),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Tutup", color = sw.inkMuted)
+            }
+        },
+        containerColor = sw.surface,
+    )
 }

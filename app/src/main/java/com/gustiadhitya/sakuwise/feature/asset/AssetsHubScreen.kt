@@ -205,28 +205,17 @@ fun AssetsHubScreen(
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        // Track is brighter (0.22) so Akun's primary slice has
-                        // enough contrast against the same-coloured hero bg.
                         .background(Color.White.copy(alpha = 0.22f)),
                 ) {
-                    // Akun gets a soft lavender — distinct from warning/info/
-                    // accent (the other three asset slices) AND pops cleanly
-                    // against the deep-green hero in BOTH light and dark mode.
-                    // Was using onPrimaryHero (cream/light-mint) which was
-                    // too close to "no color at all" against the bright track.
+                    // Each segment uses weight() so fractions are relative to
+                    // the full row width, giving a true 100% stacked bar.
                     val akunColor = AccountsAccent
-                    if (nw.accountsTotal > 0) Box(Modifier.fillMaxHeight()
-                        .fillMaxWidth(nw.accountsTotal.toFloat() / totalPos)
-                        .background(akunColor))
-                    if (nw.goldTotal > 0) Box(Modifier.fillMaxHeight()
-                        .fillMaxWidth(nw.goldTotal.toFloat() / totalPos)
-                        .background(sw.warning))
-                    if (nw.landTotal > 0) Box(Modifier.fillMaxHeight()
-                        .fillMaxWidth(nw.landTotal.toFloat() / totalPos)
-                        .background(sw.info))
-                    if (nw.depositTotal > 0) Box(Modifier.fillMaxHeight()
-                        .fillMaxWidth(nw.depositTotal.toFloat() / totalPos)
-                        .background(sw.accent))
+                    if (nw.accountsTotal > 0) Box(Modifier.weight(nw.accountsTotal.toFloat()).fillMaxHeight().background(akunColor))
+                    if (nw.goldTotal > 0) Box(Modifier.weight(nw.goldTotal.toFloat()).fillMaxHeight().background(sw.warning))
+                    if (nw.landTotal > 0) Box(Modifier.weight(nw.landTotal.toFloat()).fillMaxHeight().background(sw.info))
+                    if (nw.depositTotal > 0) Box(Modifier.weight(nw.depositTotal.toFloat()).fillMaxHeight().background(sw.accent))
+                    // Remaining track when all totals are 0
+                    if (totalPos == 1L) Box(Modifier.weight(1f).fillMaxHeight())
                 }
                 Spacer(Modifier.height(6.dp))
                 // Legend — proto uses flex-wrap so 4 items reflow onto a
@@ -251,6 +240,8 @@ fun AssetsHubScreen(
         Spacer(Modifier.height(14.dp))
 
         SwSectionLabel(stringResource(R.string.assets_class_section), modifier = Modifier.padding(horizontal = SwSpace.pageH))
+        val totalAssets = (nw.accountsTotal + nw.goldTotal + nw.landTotal + nw.depositTotal)
+            .coerceAtLeast(1L)
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = SwSpace.pageH),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -258,7 +249,9 @@ fun AssetsHubScreen(
             AssetClassCard(stringResource(R.string.assets_class_accounts),
                 stringResource(R.string.assets_class_active_format, state.accounts.size),
                 state.accountsTotal, sw.primary, R.drawable.ic_asset_wallet,
-                Modifier.weight(1f), onClick = onNavigateToAccounts)
+                Modifier.weight(1f),
+                contributionPct = nw.accountsTotal.toFloat() / totalAssets * 100f,
+                onClick = onNavigateToAccounts)
             val goldBuy = state.gold.sumOf { it.buyPrice }
             val goldGrowth = if (goldBuy > 0L)
                 ((nw.goldTotal - goldBuy).toFloat() / goldBuy.toFloat()) * 100f
@@ -268,6 +261,7 @@ fun AssetsHubScreen(
                 nw.goldTotal, sw.warning, R.drawable.ic_asset_gold,
                 Modifier.weight(1f),
                 growthPct = goldGrowth,
+                contributionPct = nw.goldTotal.toFloat() / totalAssets * 100f,
                 onClick = onNavigateToGold)
         }
         Spacer(Modifier.height(10.dp))
@@ -284,14 +278,14 @@ fun AssetsHubScreen(
                 nw.landTotal, sw.info, R.drawable.ic_asset_land,
                 Modifier.weight(1f),
                 growthPct = landGrowth,
+                contributionPct = nw.landTotal.toFloat() / totalAssets * 100f,
                 onClick = onNavigateToLand)
             AssetClassCard(stringResource(R.string.assets_class_deposit),
                 stringResource(R.string.assets_class_count_format, state.deposits.size),
                 nw.depositTotal, sw.accent, R.drawable.ic_asset_deposit,
                 Modifier.weight(1f),
-                // Deposit growth needs first vs last snapshot per asset, not
-                // exposed in HubState today. Hide chip until VM supplies it.
                 growthPct = null,
+                contributionPct = nw.depositTotal.toFloat() / totalAssets * 100f,
                 onClick = onNavigateToDeposit)
         }
         Spacer(Modifier.height(16.dp))
@@ -480,14 +474,10 @@ private fun AssetClassCard(
     @androidx.annotation.DrawableRes iconRes: Int,
     modifier: Modifier = Modifier,
     growthPct: Float? = null,
+    contributionPct: Float? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val sw = SwTheme.colors
-    // Proto AssetCard (screens-assets.jsx:138): 14dp padding, 36dp icon, 10dp
-    // gap, no decorative watermark. Earlier Android impl added a 96dp tinted
-    // background icon that roughly doubled card height — drop it to match.
-    // Icons use VectorDrawables ported from proto/icons.jsx so the wallet
-    // clasp dot, gold facets, land peaks, and deposit "$"-coin all match 1:1.
     SwCard(modifier = modifier, padding = PaddingValues(14.dp), onClick = onClick) {
         Column {
             Box(
@@ -520,6 +510,30 @@ private fun AssetClassCard(
                             fontFeatureSettings = "tnum"),
                     )
                 }
+            }
+            if (contributionPct != null) {
+                Spacer(Modifier.height(8.dp))
+                val fraction = (contributionPct / 100f).coerceIn(0f, 1f)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(tint.copy(alpha = 0.15f)),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction)
+                            .fillMaxHeight()
+                            .background(tint),
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "%.1f%% dari total".format(contributionPct),
+                    color = tint,
+                    style = SwType.LabelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold),
+                )
             }
         }
     }

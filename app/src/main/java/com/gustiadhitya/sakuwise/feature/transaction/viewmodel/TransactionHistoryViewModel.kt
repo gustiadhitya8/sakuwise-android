@@ -56,5 +56,6 @@ class TransactionHistoryViewModel @Inject constructor(
         val now = YearMonth.now()
         if (_month.value < now) _month.value = _month.value.plusMonths(1)
     }
+    fun setMonth(month: YearMonth) { _month.value = month.coerceAtMost(YearMonth.now()) }
     fun setTypeFilter(type: TxnType?) { _typeFilter.value = type }
 }
