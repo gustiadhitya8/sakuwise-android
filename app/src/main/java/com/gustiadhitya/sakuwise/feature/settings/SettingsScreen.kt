@@ -28,6 +28,8 @@ import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Lock
@@ -71,6 +73,8 @@ fun SettingsScreen(
     onNavigateToDonate: () -> Unit = {},
     onNavigateToReset: () -> Unit = {},
     onNavigateToExport: () -> Unit = {},
+    onNavigateToExportCsv: () -> Unit = {},
+    onNavigateToImportCsv: () -> Unit = {},
     onNavigateToTheme: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
     mainVm: MainViewModel = hiltViewModel(),
@@ -180,6 +184,14 @@ fun SettingsScreen(
                 stringResource(R.string.settings_export_pdf_sub),
                 icon = Icons.Outlined.Description,
                 onClick = onNavigateToExport)
+            SettingsRow("Export CSV / XLSX",
+                "Export transaksi ke spreadsheet",
+                icon = Icons.Outlined.FileDownload,
+                onClick = onNavigateToExportCsv)
+            SettingsRow("Import CSV",
+                "Impor transaksi dari file CSV",
+                icon = Icons.Outlined.FileUpload,
+                onClick = onNavigateToImportCsv)
             SettingsRow(stringResource(R.string.settings_export_reset),
                 stringResource(R.string.settings_export_reset_sub),
                 icon = Icons.Outlined.Delete,

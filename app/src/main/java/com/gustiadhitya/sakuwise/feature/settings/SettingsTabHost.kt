@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.gustiadhitya.sakuwise.feature.settings.importexport.ExportTransactionScreen
+import com.gustiadhitya.sakuwise.feature.settings.importexport.ImportTransactionScreen
 import com.gustiadhitya.sakuwise.feature.settings.sub.AboutScreen
 import com.gustiadhitya.sakuwise.feature.settings.sub.AllocationEditorScreen
 import com.gustiadhitya.sakuwise.feature.settings.sub.AutoLockSettingsScreen
@@ -35,6 +37,8 @@ sealed interface SettingsRoute {
     data object Donate : SettingsRoute
     data object Reset : SettingsRoute
     data object ExportPdf : SettingsRoute
+    data object ExportCsv : SettingsRoute
+    data object ImportCsv : SettingsRoute
     data object Theme : SettingsRoute
     data object PrivacyPolicy : SettingsRoute
     data object Licenses : SettingsRoute
@@ -75,6 +79,8 @@ fun SettingsTabHost(
             onNavigateToDonate = { route = SettingsRoute.Donate },
             onNavigateToReset = { route = SettingsRoute.Reset },
             onNavigateToExport = { route = SettingsRoute.ExportPdf },
+            onNavigateToExportCsv = { route = SettingsRoute.ExportCsv },
+            onNavigateToImportCsv = { route = SettingsRoute.ImportCsv },
             onNavigateToTheme = { route = SettingsRoute.Theme },
             onReplayOnboarding = { prefMutator.replayOnboarding() },
         )
@@ -110,6 +116,8 @@ fun SettingsTabHost(
         )
         SettingsRoute.ExportPdf ->
             com.gustiadhitya.sakuwise.feature.settings.export.ExportPdfScreen(onBack = pop)
+        SettingsRoute.ExportCsv -> ExportTransactionScreen(onBack = pop)
+        SettingsRoute.ImportCsv -> ImportTransactionScreen(onBack = pop)
         SettingsRoute.Theme ->
             com.gustiadhitya.sakuwise.feature.settings.sub.ThemeSettingsScreen(onBack = pop)
     }
