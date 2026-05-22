@@ -38,7 +38,7 @@ class ExportTransactionsUseCase @Inject constructor(
             val accounts = accountRepo.observeAll().first()
             val nameById = accounts.associate { it.id to it.name }
 
-            val headers = listOf("Date", "Month", "Type", "Category", "Amount", "Catatan", "Account")
+            val headers = listOf("Date", "Month", "Type", "Category", "Amount", "Note", "Account")
             val rows    = txns.map { buildRow(it, nameById) }
 
             val exportsDir = File(context.cacheDir, "exports").apply { mkdirs() }

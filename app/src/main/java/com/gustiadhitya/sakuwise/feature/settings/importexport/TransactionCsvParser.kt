@@ -39,7 +39,7 @@ object TransactionCsvParser {
         val typeIdx    = headerRow.indexOfFirst { it == "type" }
         val categoryIdx= headerRow.indexOfFirst { it == "category" }
         val amountIdx  = headerRow.indexOfFirst { it == "amount" }
-        val catatanIdx = headerRow.indexOfFirst { it == "catatan" }
+        val catatanIdx = headerRow.indexOfFirst { it == "note" || it == "catatan" }
 
         if (dateIdx < 0 || typeIdx < 0 || amountIdx < 0) {
             return ParseResult(

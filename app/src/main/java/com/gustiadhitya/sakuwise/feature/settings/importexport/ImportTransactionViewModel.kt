@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,7 +31,7 @@ sealed interface ImportUiState {
         val errors: List<String>,
     ) : ImportUiState
     data class Importing(val done: Int, val total: Int) : ImportUiState
-    data class Done(val imported: Int, val skipped: Int) : ImportUiState
+    data class Done(val imported: Int, val skipped: Int, val duplicates: Int = 0) : ImportUiState
     data class Err(val message: String) : ImportUiState
 }
 
@@ -77,32 +78,49 @@ class ImportTransactionViewModel @Inject constructor(
     }
 
     fun importRows(rows: List<ImportRow>, accountId: String) {
-        val skipped = (_state.value as? ImportUiState.Preview)?.skipped ?: 0
+        val parseSkipped = (_state.value as? ImportUiState.Preview)?.skipped ?: 0
         _state.value = ImportUiState.Importing(0, rows.size)
         viewModelScope.launch {
+            var dupeSkipped = 0
+            var imported = 0
             withContext(Dispatchers.IO) {
+                // Load existing transactions for the date range to dedup in-memory.
+                // Key: (date, amount, type, note) — same combination = duplicate.
+                val minDate = rows.minOf { it.date }
+                val maxDate = rows.maxOf { it.date }
+                val existing = transactionRepo.observeBetween(minDate, maxDate)
+                    .first()
+                    .map { Triple(it.date, it.amount, it.type to it.note) }
+                    .toHashSet()
+
                 rows.forEachIndexed { i, row ->
-                    transactionRepo.upsert(
-                        Transaction(
-                            id               = UUID.randomUUID().toString(),
-                            date             = row.date,
-                            amount           = row.amount,
-                            type             = row.type,
-                            sourceAccountId  = accountId,
-                            destAccountId    = null,
-                            transferFee      = null,
-                            planItemId       = null,
-                            debtId           = null,
-                            photoBlob        = null,
-                            incomeCategoryId = null,
-                            note             = row.note,
-                            createdAt        = System.currentTimeMillis(),
-                        ),
-                    )
+                    val key = Triple(row.date, row.amount, row.type to row.note)
+                    if (key in existing) {
+                        dupeSkipped++
+                    } else {
+                        transactionRepo.upsert(
+                            Transaction(
+                                id               = UUID.randomUUID().toString(),
+                                date             = row.date,
+                                amount           = row.amount,
+                                type             = row.type,
+                                sourceAccountId  = accountId,
+                                destAccountId    = null,
+                                transferFee      = null,
+                                planItemId       = null,
+                                debtId           = null,
+                                photoBlob        = null,
+                                incomeCategoryId = null,
+                                note             = row.note,
+                                createdAt        = System.currentTimeMillis(),
+                            ),
+                        )
+                        imported++
+                    }
                     _state.value = ImportUiState.Importing(i + 1, rows.size)
                 }
             }
-            _state.value = ImportUiState.Done(rows.size, skipped)
+            _state.value = ImportUiState.Done(imported, parseSkipped + dupeSkipped, dupeSkipped)
         }
     }
 

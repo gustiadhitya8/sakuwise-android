@@ -65,7 +65,7 @@ fun ImportTransactionScreen(
     SimpleSettingsScreen(title = "Import Transaksi", onBack = onBack) {
 
         Text(
-            "Import transaksi dari file CSV. Format kolom: Date, Type, Category, Amount, Catatan.",
+            "Import transaksi dari file CSV. Format kolom: Date, Type, Category, Amount, Note.",
             color = sw.inkMuted,
             style = SwType.LabelSmall.copy(fontSize = 13.sp),
         )
@@ -87,9 +87,9 @@ fun ImportTransactionScreen(
                         Spacer(Modifier.height(4.dp))
                         FormatHintRow("Date", "YYYYMMDD")
                         FormatHintRow("Type", "Income / Expense / Transfer")
-                        FormatHintRow("Category", "Opsional — nama kategori")
-                        FormatHintRow("Amount", "Angka saja, tanpa Rp atau titik")
-                        FormatHintRow("Catatan", "Opsional — deskripsi tambahan")
+                        FormatHintRow("Category", "Optional — category name")
+                        FormatHintRow("Amount", "Number only, no Rp or dots")
+                        FormatHintRow("Note", "Optional — description")
                     }
                 }
             }
@@ -250,8 +250,11 @@ fun ImportTransactionScreen(
                         Spacer(Modifier.height(8.dp))
                         Text("${s.imported} transaksi berhasil diimpor.", color = sw.ink,
                             style = SwType.Body.copy(fontSize = 13.sp))
-                        if (s.skipped > 0)
-                            Text("${s.skipped} baris dilewati.", color = sw.inkMuted,
+                        if (s.duplicates > 0)
+                            Text("${s.duplicates} duplikat dilewati (sudah ada).", color = sw.inkMuted,
+                                style = SwType.LabelSmall.copy(fontSize = 12.sp))
+                        if (s.skipped - s.duplicates > 0)
+                            Text("${s.skipped - s.duplicates} baris dilewati (data tidak valid).", color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
                     }
                 }
