@@ -2,6 +2,7 @@ package com.gustiadhitya.sakuwise.feature.asset.deposit
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -226,7 +227,7 @@ fun DepositListScreen(
         // the watermark layer from inflating the card past the content.
         Box(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
-                .background(sw.accent).padding(18.dp),
+                .background(if (isSystemInDarkTheme()) sw.accentSoft else sw.accent).padding(18.dp),
         ) {
             Box(modifier = Modifier.matchParentSize()) {
                 // Bottom-right watermark, fully inside the card (no overflow,

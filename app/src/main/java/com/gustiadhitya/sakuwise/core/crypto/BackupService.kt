@@ -94,7 +94,14 @@ class BackupService @Inject constructor(
                 // Also clear WAL/SHM sidecar files — stale checkpoint state breaks SQLCipher.
                 File(dbFile.parentFile, "sakuwise.db-wal").takeIf { it.exists() }?.delete()
                 File(dbFile.parentFile, "sakuwise.db-shm").takeIf { it.exists() }?.delete()
-                tmp.renameTo(dbFile)
+                // renameTo() can return false silently on some Android filesystem
+                // configurations (e.g. cross-mount-point moves). Fall back to
+                // copyTo+delete so the caller always receives a real exception
+                // instead of silently opening a brand-new empty database.
+                if (!tmp.renameTo(dbFile)) {
+                    tmp.copyTo(dbFile, overwrite = true)
+                    tmp.delete()
+                }
             } finally {
                 dek.fill(0)
             }

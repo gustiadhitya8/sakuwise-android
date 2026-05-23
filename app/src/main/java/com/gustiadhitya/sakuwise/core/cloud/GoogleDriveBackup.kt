@@ -1,6 +1,5 @@
 package com.gustiadhitya.sakuwise.core.cloud
 
-import android.accounts.Account
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -170,12 +169,17 @@ class GoogleDriveBackup @Inject constructor(
     private fun driveService(): Drive? {
         val account = GoogleSignIn.getLastSignedInAccount(appContext) ?: return null
         if (!GoogleSignIn.hasPermissions(account, Scope(DriveScopes.DRIVE_APPDATA))) return null
-        val email = account.email ?: return null
+        // account.account is the platform Account object already registered with
+        // AccountManager by Google Play Services. Constructing Account(email,
+        // "com.google") manually fails with CommonStatusCodes.INTERNAL_ERROR (8)
+        // when GMS can't find a matching entry in AccountManager — which is the
+        // root cause of the user-visible "Upload gagal: 8" error.
+        val platformAccount = account.account ?: return null
         val credential = GoogleAccountCredential.usingOAuth2(
             appContext,
             listOf(DriveScopes.DRIVE_APPDATA),
         ).apply {
-            selectedAccount = Account(email, "com.google")
+            selectedAccount = platformAccount
         }
         // AndroidHttp.newCompatibleTransport() was removed in google-http-client
         // 1.41+. NetHttpTransport is the documented Android-compatible
