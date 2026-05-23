@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sakuwise · Pelacak Uang Lokal untuk Android</title>
+  <meta name="description" content="Sakuwise — aplikasi anggaran pribadi local-first untuk Android. Encrypted at rest, tanpa server, tanpa pelacakan.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F1E8;
+      --surface: #FAF7F0;
+      --primary: #0F4C3A;
+      --on-primary: #F5F1E8;
+      --accent: #7BC4A4;
+      --ink: #1A2520;
+      --ink-muted: #5C6963;
+      --border: #E8E0CC;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .hero {
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: 64px 20px;
+      text-align: center;
+    }
+    .mark {
+      width: 96px;
+      height: 96px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+    .mark svg { display: block; width: 100%; height: 100%; }
+    .wordmark {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin: 0 0 8px;
+    }
+    .wordmark .green { color: var(--accent); }
+    .tagline {
+      font-size: 1.15rem;
+      opacity: 0.85;
+      margin: 0 0 32px;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-top: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    .card p { margin: 0; color: var(--ink-muted); font-size: 0.95rem; }
+    .links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 32px 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--on-primary);
+      color: var(--primary);
+    }
+    .btn-primary:hover { background: var(--accent); color: var(--ink); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--on-primary);
+      border: 1px solid var(--on-primary);
+    }
+    .btn-secondary:hover { background: rgba(245, 241, 232, 0.1); }
+    footer {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+    }
+    footer a { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="mark" aria-label="Logo Sakuwise">
+    <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sakuwise">
+      <!-- Cream squircle (inverse of app icon for contrast on dark hero) -->
+      <path fill="#F5F1E8" d="M 96,16 C 152,16 176,40 176,96 C 176,152 152,176 96,176 C 40,176 16,152 16,96 C 16,40 40,16 96,16 Z"/>
+      <!-- Leaf body in forest green -->
+      <path fill="#0F4C3A" d="M 96,52 C 138,72 138,142 96,162 C 54,142 54,72 96,52 Z"/>
+      <!-- Mid vein cream -->
+      <path stroke="#F5F1E8" stroke-width="6" stroke-linecap="round" fill="none" d="M 96,60 L 96,156"/>
+      <!-- Side veins cream at 55% opacity -->
+      <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,88 Q 110,92 117,100"/>
+      <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,116 Q 110,120 117,128"/>
+      <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,88 Q 82,92 75,100"/>
+      <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,116 Q 82,120 75,128"/>
+    </svg>
+  </div>
+  <h1 class="wordmark">Saku<span class="green">wise</span></h1>
+  <p class="tagline">Rencanakan. Catat. Tenang.</p>
+  <div class="links">
+    <a class="btn btn-primary" href="privacy/">Kebijakan Privasi</a>
+    <a class="btn btn-secondary" href="privacy/#en">Privacy Policy (English)</a>
+  </div>
+</header>
+
+<main>
+  <h2>Tentang Sakuwise</h2>
+  <p>Sakuwise adalah aplikasi anggaran pribadi untuk Android yang dirancang dengan prinsip <strong>local-first</strong>. Semua data keuangan Anda — transaksi, akun, plan, foto struk, info aset — tinggal di perangkat Anda. Tanpa server. Tanpa analytics. Tanpa pelacakan.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>🔒 Encrypted at Rest</h3>
+      <p>Database terenkripsi dengan AES-256 via SQLCipher. Kunci tersimpan di Android Keystore.</p>
+    </div>
+    <div class="card">
+      <h3>💾 Backup yang Anda Kontrol</h3>
+      <p>Simpan backup ke lokasi pilihan Anda atau opt-in ke Google Drive private folder.</p>
+    </div>
+    <div class="card">
+      <h3>📷 OCR Struk On-Device</h3>
+      <p>ML Kit Text Recognition memproses struk Anda di perangkat — tanpa upload ke server.</p>
+    </div>
+    <div class="card">
+      <h3>🌱 Pixel-Perfect Design</h3>
+      <p>Forest green warm Indonesia-first. Dibuat untuk pengguna Indonesia kelas menengah.</p>
+    </div>
+  </div>
+
+  <h2>Kontak</h2>
+  <p>Pertanyaan atau feedback: <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a></p>
+</main>
+
+<footer>
+  <p>© 2026 Gusti Adhitya · <a href="https://github.com/gustiadhitya/sakuwise-web">Source on GitHub</a></p>
+</footer>
+
+</body>
+</html>

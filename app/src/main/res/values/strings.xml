@@ -771,7 +771,7 @@
     <string name="donate_section_platform">PILIH PLATFORM</string>
     <string name="donate_footnote">Sakuwise tidak memproses pembayaran di dalam aplikasi. Semua donasi mengalir lewat platform eksternal.</string>
     <string name="donate_platform_saweria">Saweria</string>
-    <string name="donate_platform_saweria_url">saweria.co/gustiadhitya</string>
+    <string name="donate_platform_saweria_url">https://saweria.co/gustiadhitya</string>
 
     <!-- Backup settings -->
     <string name="backup_title">Backup &amp; Pemulihan</string>
