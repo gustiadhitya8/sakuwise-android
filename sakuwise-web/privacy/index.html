@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kebijakan Privasi · Sakuwise</title>
+  <meta name="description" content="Kebijakan privasi Sakuwise — aplikasi anggaran pribadi local-first untuk Android. Tidak ada server, tidak ada analytics, tidak ada pelacakan.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F1E8;
+      --surface: #FAF7F0;
+      --primary: #0F4C3A;
+      --on-primary: #F5F1E8;
+      --accent: #7BC4A4;
+      --ink: #1A2520;
+      --ink-muted: #5C6963;
+      --ink-subtle: #8B948F;
+      --border: #E8E0CC;
+      --success: #2D7A4F;
+      --success-soft: #DCE8DE;
+      --warning: #C68A2E;
+      --warning-soft: #F5E8CC;
+      --danger: #B23A2E;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .header {
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: 24px 20px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(15, 76, 58, 0.15);
+    }
+    .header-content {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.025em;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: block;
+      flex-shrink: 0;
+    }
+    .brand-mark svg { display: block; width: 100%; height: 100%; }
+    .brand-text { color: var(--on-primary); font-weight: 700; letter-spacing: -0.025em; }
+    .brand-text .suffix { color: var(--accent); font-weight: 700; }
+    .lang-toggle {
+      display: inline-flex;
+      background: rgba(245, 241, 232, 0.15);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 2px;
+    }
+    .lang-btn {
+      background: transparent;
+      color: var(--on-primary);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background: var(--on-primary);
+      color: var(--primary);
+    }
+    .lang-btn:not(.active):hover { background: rgba(245, 241, 232, 0.1); }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+    .meta-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+    }
+    .meta-card strong { color: var(--ink); font-weight: 600; }
+    .tldr {
+      background: var(--success-soft);
+      border-left: 4px solid var(--success);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+    }
+    .tldr h2 {
+      margin-top: 0;
+      color: var(--success);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .tldr p { margin: 12px 0; }
+    .tldr p:last-child { margin-bottom: 0; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin: 40px 0 16px;
+      color: var(--primary);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h2:first-of-type { margin-top: 0; }
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: var(--ink);
+    }
+    p { margin: 12px 0; }
+    a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+    a:hover { color: var(--success); }
+    strong { font-weight: 700; color: var(--ink); }
+    code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 0.9em;
+    }
+    ul, ol { padding-left: 24px; margin: 12px 0; }
+    li { margin: 6px 0; }
+    li::marker { color: var(--primary); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: var(--primary);
+      color: var(--on-primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    tr:last-child td { border-bottom: none; }
+    @media (max-width: 600px) {
+      table { font-size: 0.85rem; }
+      th, td { padding: 10px 8px; }
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 32px auto 0;
+      padding: 24px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--ink-subtle);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .footer a { color: var(--ink-muted); }
+
+    /* Hide one language at a time */
+    .lang-content { display: none; }
+    .lang-content.active { display: block; }
+
+    /* Print styles */
+    @media print {
+      .header { background: white; color: black; box-shadow: none; position: static; }
+      .brand-text, .brand-mark { color: black; background: white; border: 1px solid #ccc; }
+      .lang-toggle { display: none; }
+      .lang-content { display: block !important; }
+      .lang-content + .lang-content { page-break-before: always; }
+      h2 { color: black; }
+      a { color: black; text-decoration: underline; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-content">
+    <a class="brand" href="../" aria-label="Kembali ke halaman utama Sakuwise" style="text-decoration:none;">
+      <div class="brand-mark" aria-label="Logo Sakuwise">
+        <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sakuwise">
+          <!-- Cream squircle (inverse of app icon for contrast on dark header) -->
+          <path fill="#F5F1E8" d="M 96,16 C 152,16 176,40 176,96 C 176,152 152,176 96,176 C 40,176 16,152 16,96 C 16,40 40,16 96,16 Z"/>
+          <!-- Leaf body in forest green -->
+          <path fill="#0F4C3A" d="M 96,52 C 138,72 138,142 96,162 C 54,142 54,72 96,52 Z"/>
+          <!-- Mid vein cream -->
+          <path stroke="#F5F1E8" stroke-width="6" stroke-linecap="round" fill="none" d="M 96,60 L 96,156"/>
+          <!-- Side veins cream at 45% opacity -->
+          <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,88 Q 110,92 117,100"/>
+          <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,116 Q 110,120 117,128"/>
+          <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,88 Q 82,92 75,100"/>
+          <path stroke="#F5F1E8" stroke-opacity="0.55" stroke-width="4.8" stroke-linecap="round" fill="none" d="M 96,116 Q 82,120 75,128"/>
+        </svg>
+      </div>
+      <span class="brand-text">Saku<span class="suffix">wise</span></span>
+    </a>
+    <div class="lang-toggle" role="tablist" aria-label="Language">
+      <button class="lang-btn active" data-lang="id" role="tab" aria-selected="true">Indonesia</button>
+      <button class="lang-btn" data-lang="en" role="tab" aria-selected="false">English</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== INDONESIAN ==================== -->
+<div class="lang-content active" data-lang="id">
+
+  <h1>Kebijakan Privasi Sakuwise</h1>
+
+  <div class="meta-card">
+    <strong>Berlaku sejak:</strong> 22 Mei 2026 ·
+    <strong>Versi:</strong> 1.0 ·
+    <strong>Aplikasi:</strong> Sakuwise (Android) ·
+    <strong>Developer:</strong> Gusti Adhitya ·
+    <strong>Kontak:</strong> <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a>
+  </div>
+
+  <div class="tldr">
+    <h2>Ringkasan Singkat</h2>
+    <p>Sakuwise adalah aplikasi anggaran pribadi yang dirancang dengan prinsip <strong>local-first</strong>: semua data keuangan Anda tinggal di perangkat Android Anda dan <strong>tidak dikirim ke server kami</strong>. Kami tidak memiliki server dan tidak mengumpulkan data Anda.</p>
+    <p>Satu pengecualian: bila Anda secara sukarela mengaktifkan fitur <strong>Backup ke Google Drive</strong>, file backup terenkripsi Anda di-upload ke folder pribadi aplikasi di Google Drive Anda sendiri. Kunci enkripsi diturunkan dari PIN Anda, jadi Google tidak dapat membaca isi file backup.</p>
+    <p>Tidak ada iklan. Tidak ada analytics. Tidak ada pelacakan.</p>
+  </div>
+
+  <h2>1. Data yang Sakuwise Kumpulkan</h2>
+  <p><strong>Sakuwise (kami) tidak mengumpulkan data Anda sama sekali.</strong> Kami tidak memiliki server, tidak ada endpoint API milik kami, dan tidak ada SDK pihak ketiga untuk analytics atau telemetry.</p>
+  <p>Data yang Anda input ke aplikasi (transaksi, nama akun, kategori plan, nominal, catatan, foto struk, info aset emas/properti/deposito, info hutang) tersimpan <strong>secara lokal di perangkat Anda</strong>, terenkripsi at-rest dengan AES-256 via SQLCipher. Database hanya dapat dibuka dengan kunci yang disimpan di Android Keystore perangkat Anda, dibuka via biometrik atau PIN Anda.</p>
+
+  <h2>2. Data yang TIDAK Sakuwise Kumpulkan</h2>
+  <p>Untuk transparansi maksimum, berikut yang <strong>tidak</strong> kami akses:</p>
+  <ul>
+    <li>Identifier perangkat (Advertising ID, IMEI, MAC, dll.)</li>
+    <li>Lokasi (GPS, koarse, atau berdasarkan IP)</li>
+    <li>Daftar kontak, kalender, atau aplikasi terpasang</li>
+    <li>Riwayat browser atau pencarian</li>
+    <li>Mikrofon atau audio</li>
+    <li>Phone state, panggilan, atau SMS</li>
+    <li>Email atau nama akun Google Anda (kecuali saat Anda opt-in Drive backup — lihat §4)</li>
+  </ul>
+
+  <h2>3. Izin (Permissions) yang Sakuwise Minta</h2>
+  <p>Sakuwise meminta izin berikut di Android. Beberapa bersifat <strong>opsional</strong> — Anda bisa menolak dan aplikasi tetap berfungsi tanpa fitur terkait.</p>
+  <table>
+    <thead><tr><th>Izin</th><th>Tujuan</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>USE_BIOMETRIC</code></td><td>Membuka kunci aplikasi via sidik jari / wajah</td><td>Opsional (fallback: PIN)</td></tr>
+      <tr><td><code>CAMERA</code></td><td>OCR struk belanja untuk mengisi otomatis form pengeluaran</td><td>Opsional (fitur OCR)</td></tr>
+      <tr><td><code>POST_NOTIFICATIONS</code></td><td>Mengingatkan pembayaran berulang yang Anda set</td><td>Opsional (reminder)</td></tr>
+      <tr><td><code>INTERNET</code></td><td>Backup ke Google Drive (lihat §4)</td><td>Wajib di manifest, tapi hanya aktif bila Anda opt-in Drive backup</td></tr>
+      <tr><td><code>ACCESS_NETWORK_STATE</code></td><td>Cek koneksi internet sebelum upload Drive backup</td><td>Sama dengan INTERNET</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Penting:</strong> Tanpa fitur Drive backup yang Anda aktifkan, Sakuwise <strong>tidak pernah mengirim traffic apa pun ke internet</strong>, meskipun <code>INTERNET</code> ada di manifest.</p>
+
+  <h2>4. Google Drive Backup (Opsional, Opt-In)</h2>
+  <p>Sakuwise menawarkan fitur opsional untuk mem-backup data Anda ke <strong>Google Drive folder pribadi aplikasi</strong> (scope <code>drive.appdata</code>).</p>
+  <p><strong>Apa yang terjadi saat Anda mengaktifkan fitur ini:</strong></p>
+  <ol>
+    <li>Anda diminta sign-in ke akun Google Anda via standar Google Sign-In.</li>
+    <li>Sakuwise meminta consent untuk scope <code>https://www.googleapis.com/auth/drive.appdata</code> saja — <strong>bukan</strong> akses ke file Drive Anda lainnya.</li>
+    <li>Saat Anda menyimpan backup, file <code>.sakuwise</code> Anda di-enkripsi terlebih dahulu menggunakan AES-256-GCM dengan kunci yang diturunkan dari PIN backup Anda via Argon2id (memory 64 MB, iterations 3). Kemudian file terenkripsi tersebut di-upload ke folder AppData pribadi Sakuwise di Google Drive Anda.</li>
+    <li>Folder AppData adalah folder pribadi per-aplikasi yang <strong>tidak terlihat di Google Drive UI Anda</strong> secara default, dan hanya dapat diakses oleh Sakuwise (kombinasi package name + signing key).</li>
+    <li>Google bertindak sebagai data processor untuk file Anda. Google <strong>tidak dapat membaca isi file</strong> karena sudah terenkripsi sebelum upload — Google hanya melihat ukuran file dan timestamp.</li>
+  </ol>
+  <p><strong>Email akun Google Anda</strong> akan diterima Sakuwise dari Google Play Services hanya saat sign-in. Email ini disimpan secara lokal di perangkat Anda untuk menampilkan "Tersambung sebagai [email]" di Settings, dan <strong>tidak dikirim ke kami atau pihak ketiga lain</strong>.</p>
+  <p><strong>Cara nonaktif:</strong> Toggle "Backup ke Google Drive" di Settings → Backup & Pemulihan. Sign-out + revoke akses akan menghapus token dari perangkat. Untuk menghapus file backup di Google Drive Anda, Anda dapat me-revoke akses Sakuwise di <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a> — folder AppData beserta isinya akan ikut terhapus.</p>
+
+  <h2>5. Backup Lokal (Penyimpanan Sendiri)</h2>
+  <p>Sebagai alternatif Drive backup, Anda dapat menyimpan file backup secara lokal: ke storage internal, USB drive, atau folder yang ter-sync dengan layanan cloud lain (Dropbox, OneDrive folder, dll.).</p>
+  <p>File backup lokal di-enkripsi dengan kunci yang sama (Argon2id-derived dari PIN Anda) sebelum disimpan. Saat menyimpan, sistem Android akan menampilkan file picker untuk Anda memilih lokasi — Sakuwise <strong>tidak membuat keputusan lokasi sendiri</strong>.</p>
+  <p>File backup lokal <strong>tetap ada setelah Anda uninstall Sakuwise</strong>, sehingga dapat dipakai untuk restore di perangkat baru.</p>
+
+  <h2>6. Layanan Pihak Ketiga</h2>
+  <table>
+    <thead><tr><th>Layanan</th><th>Tujuan</th><th>Penanganan Data</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Google Play Services (Android Vitals)</strong></td><td>Crash & ANR reporting agregat</td><td>Otomatis oleh Android OS pada perangkat dengan Play Store. Stack trace anonim dikirim ke Google. Sakuwise hanya membaca dashboard agregat di Play Console. Tidak ada data personal di-share.</td></tr>
+      <tr><td><strong>Google Sign-In</strong></td><td>Authentication untuk Drive backup (opt-in)</td><td>Hanya aktif bila Anda opt-in Drive backup. Lihat §4.</td></tr>
+      <tr><td><strong>Google Drive API</strong></td><td>Upload/download file backup ke folder AppData (opt-in)</td><td>Lihat §4.</td></tr>
+      <tr><td><strong>ML Kit Text Recognition</strong></td><td>OCR struk on-device</td><td>Seluruh pemrosesan <strong>on-device</strong>, tidak ada gambar dikirim ke server Google.</td></tr>
+    </tbody>
+  </table>
+  <p>Selain di atas, Sakuwise tidak menggunakan SDK analytics (tidak ada Firebase Analytics, Crashlytics, Mixpanel, Amplitude, dll.), tidak ada SDK ads, dan tidak ada tracking library.</p>
+
+  <h2>7. Penyimpanan & Retensi Data</h2>
+  <p>Karena Sakuwise tidak mengumpulkan data ke server kami, retensi data sepenuhnya dalam kendali Anda:</p>
+  <ul>
+    <li><strong>Data aplikasi:</strong> Tersimpan di perangkat Anda. Hapus semua data via Settings → Reset Aplikasi.</li>
+    <li><strong>File backup lokal:</strong> Tersimpan di lokasi yang Anda pilih. Hapus manual bila perlu.</li>
+    <li><strong>File backup Drive:</strong> Tersimpan di folder AppData Google Drive Anda. Hapus dengan revoke akses Sakuwise di <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+    <li><strong>Cache:</strong> Sakuwise tidak menggunakan cache disk untuk gambar (foto struk render langsung dari database, in-memory cache only).</li>
+  </ul>
+  <p>Uninstall aplikasi akan menghapus database aplikasi dari perangkat (file backup tetap aman).</p>
+
+  <h2>8. Privasi Anak (Children's Privacy)</h2>
+  <p>Sakuwise <strong>tidak ditujukan untuk anak di bawah 13 tahun</strong>. Kami tidak secara sadar mengumpulkan data anak. Bila Anda adalah orang tua dan menemukan anak Anda menggunakan Sakuwise, kami sarankan menggunakan kontrol parental Android untuk membatasi akses.</p>
+
+  <h2>9. Hak Anda (UU PDP Indonesia)</h2>
+  <p>Sesuai Undang-Undang Perlindungan Data Pribadi Republik Indonesia (UU 27/2022), Anda memiliki hak:</p>
+  <ul>
+    <li><strong>Akses & portabilitas:</strong> Export data via Export CSV / XLSX / PDF di Settings.</li>
+    <li><strong>Koreksi:</strong> Edit/hapus transaksi atau data lain langsung di aplikasi.</li>
+    <li><strong>Penghapusan:</strong> Settings → Reset Aplikasi, atau uninstall aplikasi.</li>
+    <li><strong>Penolakan pemrosesan:</strong> Tolak fitur opsional (Drive backup, biometrik, notifikasi, OCR) tanpa kehilangan fungsi utama.</li>
+    <li><strong>Komplain:</strong> Kontak <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a>.</li>
+  </ul>
+
+  <h2>10. Perubahan Kebijakan Privasi</h2>
+  <p>Bila kami memperbarui kebijakan ini (mis. menambah fitur yang membutuhkan akses data baru), kami akan:</p>
+  <ol>
+    <li>Update tanggal "Berlaku sejak" di atas</li>
+    <li>Menampilkan banner notifikasi di dalam aplikasi pada update berikutnya</li>
+    <li>Memberi user kesempatan review sebelum fitur baru aktif</li>
+  </ol>
+  <p>Riwayat versi kebijakan privasi dapat dilihat di repository public: <a href="https://github.com/gustiadhitya/sakuwise-web">github.com/gustiadhitya/sakuwise-web</a>.</p>
+
+  <h2>11. Kontak</h2>
+  <p>Pertanyaan, klarifikasi, atau komplain:</p>
+  <ul>
+    <li><strong>Email:</strong> <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a></li>
+    <li><strong>Subject email:</strong> "[Sakuwise Privacy] {topik singkat}" untuk respons lebih cepat</li>
+  </ul>
+
+</div>
+
+<!-- ==================== ENGLISH ==================== -->
+<div class="lang-content" data-lang="en">
+
+  <h1>Sakuwise Privacy Policy</h1>
+
+  <div class="meta-card">
+    <strong>Effective:</strong> 22 May 2026 ·
+    <strong>Version:</strong> 1.0 ·
+    <strong>App:</strong> Sakuwise (Android) ·
+    <strong>Developer:</strong> Gusti Adhitya ·
+    <strong>Contact:</strong> <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a>
+  </div>
+
+  <div class="tldr">
+    <h2>TL;DR</h2>
+    <p>Sakuwise is a personal budget app built on a <strong>local-first</strong> principle: all your financial data stays on your Android device and is <strong>never sent to our servers</strong>. We do not operate any server and do not collect your data.</p>
+    <p>One exception: if you voluntarily enable the <strong>Google Drive Backup</strong> feature, your encrypted backup file is uploaded to a private app folder in your own Google Drive. Encryption keys are derived from your PIN, so Google cannot read the contents of your backup file.</p>
+    <p>No ads. No analytics. No tracking.</p>
+  </div>
+
+  <h2>1. Data Sakuwise Collects</h2>
+  <p><strong>Sakuwise (we) does not collect any of your data.</strong> We do not operate any server, we have no API endpoints of our own, and we do not include any third-party SDKs for analytics or telemetry.</p>
+  <p>Data you input into the app (transactions, account names, plan categories, amounts, notes, receipt photos, gold/property/deposit asset info, debt info) is stored <strong>locally on your device</strong>, encrypted at rest using AES-256 via SQLCipher. The database can only be opened with a key stored in your device's Android Keystore, unlocked via your biometric or PIN.</p>
+
+  <h2>2. Data Sakuwise Does NOT Access</h2>
+  <p>For full transparency, here's what we <strong>don't</strong> touch:</p>
+  <ul>
+    <li>Device identifiers (Advertising ID, IMEI, MAC, etc.)</li>
+    <li>Location (GPS, coarse, or IP-based)</li>
+    <li>Contacts, calendar, or installed apps</li>
+    <li>Browser or search history</li>
+    <li>Microphone or audio</li>
+    <li>Phone state, calls, or SMS</li>
+    <li>Your email or Google account name (except when you opt in to Drive backup — see §4)</li>
+  </ul>
+
+  <h2>3. Permissions Sakuwise Requests</h2>
+  <p>Sakuwise requests the following Android permissions. Several are <strong>optional</strong> — you can deny them and the app still works without the related features.</p>
+  <table>
+    <thead><tr><th>Permission</th><th>Purpose</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>USE_BIOMETRIC</code></td><td>Unlock app via fingerprint / face</td><td>Optional (fallback: PIN)</td></tr>
+      <tr><td><code>CAMERA</code></td><td>OCR receipts to auto-fill expense form</td><td>Optional (OCR feature)</td></tr>
+      <tr><td><code>POST_NOTIFICATIONS</code></td><td>Recurring payment reminders you set</td><td>Optional (reminders)</td></tr>
+      <tr><td><code>INTERNET</code></td><td>Backup to Google Drive (see §4)</td><td>Required in manifest, but only active when you opt in to Drive backup</td></tr>
+      <tr><td><code>ACCESS_NETWORK_STATE</code></td><td>Check connectivity before Drive backup upload</td><td>Same as INTERNET</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Important:</strong> Unless you activate the Drive backup feature, Sakuwise <strong>never sends any network traffic</strong>, even though <code>INTERNET</code> is declared in the manifest.</p>
+
+  <h2>4. Google Drive Backup (Optional, Opt-In)</h2>
+  <p>Sakuwise offers an optional feature to back up your data to a <strong>Google Drive private app folder</strong> (scope: <code>drive.appdata</code>).</p>
+  <p><strong>What happens when you enable this feature:</strong></p>
+  <ol>
+    <li>You're prompted to sign in to your Google account via standard Google Sign-In.</li>
+    <li>Sakuwise requests consent for the <code>https://www.googleapis.com/auth/drive.appdata</code> scope only — <strong>not</strong> access to your other Drive files.</li>
+    <li>When you save a backup, your <code>.sakuwise</code> file is first encrypted using AES-256-GCM with a key derived from your backup PIN via Argon2id (memory 64 MB, iterations 3). The encrypted file is then uploaded to Sakuwise's private AppData folder in your Google Drive.</li>
+    <li>The AppData folder is a private per-app folder that is <strong>not visible in your Google Drive UI</strong> by default, and can only be accessed by Sakuwise (package name + signing key combination).</li>
+    <li>Google acts as a data processor for your file. Google <strong>cannot read the file contents</strong> because they're encrypted before upload — Google only sees the file size and timestamp.</li>
+  </ol>
+  <p><strong>Your Google account email</strong> will be received by Sakuwise from Google Play Services only during sign-in. This email is stored locally on your device to display "Connected as [email]" in Settings, and is <strong>not sent to us or any other third party</strong>.</p>
+  <p><strong>To disable:</strong> Toggle "Backup to Google Drive" in Settings → Backup & Recovery. Sign-out + revoke access will remove the token from your device. To delete backup files in your Google Drive, you can revoke Sakuwise's access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a> — the AppData folder and its contents will be deleted accordingly.</p>
+
+  <h2>5. Local Backup (Your Own Storage)</h2>
+  <p>As an alternative to Drive backup, you can save backup files locally: to internal storage, USB drive, or a folder synced with other cloud services (Dropbox, OneDrive folder, etc.).</p>
+  <p>Local backup files are encrypted with the same key (Argon2id-derived from your PIN) before being saved. When saving, the Android system presents a file picker for you to choose the location — Sakuwise <strong>does not make location decisions on its own</strong>.</p>
+  <p>Local backup files <strong>persist after you uninstall Sakuwise</strong>, so they can be used to restore on a new device.</p>
+
+  <h2>6. Third-Party Services</h2>
+  <table>
+    <thead><tr><th>Service</th><th>Purpose</th><th>Data Handling</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Google Play Services (Android Vitals)</strong></td><td>Aggregate crash & ANR reporting</td><td>Automatic by Android OS on devices with Play Store. Anonymized stack traces sent to Google. Sakuwise only reads aggregated dashboards in Play Console. No personal data shared.</td></tr>
+      <tr><td><strong>Google Sign-In</strong></td><td>Authentication for Drive backup (opt-in)</td><td>Only active when you opt in to Drive backup. See §4.</td></tr>
+      <tr><td><strong>Google Drive API</strong></td><td>Upload/download backup files to AppData folder (opt-in)</td><td>See §4.</td></tr>
+      <tr><td><strong>ML Kit Text Recognition</strong></td><td>On-device receipt OCR</td><td>All processing <strong>on-device</strong>, no images sent to Google servers.</td></tr>
+    </tbody>
+  </table>
+  <p>Beyond the above, Sakuwise does not use any analytics SDK (no Firebase Analytics, Crashlytics, Mixpanel, Amplitude, etc.), no ad SDK, and no tracking library.</p>
+
+  <h2>7. Data Storage & Retention</h2>
+  <p>Because Sakuwise does not collect data to our servers, data retention is entirely in your control:</p>
+  <ul>
+    <li><strong>App data:</strong> Stored on your device. Delete all via Settings → Reset App.</li>
+    <li><strong>Local backup files:</strong> Stored at the location you chose. Delete manually as needed.</li>
+    <li><strong>Drive backup files:</strong> Stored in your Google Drive AppData folder. Delete by revoking Sakuwise's access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+    <li><strong>Cache:</strong> Sakuwise does not use disk cache for images (receipt photos render directly from the database, in-memory cache only).</li>
+  </ul>
+  <p>Uninstalling the app removes the app's database from the device (backup files remain safe).</p>
+
+  <h2>8. Children's Privacy</h2>
+  <p>Sakuwise is <strong>not directed at children under 13</strong>. We do not knowingly collect data from children. If you are a parent and find your child using Sakuwise, we recommend using Android parental controls to restrict access.</p>
+
+  <h2>9. Your Rights</h2>
+  <p>We honor user rights consistent with major data protection frameworks (e.g., GDPR, Indonesia's UU PDP / Law 27/2022):</p>
+  <ul>
+    <li><strong>Access & portability:</strong> Export all data via Export CSV / XLSX / PDF in Settings.</li>
+    <li><strong>Correction:</strong> Edit/delete transactions or other data directly in the app.</li>
+    <li><strong>Deletion:</strong> Settings → Reset App, or uninstall.</li>
+    <li><strong>Opt-out of processing:</strong> Decline optional features (Drive backup, biometrics, notifications, OCR) without losing core functionality.</li>
+    <li><strong>Complaints:</strong> Contact <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a>.</li>
+  </ul>
+
+  <h2>10. Changes to This Privacy Policy</h2>
+  <p>If we update this policy (e.g., add a feature that requires new data access), we will:</p>
+  <ol>
+    <li>Update the "Effective" date at the top</li>
+    <li>Display an in-app notification banner on the next update</li>
+    <li>Give users a chance to review before the new feature activates</li>
+  </ol>
+  <p>Version history of this privacy policy is available in the public repository: <a href="https://github.com/gustiadhitya/sakuwise-web">github.com/gustiadhitya/sakuwise-web</a>.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions, clarifications, or complaints:</p>
+  <ul>
+    <li><strong>Email:</strong> <a href="mailto:gakadigilabs@gmail.com">gakadigilabs@gmail.com</a></li>
+    <li><strong>Subject prefix:</strong> "[Sakuwise Privacy] {short topic}" for faster response</li>
+  </ul>
+
+</div>
+
+</main>
+
+<footer class="footer">
+  <p>Sakuwise · <span data-id="Rencanakan. Catat. Tenang." data-en="Plan. Track. Relax.">Rencanakan. Catat. Tenang.</span></p>
+  <p><a href="https://github.com/gustiadhitya/sakuwise-web">github.com/gustiadhitya/sakuwise-web</a></p>
+</footer>
+
+<script>
+  // Language toggle
+  const buttons = document.querySelectorAll('.lang-btn');
+  const contents = document.querySelectorAll('.lang-content');
+  const footerSpan = document.querySelector('footer span[data-id]');
+
+  function setLang(lang) {
+    buttons.forEach(btn => {
+      const isActive = btn.dataset.lang === lang;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    contents.forEach(content => {
+      content.classList.toggle('active', content.dataset.lang === lang);
+    });
+    document.documentElement.lang = lang;
+    if (footerSpan) {
+      footerSpan.textContent = lang === 'id' ? footerSpan.dataset.id : footerSpan.dataset.en;
+    }
+    // Update URL hash for deep-linking
+    try { history.replaceState(null, '', '#' + lang); } catch (e) {}
+  }
+
+  buttons.forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+
+  // Initialize from URL hash or browser language
+  const initialLang = (location.hash === '#en' ? 'en'
+    : location.hash === '#id' ? 'id'
+    : (navigator.language || 'id').toLowerCase().startsWith('id') ? 'id'
+    : 'en');
+  setLang(initialLang);
+</script>
+
+</body>
+</html>

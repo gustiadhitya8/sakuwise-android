@@ -1,0 +1,110 @@
+package com.gustiadhitya.sakuwise.feature.onboarding.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.gustiadhitya.sakuwise.core.crypto.PinStore
+import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
+import com.gustiadhitya.sakuwise.core.domain.model.AccountType
+import com.gustiadhitya.sakuwise.core.domain.usecase.ComputeCurrentPlanPeriodUseCase
+import com.gustiadhitya.sakuwise.core.domain.usecase.CreateFirstAccountUseCase
+import com.gustiadhitya.sakuwise.core.domain.usecase.CreatePlanUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+data class OnboardingUiState(
+    val lang: String = "id",
+    // Empty by default so the user gets the placeholder + must type their own.
+    // A prior prefill of "Gusti" was a dev placeholder that caused appending on
+    // re-tap and shipped one developer's name as the literal default.
+    val nickname: String = "",
+    val pin: String = "",
+    val biometric: Boolean = true,
+    // "Tunai" is the intended first-account default per PRD §7.1.4 (most users
+    // start with cash) — keep it.
+    val accountName: String = "Tunai",
+    val accountType: String = "Tunai",
+    val accountBalance: Long = 0L,
+    val finishing: Boolean = false,
+)
+
+@HiltViewModel
+class OnboardingViewModel @Inject constructor(
+    private val prefsRepo: UserPreferencesRepository,
+    private val pinStore: PinStore,
+    private val createFirstAccount: CreateFirstAccountUseCase,
+    private val createPlan: CreatePlanUseCase,
+    private val computePlanPeriod: ComputeCurrentPlanPeriodUseCase,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(OnboardingUiState())
+    val state: StateFlow<OnboardingUiState> = _state
+
+    fun update(transform: (OnboardingUiState) -> OnboardingUiState) {
+        _state.value = transform(_state.value)
+    }
+
+    /**
+     * Per PRD §6 + user feedback (2026-05-21): persist the first account, then
+     * create JUST the empty plan period (no allocations, no starter template
+     * categories). The Plan tab renders its own welcoming empty state and the
+     * user picks either "Mulai dari kosong" or "Pakai template starter" from
+     * there — auto-seeding 23 categories during onboarding made the Plan tab
+     * look pre-populated, contradicting the "start blank" intent.
+     *
+     * Lastly flip `onboarding_completed` so the UI navigates to the dashboard.
+     */
+    fun finish() {
+        if (_state.value.finishing) return
+        _state.value = _state.value.copy(finishing = true)
+        val s = _state.value
+        viewModelScope.launch {
+            // 1. Account
+            val accountType = when (s.accountType.lowercase()) {
+                "bank" -> AccountType.Bank
+                "dompet", "ewallet" -> AccountType.EWallet
+                else -> AccountType.Cash
+            }
+            createFirstAccount(
+                name = s.accountName.trim().ifBlank { "Tunai" },
+                type = accountType,
+                balance = s.accountBalance,
+            )
+
+            // 2. Empty plan shell only — no allocations, no categories. User
+            // populates from the Plan-tab welcoming empty state.
+            val prefs = prefsRepo.prefs.first()
+            val period = computePlanPeriod(planStartDay = prefs.planPeriodStartDay)
+            createPlan(period)
+
+            // 3a. Mark current credential format as PIN (onboarding always uses
+            // the 6-digit PIN UI). Passphrase mode is only reachable later via
+            // Settings → PIN & Biometrik.
+            prefsRepo.setCurrentCredentialIsPassphrase(false)
+            // 3b. PIN — persist the 6-digit PIN captured on step 2 into PinStore
+            // so the lock screen recognizes it on cold-restart instead of
+            // prompting "Set PIN & Buka" again. UI gates Lanjut on length == 6,
+            // so this branch is the typical path; the guard keeps us safe if
+            // a future change ever lets the user proceed without entering one.
+            if (s.pin.length >= 6) {
+                val chars = s.pin.toCharArray()
+                // Zero out the char array after use (defense-in-depth — keeps
+                // the PIN from sitting in heap memory longer than necessary).
+                // Use the escape literal '\u0000' so the source stays pure
+                // UTF-8 and git tracks line diffs instead of treating the
+                // file as binary.
+                try { pinStore.setPin(chars) } finally { chars.fill('\u0000') }
+            }
+
+            // 4. Prefs: nickname/language/biometric + onboarding flag
+            prefsRepo.completeOnboarding(
+                nickname = s.nickname.trim().ifBlank { "Teman" },
+                language = s.lang,
+                biometricEnabled = s.biometric,
+            )
+        }
+    }
+}

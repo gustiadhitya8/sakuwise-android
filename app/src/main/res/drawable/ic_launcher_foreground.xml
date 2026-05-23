@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground (108dp canvas). Background is solid primary, so
+  this layer only draws the cream leaf + veins, sized to sit inside the
+  66dp adaptive-icon safe zone centered at (54, 54).
+
+  Leaf path is the LogoA_Daun shape from proto/brand/logos.jsx (viewBox 64,
+  M 32 13 C 50 20 50 44 32 51 C 14 44 14 20 32 13) translated to a centered
+  108 viewBox at 0.8× scale so it survives any launcher's circular mask.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Leaf body: centered at (54, 54). Top=24, bottom=84 → mid=54. -->
+    <path
+        android:fillColor="#F5F1E8"
+        android:pathData="M 54,24 C 78.4,33.6 78.4,74.4 54,84 C 29.6,74.4 29.6,33.6 54,24 Z" />
+
+    <!-- Mid vein: y=28..80 (3dp inset from leaf top/bottom). -->
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeWidth="3.4"
+        android:strokeLineCap="round"
+        android:pathData="M 54,28 L 54,80" />
+
+    <!-- 4 side veins, matching prototype (44.6% opacity ≈ 0x73 alpha). -->
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="2.7"
+        android:strokeLineCap="round"
+        android:pathData="M 54,46 Q 62.1,49.4 66.2,54.0" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="2.7"
+        android:strokeLineCap="round"
+        android:pathData="M 54,62 Q 62.1,65.4 66.2,70.0" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="2.7"
+        android:strokeLineCap="round"
+        android:pathData="M 54,46 Q 45.9,49.4 41.8,54.0" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="2.7"
+        android:strokeLineCap="round"
+        android:pathData="M 54,62 Q 45.9,65.4 41.8,70.0" />
+</vector>

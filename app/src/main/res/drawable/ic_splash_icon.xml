@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash-screen icon: complete app mark (green squircle + cream leaf + veins).
+  Drawn at 192dp so the SplashScreen API masks at the right size (it expects a
+  large source it will scale down). The leaf coords match ic_launcher_foreground.xml
+  but composed against a primary-green rounded square.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+
+    <!-- Squircle background -->
+    <path
+        android:fillColor="#0F4C3A"
+        android:pathData="M 96,16
+                           C 152,16 176,40 176,96
+                           C 176,152 152,176 96,176
+                           C 40,176 16,152 16,96
+                           C 16,40 40,16 96,16 Z" />
+
+    <!-- Leaf body — cream on green -->
+    <path
+        android:fillColor="#F5F1E8"
+        android:pathData="M 96,52
+                           C 138,72 138,142 96,162
+                           C 54,142 54,72 96,52 Z" />
+
+    <!-- Mid vein -->
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M 96,60 L 96,156" />
+
+    <!-- Side veins -->
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="4.8"
+        android:strokeLineCap="round"
+        android:pathData="M 96,88 Q 110,92 117,100" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="4.8"
+        android:strokeLineCap="round"
+        android:pathData="M 96,116 Q 110,120 117,128" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="4.8"
+        android:strokeLineCap="round"
+        android:pathData="M 96,88 Q 82,92 75,100" />
+    <path
+        android:strokeColor="#0F4C3A"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="4.8"
+        android:strokeLineCap="round"
+        android:pathData="M 96,116 Q 82,120 75,128" />
+</vector>

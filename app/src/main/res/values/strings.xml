@@ -1,0 +1,883 @@
+<resources>
+    <string name="app_name">Sakuwise</string>
+
+    <!-- Bottom tab bar -->
+    <string name="tab_home">Beranda</string>
+    <string name="tab_plan">Plan</string>
+    <string name="tab_assets">Aset</string>
+    <string name="tab_me">Saya</string>
+    <string name="tab_add">Tambah</string>
+
+    <!-- Common buttons / chrome -->
+    <string name="action_save">Simpan</string>
+    <string name="action_cancel">Batal</string>
+    <string name="action_delete">Hapus</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_back">Kembali</string>
+    <string name="action_continue">Lanjut</string>
+    <string name="action_done">Selesai</string>
+    <string name="action_open">Buka</string>
+    <string name="action_add">Tambah</string>
+    <string name="common_date_label">Tanggal</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting_morning">Selamat pagi</string>
+    <string name="dashboard_greeting_noon">Selamat siang</string>
+    <string name="dashboard_greeting_afternoon">Selamat sore</string>
+    <string name="dashboard_greeting_evening">Selamat malam</string>
+    <string name="dashboard_default_name">Teman</string>
+    <string name="dashboard_top_expenses">Pengeluaran Teratas</string>
+    <string name="dashboard_active_period">periode aktif</string>
+    <string name="dashboard_no_plan">Belum ada plan bulan ini</string>
+    <string name="dashboard_period_format">%1$s · sisa %2$d hari</string>
+    <string name="dashboard_notifications">Notifikasi</string>
+    <string name="notifications_title">Notifikasi</string>
+    <string name="notifications_clear">Tandai sudah dibaca</string>
+    <string name="notifications_empty_title">Belum ada notifikasi</string>
+    <string name="notifications_empty_body">Pengingat &amp; status backup akan muncul di sini.</string>
+    <string name="notif_backup_overdue_title">Backup terakhir sudah lama</string>
+    <string name="notif_backup_overdue_body_format">Sudah %1$d hari sejak backup terakhir. Datamu tidak terlindungi kalau HP hilang.</string>
+    <string name="notif_backup_never_title">Belum pernah backup</string>
+    <string name="notif_backup_never_body">Kamu belum pernah backup. Tap untuk simpan file backup terenkripsi.</string>
+    <string name="action_close">Tutup</string>
+    <string name="dashboard_add_txn">Tambah transaksi</string>
+
+    <!-- Plan -->
+    <string name="plan_title">Plan</string>
+    <string name="plan_no_plan">Belum ada plan</string>
+    <string name="plan_expected_income">PEMASUKAN DIHARAPKAN</string>
+    <string name="plan_filter_all">Semua</string>
+    <string name="plan_filter_needs">Kebutuhan</string>
+    <string name="plan_filter_wants">Keinginan</string>
+    <string name="plan_filter_invest">Investasi</string>
+
+    <!-- Allocation display names (used in headers / chips / cards) -->
+    <string name="alloc_needs">Kebutuhan</string>
+    <string name="alloc_wants">Keinginan</string>
+    <string name="alloc_invest">Investasi</string>
+    <string name="alloc_add_category_format">+ Tambah Kategori di %1$s</string>
+    <string name="plan_action_sheet_title">Aksi Plan</string>
+    <string name="plan_action_set_income">Atur Pemasukan Diharapkan</string>
+    <string name="plan_action_apply_starter">Terapkan Template Starter</string>
+    <string name="plan_action_regen_next">Buat Plan Bulan Depan</string>
+    <string name="plan_action_reset">Reset Plan Bulan Ini</string>
+    <string name="plan_action_set_income_sub">Atur target pemasukan untuk periode ini</string>
+    <string name="plan_action_apply_starter_sub">Tambah 23 kategori standar ke plan ini</string>
+    <string name="plan_action_regen_next_sub">Salin item berulang (bulanan/kwartalan/tahunan) ke periode berikutnya</string>
+    <string name="plan_action_reset_sub">Hapus SEMUA kategori &amp; item — mulai dari nol</string>
+    <string name="plan_action_edit_allocations">Atur Alokasi Bulan Ini</string>
+    <string name="plan_action_edit_allocations_sub">Sesuaikan persentase Needs / Wants / Invest khusus periode ini</string>
+    <string name="plan_alloc_editor_title">Atur Alokasi</string>
+    <string name="plan_alloc_editor_intro">Persentase ini hanya berlaku untuk plan periode ini. Default di Pengaturan tidak berubah.</string>
+    <string name="plan_alloc_sum_ok_format">Total %1$d%% · pas 100</string>
+    <string name="plan_alloc_sum_warn_format">Total %1$d%% — sebaiknya 100. Persentase akan dinormalisasi otomatis di perhitungan.</string>
+    <string name="plan_empty_no_allocs">Plan ini belum punya alokasi (Kebutuhan/Keinginan/Investasi).</string>
+    <string name="plan_empty_welcoming_title">Belum ada plan bulan ini</string>
+    <string name="plan_empty_welcoming_body">Buat plan baru — atur sendiri kategori &amp; item sesuai kebutuhan kamu. Atau pakai template starter biar lebih cepat.</string>
+    <string name="plan_empty_add_first">Buat plan dari awal</string>
+    <string name="plan_empty_use_starter">Pakai template starter</string>
+
+    <!-- Dashboard hero + sections (i18n round 2) -->
+    <string name="dashboard_remaining_budget">SISA ANGGARAN</string>
+    <string name="dashboard_daily_budget">Anggaran harian</string>
+    <string name="dashboard_per_day">/ hari</string>
+    <string name="dashboard_metric_income">Pemasukan</string>
+    <string name="dashboard_metric_expense">Pengeluaran</string>
+    <string name="dashboard_assets_card_title">Aset &amp; Kekayaan</string>
+    <string name="dashboard_assets_card_sub_format">%1$d akun aktif · %2$s di akun · detail di tab Aset</string>
+    <string name="dashboard_assets_card_sub_hidden_format">%1$d akun aktif · detail di tab Aset</string>
+    <string name="dashboard_recent_txns">Transaksi Terbaru</string>
+    <string name="dashboard_action_all">Semua</string>
+    <string name="dashboard_empty_txns">Belum ada transaksi. Tap tombol + untuk catat pengeluaran pertamamu.</string>
+    <string name="dashboard_backup_never_label">Belum pernah backup</string>
+    <string name="dashboard_backup_overdue_days_format">%1$d hari sejak backup terakhir</string>
+    <string name="dashboard_backup_banner_sub_never">Amankan data uangmu — backup sekarang.</string>
+    <string name="dashboard_backup_banner_cta">Backup</string>
+
+    <!-- Plan inline labels -->
+    <string name="plan_used_prefix">Terpakai </string>
+    <string name="plan_of_prefix">dari </string>
+    <string name="plan_old_readonly">Plan lama bersifat read-only.</string>
+    <string name="plan_period_active_hint">Periode aktif ditentukan otomatis dari Tanggal Mulai Periode di Pengaturan. Plan lama bersifat read-only.</string>
+    <string name="plan_delete_category_body_format">Hapus kategori \"%1$s\" dan semua plan item di dalamnya. Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="plan_delete_category_confirm">Ya, hapus kategori</string>
+    <string name="plan_expected_income_body">Total pemasukan yang kamu ekspektasikan di periode ini. Dipakai sebagai baseline progress bar plan.</string>
+
+    <!-- Plan reset confirm sheet -->
+    <string name="plan_reset_body">Semua kategori dan plan item di periode ini akan dihapus.\n\nTransaksi yang sudah dicatat tidak terhapus, tapi hilang link-nya ke plan item lama.</string>
+    <string name="plan_reset_irreversible">Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="plan_reset_confirm">Ya, reset plan</string>
+
+    <!-- OCR + lock -->
+    <string name="ocr_idle_body">Foto struk untuk auto-isi pengeluaran</string>
+    <string name="ocr_review_info_format">Tap Lanjut untuk buka form pengeluaran. Field yang terdeteksi sudah di-prefill. Foto struk otomatis di-attach (terkompresi ~200 KB).</string>
+    <string name="lock_biometric_subtitle">Gunakan biometrik untuk membuka aplikasi.</string>
+    <string name="lock_biometric_unsupported">Biometrik tidak didukung di context ini.</string>
+    <string name="lock_biometric_prompt_title">Buka Sakuwise</string>
+
+    <!-- Settings + picker empty states -->
+    <string name="settings_last_backup_never">Belum pernah</string>
+    <string name="settings_days_ago_format">%1$d hari lalu</string>
+    <string name="picker_no_open_debts">Belum ada hutang terbuka. Tambah dulu di tab Aset → Hutang.</string>
+    <string name="picker_no_income_categories">Belum ada kategori sumber.</string>
+
+    <!-- Misc i18n round 2 -->
+    <string name="plan_expected_income_label">Pemasukan diharapkan</string>
+    <string name="reconcile_already_match">Saldo sudah sesuai</string>
+    <string name="reconcile_failed">Gagal rekonsiliasi</string>
+    <string name="reconcile_adjustment_plus_format">Penyesuaian +Rp %1$d disimpan</string>
+    <string name="reconcile_adjustment_minus_format">Penyesuaian -Rp %1$d disimpan</string>
+    <string name="backup_no_local_files">Belum ada file backup lokal. Buat backup dulu lewat tombol Backup Sekarang.</string>
+    <string name="export_pdf_no_accounts">Belum ada akun.</string>
+    <string name="export_pdf_income_vs_expense">Pemasukan vs Pengeluaran</string>
+    <string name="export_pdf_no_transactions">Belum ada transaksi.</string>
+    <string name="assets_hub_since_month_format">%1$s%2$s%% sejak %3$s</string>
+    <string name="assets_hub_since_today">hari ini</string>
+    <string name="land_since_purchase_format">%1$s · %2$s%3$s%% sejak beli</string>
+    <string name="expense_pick_debt_placeholder">Pilih hutang…</string>
+    <string name="ocr_pick_from_gallery">Pilih dari Galeri</string>
+    <string name="backup_delete_failed_format">Hapus gagal: %1$s</string>
+    <string name="plan_delete_item">Hapus item</string>
+    <string name="dashboard_add_account_cd">Tambah akun</string>
+    <string name="settings_lang_biometric">Biometrik aktif</string>
+    <string name="settings_lang_pin_only">PIN saja</string>
+    <string name="settings_period_day_format">Tanggal %1$d</string>
+
+    <!-- i18n round 3: dashboard alloc + account detail diff + reconcile note -->
+    <string name="dashboard_alloc_section">Alokasi</string>
+    <string name="dashboard_alloc_detail">Detail</string>
+    <string name="dashboard_alloc_used_pct_format">%1$d%% terpakai</string>
+    <string name="dashboard_alloc_over_format">Over %1$s</string>
+    <string name="account_detail_diff_label"> · selisih </string>
+    <string name="reconcile_default_note">Rekonsiliasi</string>
+
+    <string name="plan_apply_starter_btn">Terapkan Template Starter</string>
+
+    <!-- Settings hub -->
+    <string name="settings_title">Saya</string>
+    <string name="settings_group_plan">Plan</string>
+    <string name="settings_group_security">Keamanan</string>
+    <string name="settings_group_backup">Backup &amp; Data</string>
+    <string name="settings_group_app">Aplikasi</string>
+    <string name="settings_default_alloc">Default Alokasi</string>
+    <string name="settings_period_start">Tanggal Mulai Periode</string>
+    <string name="settings_pin_bio">PIN &amp; Biometrik</string>
+    <string name="settings_autolock">Auto-lock</string>
+    <string name="settings_backup_restore">Backup &amp; Pemulihan</string>
+    <string name="settings_export_reset">Reset Aplikasi</string>
+    <string name="settings_export_reset_sub">Hapus semua data, mulai dari nol</string>
+    <string name="settings_export_pdf">Ekspor PDF</string>
+    <string name="settings_export_pdf_sub">Buat laporan ringkas untuk dibagikan atau diarsipkan</string>
+
+    <!-- Export PDF screen (V1.1 / M49) -->
+    <string name="export_pdf_title">Ekspor PDF</string>
+    <string name="export_pdf_intro">Buat laporan PDF yang merangkum net worth, akun, transaksi, dan top pengeluaran. File disimpan sementara di HP — kamu yang putuskan mau dibagikan atau di-arsipkan.</string>
+    <string name="export_pdf_period_label">Periode</string>
+    <string name="export_pdf_period_current_month">Bulan ini</string>
+    <string name="export_pdf_period_last_30d">30 hari terakhir</string>
+    <string name="export_pdf_period_this_year">Tahun ini</string>
+    <string name="export_pdf_period_all_time">Sepanjang waktu</string>
+    <string name="export_pdf_action">Ekspor PDF</string>
+    <string name="export_pdf_action_working">Menyiapkan laporan…</string>
+    <string name="export_pdf_ready_title">Laporan siap</string>
+    <string name="export_pdf_ready_body">File PDF berhasil dibuat. Buka untuk pratinjau atau bagikan ke aplikasi lain.</string>
+    <string name="export_pdf_open">Buka PDF</string>
+    <string name="export_pdf_share">Bagikan</string>
+    <string name="export_pdf_again">Ekspor lagi</string>
+    <string name="export_pdf_failed_title">Gagal membuat PDF</string>
+    <string name="export_pdf_retry">Coba lagi</string>
+    <string name="export_pdf_footnote">File PDF disimpan di cache aplikasi dan bisa dihapus otomatis oleh sistem kapan saja. Jika kamu butuh menyimpannya permanen, gunakan tombol Bagikan dan simpan ke Files / Drive.</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_title">Tema Aplikasi</string>
+    <string name="theme_intro">Pilih tampilan terang atau gelap, atau biarkan mengikuti pengaturan sistem.</string>
+    <string name="theme_opt_system">Ikuti Sistem</string>
+    <string name="theme_opt_system_sub">Otomatis mengikuti tema HP kamu</string>
+    <string name="theme_opt_light">Terang</string>
+    <string name="theme_opt_light_sub">Selalu pakai tema terang</string>
+    <string name="theme_opt_dark">Gelap</string>
+    <string name="theme_opt_dark_sub">Selalu pakai tema gelap</string>
+    <string name="settings_replay_onboarding">Lihat Onboarding Lagi</string>
+    <string name="settings_replay_onboarding_sub">Tampilkan tur pembuka &amp; atur ulang preferensi awal</string>
+    <string name="settings_donate">Donasi</string>
+    <string name="settings_donate_sub">Dukung pengembangan Sakuwise</string>
+    <string name="settings_about">Tentang Sakuwise</string>
+    <string name="settings_active">Aktif</string>
+    <string name="settings_inactive">Nonaktif</string>
+    <string name="settings_minutes_format">%1$d menit</string>
+
+    <!-- Lock screen -->
+    <string name="lock_welcome_back">Selamat datang kembali</string>
+    <string name="lock_hint">Masukkan PIN atau gunakan biometrik untuk membuka.</string>
+    <string name="lock_use_biometric">Gunakan Biometrik</string>
+    <string name="lock_unlock">Buka</string>
+    <string name="lock_set_pin_and_unlock">Set PIN &amp; Buka</string>
+    <string name="lock_pin_six_digits">Masukkan 6 digit PIN.</string>
+    <string name="lock_pin_wrong">PIN salah.</string>
+
+    <!-- AddTxn picker -->
+    <string name="addtxn_question">Tambah Transaksi</string>
+    <string name="addtxn_expense">Pengeluaran</string>
+    <string name="addtxn_expense_sub">Catat uang yang keluar — wajib terhubung ke plan item</string>
+    <string name="addtxn_income">Pemasukan</string>
+    <string name="addtxn_income_sub">Gaji, bonus, THR, penghasilan sampingan</string>
+    <string name="addtxn_transfer">Transfer</string>
+    <string name="addtxn_transfer_sub">Pindah uang antar akun sendiri</string>
+    <string name="addtxn_ocr">Scan Struk (OCR)</string>
+    <string name="addtxn_ocr_sub">Foto struk → otomatis isi draft pengeluaran</string>
+
+    <!-- Transaction forms -->
+    <string name="txn_expense_title">Pengeluaran</string>
+    <string name="txn_expense_amount_label">Jumlah Pengeluaran</string>
+    <string name="txn_expense_alloc_subtitle_format">Alokasi %1$s</string>
+    <string name="txn_income_title">Pemasukan</string>
+    <string name="txn_income_amount_label">Jumlah Pemasukan</string>
+    <string name="txn_transfer_title">Transfer</string>
+    <string name="txn_transfer_amount_label">Jumlah Transfer</string>
+
+    <!-- Transaction form field labels -->
+    <string name="txn_field_plan_item">Plan Item</string>
+    <string name="txn_field_plan_item_placeholder">Pilih plan item…</string>
+    <string name="txn_field_account">Akun</string>
+    <string name="txn_field_account_placeholder">Pilih akun…</string>
+    <string name="txn_field_account_dest">Akun tujuan</string>
+    <string name="txn_field_date">Tanggal</string>
+    <string name="txn_field_note">Catatan (opsional)</string>
+    <string name="txn_field_note_expense_placeholder">Misal: Kopi Kenangan</string>
+    <string name="txn_field_note_income_placeholder">Mis. Gaji Mei</string>
+    <string name="txn_link_debt_label">Tautkan ke hutang</string>
+    <string name="txn_link_debt_hint">Tandai pengeluaran ini sebagai pembayaran hutang.</string>
+    <string name="txn_link_debt_attached_format">Tertaut: %1$s</string>
+    <string name="txn_income_recurring_label">Pemasukan berulang</string>
+    <string name="txn_income_recurring_hint">Tandai jika income ini bulanan (mis. gaji). Akan muncul sbg pengingat di periode berikut.</string>
+    <string name="txn_field_category_source">Kategori sumber</string>
+    <string name="txn_field_category_source_placeholder">Pilih kategori…</string>
+    <string name="txn_transfer_from">Dari akun</string>
+    <string name="txn_transfer_from_placeholder">Pilih akun sumber…</string>
+    <string name="txn_transfer_to">Ke akun</string>
+    <string name="txn_transfer_to_placeholder">Pilih akun tujuan…</string>
+    <string name="txn_transfer_swap">Tukar arah</string>
+    <string name="txn_transfer_fee">Biaya transfer (opsional)</string>
+    <string name="txn_field_note_transfer_placeholder">Mis. Tabungan bulan ini</string>
+
+    <!-- TxnType display labels (used as fallback when transaction has no note) -->
+    <string name="txntype_income">Pemasukan</string>
+    <string name="txntype_expense">Pengeluaran</string>
+    <string name="txntype_transfer">Transfer</string>
+    <string name="txntype_debt_inflow">Hutang masuk</string>
+    <string name="txntype_debt_outflow">Bayar hutang</string>
+    <string name="txntype_reconciliation">Rekonsiliasi</string>
+
+    <!-- Plan add/edit item sheet -->
+    <string name="plan_item_add_title">Tambah Plan Item</string>
+    <string name="plan_item_edit_title">Edit Plan Item</string>
+    <string name="plan_item_name_label">Nama plan item</string>
+    <string name="plan_item_name_placeholder">Mis. Internet</string>
+    <string name="plan_item_amount_label">Nominal</string>
+    <string name="plan_item_recurrence_label">Pengulangan</string>
+
+    <!-- Debt form -->
+    <string name="debt_new_title">Hutang Baru</string>
+    <string name="debt_edit_title">Edit Hutang</string>
+    <string name="debt_counterparty_label">Pihak Lain</string>
+    <string name="debt_counterparty_placeholder">Mis. KPR Bank Mandiri</string>
+    <string name="debt_principal_label">Pokok hutang</string>
+    <string name="debt_direction_label">Arah</string>
+    <string name="debt_direction_i_owe">Saya berhutang</string>
+    <string name="debt_direction_owed_to_me">Mereka berhutang</string>
+    <string name="debt_direction_owed_to_me_long">Berhutang ke saya</string>
+
+    <!-- Default allocation editor -->
+    <string name="settings_alloc_title">Default Alokasi</string>
+    <string name="settings_alloc_intro">Persentase default untuk Kebutuhan / Keinginan / Investasi. Total harus 100%. Berlaku untuk plan bulan baru yang dibuat ke depan.</string>
+    <string name="settings_alloc_total_label">Total</string>
+
+    <!-- About screen -->
+    <string name="about_title">Tentang Sakuwise</string>
+    <string name="about_privacy">Kebijakan Privasi</string>
+    <string name="about_licenses">Lisensi Open Source</string>
+    <string name="about_contact">Kontak Developer</string>
+
+    <!-- Deposit type labels -->
+    <string name="deposit_type_dplk">DPLK</string>
+    <string name="deposit_type_bpjstk">BPJSTK</string>
+    <string name="deposit_type_deposito">Deposito</string>
+    <string name="deposit_type_other">Lainnya</string>
+
+    <!-- Exit confirm + back handling -->
+    <string name="exit_confirm_title">Tutup Sakuwise?</string>
+    <string name="exit_confirm_body">Data kamu aman dan terenkripsi. Buka lagi kapan aja untuk lanjut.</string>
+    <string name="exit_confirm_yes">Ya, tutup</string>
+    <string name="exit_confirm_no">Batal</string>
+
+    <!-- Picker sheets -->
+    <string name="picker_choose_plan_item">Pilih plan item</string>
+    <string name="picker_choose_account">Pilih akun</string>
+    <string name="picker_no_plan_items">Belum ada plan item. Buat dulu di tab Plan.</string>
+    <string name="picker_no_plan_items_for_filter">Tidak ada item di filter ini.</string>
+
+    <!-- Account type display names -->
+    <string name="account_type_cash">Tunai</string>
+    <string name="account_type_bank">Bank</string>
+    <string name="account_type_ewallet">E-Wallet</string>
+    <string name="account_type_other">Lainnya</string>
+
+    <!-- Recurrence labels -->
+    <string name="recurrence_oneoff">Sekali</string>
+    <string name="recurrence_monthly">Bulanan</string>
+    <string name="recurrence_quarterly">Kwartalan</string>
+    <string name="recurrence_yearly">Tahunan</string>
+    <string name="recurrence_chip_monthly">bulanan</string>
+    <string name="recurrence_chip_quarterly">kwartalan</string>
+    <string name="recurrence_chip_yearly">tahunan</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_section_principle">Prinsip Kami</string>
+    <string name="privacy_principle_body">Sakuwise dibangun dengan satu prinsip: data keuangan kamu cuma punya kamu. Aplikasi ini tidak mengirim apa pun ke server kami atau pihak ketiga — kami bahkan tidak punya server.</string>
+    <string name="privacy_section_collect">Data yang Disimpan</string>
+    <string name="privacy_collect_body">Semua data — akun, transaksi, plan, aset, hutang, catatan, dan pengingat — disimpan hanya di HP kamu, di database SQLCipher yang dienkripsi AES-256 dengan kunci yang dilindungi Android Keystore (hardware-backed di perangkat yang mendukung).</string>
+    <string name="privacy_section_share">Data yang TIDAK Dibagi</string>
+    <string name="privacy_share_body">Sakuwise tidak meminta INTERNET permission. Tidak ada analytics, telemetri, crash reporting, A/B testing, atau iklan. Tidak ada PII (nama lengkap, email, NIK, nomor HP) yang diminta atau disimpan. Cuma nama panggilan untuk sapaan, dan itu pun lokal.</string>
+    <string name="privacy_section_backup">Backup &amp; Kontrol Kamu</string>
+    <string name="privacy_backup_body">Kamu yang memutuskan kapan, ke mana, dan bagaimana data di-backup. File .sakuwise dienkripsi ulang dengan PIN backup yang kamu tetapkan (Argon2id KDF + AES-256-GCM). Sakuwise tidak menyimpan PIN backup ini — kalau hilang, file backup tidak bisa dipulihkan oleh kami.</string>
+    <string name="privacy_section_reset">Hak Hapus</string>
+    <string name="privacy_reset_body">Buka Saya → Reset Aplikasi → ketik frasa konfirmasi untuk hapus semua data secara permanen. Setelah dihapus, tidak ada yang bisa memulihkannya kecuali kamu punya file backup yang valid.</string>
+    <string name="privacy_section_camera">Kamera (Opsional)</string>
+    <string name="privacy_camera_body">Fitur Scan Struk (OCR) meminta izin kamera saat kamu memakainya. Foto struk diproses 100%% di HP via ML Kit on-device — gambar tidak dikirim ke mana pun dan tidak disimpan setelah ekstraksi selesai.</string>
+    <string name="privacy_section_contact_q">Pertanyaan?</string>
+    <string name="privacy_contact_body">Lihat halaman Kontak Developer di Tentang Sakuwise.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="licenses_intro">Sakuwise dibangun di atas bahu raksasa. Daftar pustaka utama yang kami pakai:</string>
+    <string name="licenses_lib_kotlin">Kotlin · JetBrains</string>
+    <string name="licenses_lib_compose">Jetpack Compose &amp; AndroidX · Google</string>
+    <string name="licenses_lib_hilt">Hilt (Dagger) · Google</string>
+    <string name="licenses_lib_room">Room &amp; SQLite · Google</string>
+    <string name="licenses_lib_sqlcipher">SQLCipher Android · Zetetic LLC</string>
+    <string name="licenses_lib_argon2">argon2kt · Daniel Lambert</string>
+    <string name="licenses_lib_mlkit">ML Kit Text Recognition · Google</string>
+    <string name="licenses_lib_workmanager">WorkManager · Google</string>
+    <string name="licenses_lib_security">androidx.security.crypto · Google</string>
+    <string name="licenses_lib_appcompat">AppCompat &amp; Material 3 · Google</string>
+    <string name="licenses_apache">Apache License 2.0</string>
+    <string name="licenses_bsd">BSD-style License</string>
+    <string name="licenses_footer">Lisensi lengkap tiap library bisa dibaca di repositori masing-masing. Sakuwise sendiri belum open source di V1 — dirilis selangkah demi selangkah seiring proyek matang.</string>
+
+    <!-- Contact Developer -->
+    <string name="contact_intro">Sakuwise dibuat oleh tim kecil di Indonesia. Kami baca semua feedback yang masuk.</string>
+    <string name="contact_email_label">Email</string>
+    <string name="contact_email_value">gustiadhitya8@gmail.com</string>
+    <string name="contact_github_label">GitHub Issues</string>
+    <string name="contact_github_value">github.com/sakuwise/sakuwise/issues</string>
+    <string name="contact_bug_label">Lapor Bug</string>
+    <string name="contact_bug_body">Sertakan langkah ulangi, screenshot, dan versi aplikasi (lihat Tentang). Jangan kirim file backup mentah — kami nggak butuh dan kamu nggak mau itu beredar.</string>
+    <string name="contact_feature_label">Usul Fitur</string>
+    <string name="contact_feature_body">Ide untuk roadmap V2? Kirim via email atau buka issue di GitHub.</string>
+
+    <!-- Onboarding -->
+    <string name="onb_step1_title">Halo, kenalan dulu yuk</string>
+    <string name="onb_step1_subtitle">Sakuwise adalah aplikasi anggaran lokal — semua data tinggal di HP kamu, tanpa cloud, tanpa pelacakan.</string>
+    <string name="onb_step1_primary">Mulai</string>
+    <string name="onb_step1_section">PILIH BAHASA</string>
+    <string name="onb_lang_id">Bahasa Indonesia</string>
+    <string name="onb_lang_id_sub">Default</string>
+    <string name="onb_lang_en">English</string>
+    <string name="onb_lang_en_sub">Available too</string>
+    <string name="onb_step2_title">Atur identitas singkat</string>
+    <string name="onb_step2_subtitle">Cuma untuk sapaan dan keamanan. Tidak ada data ke server, ini semua tetap di HP kamu.</string>
+    <string name="onb_step2_nickname_label">Nama panggilan</string>
+    <string name="onb_step2_nickname_placeholder">Mis. Gusti</string>
+    <string name="onb_step2_nickname_hint">Dipakai untuk sapaan di Beranda.</string>
+    <string name="onb_step2_pin_label">PIN 6 digit (cadangan biometrik)</string>
+    <string name="onb_step2_pin_hint">Dipakai kalau biometrik gagal. Bisa diganti kapan saja di Pengaturan.</string>
+    <string name="onb_step2_biometric_title">Buka pakai biometrik</string>
+    <string name="onb_step2_biometric_sub">Sidik jari / wajah — lebih cepat dari ketik PIN.</string>
+    <string name="onb_step3_title">Data kamu tinggal di sini.</string>
+    <string name="onb_step3_subtitle">Tidak ada server Sakuwise. Tidak ada telemetry. Internet hanya dipakai jika kamu memilih backup ke Google Drive — file-nya tetap dienkripsi di HP sebelum diunggah.</string>
+    <string name="onb_step3_primary">Saya mengerti</string>
+    <string name="onb_step3_p1_title">Terenkripsi di disk</string>
+    <string name="onb_step3_p1_sub">Database &amp; foto struk semua dienkripsi pakai AES-256.</string>
+    <string name="onb_step3_p2_title">Bukan akun, bukan email</string>
+    <string name="onb_step3_p2_sub">Tidak ada login. Sakuwise tidak tahu siapa kamu.</string>
+    <string name="onb_step3_p3_title">Backup dipegang kamu</string>
+    <string name="onb_step3_p3_sub">File backup terenkripsi — kamu yang simpan, kamu yang pegang PIN-nya.</string>
+    <string name="onb_type_cash">Tunai</string>
+    <string name="onb_type_bank">Bank</string>
+    <string name="onb_type_ewallet">E-Wallet</string>
+    <string name="onb_step4_account_prefix">AKUN · %1$s</string>
+    <string name="onb_step4_account_default_name">Tunai</string>
+    <string name="onb_step4_title">Akun pertamamu</string>
+    <string name="onb_step4_subtitle">Kita siapkan akun Tunai dulu. Bisa di-rename, ubah saldonya, atau langsung lanjut.</string>
+    <string name="onb_step4_primary">Selesai · Masuk Beranda</string>
+    <string name="onb_step4_secondary">Tambah akun lain nanti</string>
+    <string name="onb_step4_name_label">Nama akun</string>
+    <string name="onb_step4_name_placeholder">Mis. Tunai, Mandiri, GoPay</string>
+    <string name="onb_step4_type_label">Tipe</string>
+    <string name="onb_step4_balance_label">Saldo awal</string>
+    <string name="onb_step4_balance_hint">Boleh 0 — kamu bisa update nanti.</string>
+    <string name="splash_tagline">Rencanakan. Catat. Tenang.</string>
+
+    <!-- Assets hub -->
+    <string name="assets_title">Aset &amp; Kekayaan</string>
+    <string name="assets_total_wealth">TOTAL KEKAYAAN</string>
+    <string name="assets_total_show">Tampilkan total kekayaan</string>
+    <string name="assets_total_hide">Sembunyikan total kekayaan</string>
+    <string name="assets_class_section">Kelas Aset</string>
+    <string name="assets_class_accounts">Akun</string>
+    <string name="assets_class_gold">Emas</string>
+    <string name="assets_class_land">Properti</string>
+    <string name="assets_class_deposit">Deposito</string>
+    <string name="assets_class_active_format">%1$d aktif</string>
+    <string name="assets_class_count_format">%1$d aset</string>
+    <string name="assets_debt_section">Hutang</string>
+    <string name="assets_debt_i_owe">Saya berhutang</string>
+    <string name="assets_debt_outstanding">Outstanding total</string>
+    <string name="assets_debt_title">Hutang &amp; Piutang</string>
+    <string name="assets_debt_empty">Belum ada hutang dicatat</string>
+    <string name="assets_trend_label">TREN KEKAYAAN</string>
+    <string name="assets_trend_period_all">Semua</string>
+
+    <!-- Accounts list -->
+    <string name="accounts_title">Akun</string>
+    <string name="accounts_add_cd">Tambah akun</string>
+    <string name="accounts_empty">Belum ada akun. Tap + untuk tambah akun pertamamu.</string>
+
+    <!-- Account detail -->
+    <string name="account_detail_default_title">Akun</string>
+    <string name="account_detail_balance_prefix">SALDO · %1$s</string>
+    <string name="account_detail_last_recon_format">Rekonsiliasi terakhir %1$s</string>
+    <string name="account_detail_no_recon">Belum pernah direkonsiliasi</string>
+    <string name="account_detail_btn_reconcile">Rekonsiliasi</string>
+    <string name="account_detail_btn_edit">Edit</string>
+    <string name="account_detail_section_snapshots">Riwayat Snapshot</string>
+    <string name="account_detail_snapshots_empty">Belum ada snapshot. Tap Rekonsiliasi untuk mencatat saldo asli dan menyamakan dengan saldo aplikasi.</string>
+    <string name="account_detail_col_date">TANGGAL</string>
+    <string name="account_detail_col_observed">SALDO ASLI</string>
+    <string name="account_detail_col_diff">SELISIH</string>
+    <string name="account_detail_section_txns">Transaksi Akun</string>
+    <string name="account_detail_txns_empty">Belum ada transaksi di akun ini.</string>
+    <string name="reconcile_title">Rekonsiliasi</string>
+    <string name="reconcile_intro">Buka aplikasi bank / e-wallet, lihat saldo aslinya. Tulis di sini — Sakuwise akan otomatis catat selisih sebagai transaksi penyesuaian.</string>
+    <string name="reconcile_app_balance">Saldo Sakuwise</string>
+    <string name="reconcile_app_balance_sub">Terkomputasi dari transaksi tercatat</string>
+    <string name="reconcile_observed_label">Saldo Asli di Bank / E-Wallet</string>
+    <string name="reconcile_note_label">Catatan (opsional)</string>
+    <string name="reconcile_note_placeholder">Misal: Jajan lupa input</string>
+    <string name="reconcile_submit">Simpan Penyesuaian</string>
+    <string name="reconcile_confirm_title">Konfirmasi Penyesuaian</string>
+    <string name="reconcile_confirm_intro">Periksa selisih di bawah. Penyesuaian akan dicatat sebagai transaksi otomatis.</string>
+    <string name="reconcile_delta_positive">Selisih (saldo nyata lebih besar)</string>
+    <string name="reconcile_delta_negative">Selisih (saldo nyata lebih kecil)</string>
+    <string name="reconcile_will_add">Akan ditambahkan sebagai pemasukan penyesuaian.</string>
+    <string name="reconcile_will_subtract">Akan dicatat sebagai pengeluaran penyesuaian.</string>
+    <string name="reconcile_done_title">Berhasil disesuaikan</string>
+    <string name="reconcile_done_body">Saldo Sakuwise sekarang sesuai dengan bank/e-wallet kamu.</string>
+    <string name="snapshot_sheet_title">Detail Rekonsiliasi</string>
+    <string name="snapshot_delete_confirm">Hapus catatan rekonsiliasi ini? Data transaksi penyesuaian yang terkait tetap ada — hanya catatan saldo yang dihapus.</string>
+    <string name="pin_settings_passphrase_title">Gunakan passphrase</string>
+    <string name="pin_settings_passphrase_sub">Pakai kata sandi panjang (≥8 karakter) ganti PIN 6 digit. Setelah aktif, atur ulang dari tombol di bawah.</string>
+    <string name="passphrase_field_label">Passphrase</string>
+    <string name="passphrase_field_placeholder">Ketik passphrase…</string>
+    <string name="passphrase_min_hint_format">Minimal %1$d karakter.</string>
+    <string name="plan_item_schedule_reminder">Jadwalkan pengingat</string>
+    <string name="plan_item_cancel_reminder">Batalkan pengingat</string>
+    <string name="plan_add_item">Tambah item</string>
+    <string name="reconcile_action_matched">✓ Sudah sesuai · Selesai</string>
+    <string name="land_tax_total">Total dibayar</string>
+    <string name="reminder_toast_scheduled">Pengingat diaktifkan</string>
+    <string name="reminder_toast_canceled">Pengingat dimatikan</string>
+    <string name="reminder_toast_denied">Izin notifikasi ditolak — pengingat tidak bisa muncul</string>
+    <string name="reminder_toast_scheduled_fmt">Pengingat aktif: tiap tanggal %1$d, jam %2$s</string>
+    <string name="reminder_when_title">Atur pengingat</string>
+    <string name="reminder_when_intro">Pilih kapan kamu mau diingatkan tiap bulan. Pengingat berulang otomatis tiap 30 hari di waktu ini.</string>
+    <string name="reminder_when_day_label">Tanggal</string>
+    <string name="reminder_when_hour_label">Jam</string>
+    <string name="reminder_when_confirm">Atur pengingat</string>
+    <string name="txn_field_account_balance_format">Saldo: %1$s</string>
+    <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · Tanpa telemetry</string>
+    <string name="settings_footer_line2">Made in Indonesia 🌱</string>
+    <string name="accounts_row_sub_rekon_format">%1$s · rekon %2$s</string>
+    <string name="accounts_list_hint">Tap akun untuk lihat detail, snapshot history, dan rekonsiliasi.</string>
+    <string name="accounts_list_hint_lead">Tap akun</string>
+    <string name="gold_hero_profit_format">Profit %1$s Rp %2$s · %3$s%4$s%%</string>
+    <string name="gold_batches_section_format">%1$d BATCH DIPEGANG</string>
+    <string name="deposit_section_label">ASET DEPOSITO / PENSIUN</string>
+    <string name="reminder_notif_title">Tagihan Sakuwise jatuh tempo</string>
+    <string name="reminder_notif_body_format">Jangan lupa bayar: %1$s</string>
+    <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>
+    <string name="plan_action_regen_incomes_sub">Cek transaksi income bertanda [BERULANG] dan tulis untuk bulan ini</string>
+    <string name="plan_recurring_result_format">%1$d pemasukan berulang ditambahkan</string>
+    <string name="plan_created_toast_format">Plan %1$s berhasil dibuat</string>
+    <string name="plan_month_picker_create_next">+ Buat Plan Bulan Berikutnya</string>
+    <string name="plan_month_picker_empty">Belum ada riwayat plan.</string>
+    <string name="plan_recurring_result_none">Tidak ada pemasukan berulang yang perlu ditambahkan.</string>
+
+    <!-- Account edit -->
+    <string name="account_edit_new_title">Akun Baru</string>
+    <string name="account_edit_edit_title">Edit Akun</string>
+    <string name="account_edit_name_label">Nama akun</string>
+    <string name="account_edit_name_placeholder">Mis. Mandiri, GoPay, Tunai</string>
+    <string name="account_edit_type_label">Tipe</string>
+    <string name="account_edit_balance_label_new">Saldo awal</string>
+    <string name="account_edit_balance_label_existing">Saldo awal (akan menggeser baseline)</string>
+    <string name="account_edit_balance_hint_new">Boleh 0 — kamu bisa update nanti.</string>
+    <string name="account_edit_balance_hint_existing">Mengubah saldo awal akan menggeser semua perhitungan saldo akun ini.</string>
+    <string name="account_edit_archive_title">Arsipkan akun</string>
+    <string name="account_edit_archive_sub">Akun diarsipkan tidak muncul di picker, tapi histori transaksi tetap terlihat.</string>
+
+    <!-- Common -->
+    <string name="cd_back">Kembali</string>
+    <string name="loading">Memuat...</string>
+
+    <!-- Land / Property -->
+    <string name="land_title">Properti</string>
+    <string name="land_add_cd">Tambah properti</string>
+    <string name="land_hero_total">TOTAL NILAI ESTIMASI</string>
+    <string name="land_hero_sub_format">%1$d aset · update nilai manual</string>
+    <string name="land_empty">Belum ada properti. Tap + untuk tambah aset pertama.</string>
+    <string name="land_item_sub_format">%1$s · %2$d m²</string>
+    <string name="land_detail_default_title">Detail Properti</string>
+    <string name="land_detail_value_label">NILAI ESTIMASI</string>
+    <string name="land_field_location">Lokasi</string>
+    <string name="land_field_size">Luas</string>
+    <string name="land_field_size_value_format">%1$d m²</string>
+    <string name="land_field_certificate">Sertifikat</string>
+    <string name="land_field_buy_price">Harga beli</string>
+    <string name="land_field_current_value">Nilai saat ini</string>
+    <string name="land_section_tax">Pembayaran Pajak (PBB)</string>
+    <string name="land_tax_add">Tambah</string>
+    <string name="land_tax_empty">Belum ada pembayaran PBB.</string>
+    <string name="land_tax_default_note">PBB</string>
+    <string name="land_delete">Hapus properti</string>
+    <string name="land_tax_sheet_title">Tambah Pembayaran PBB</string>
+    <string name="land_tax_amount">Nominal</string>
+    <string name="land_tax_note_placeholder">Mis. PBB 2026</string>
+    <string name="land_tax_account_label">Akun pembayar (opsional)</string>
+    <string name="land_tax_account_empty">Tidak terhubung ke akun</string>
+    <string name="land_tax_effect_format">Akan tercatat sebagai pengeluaran di %1$s.</string>
+    <string name="land_tax_effect_none">Kosongkan jika cuma dokumentasi (tidak mempengaruhi saldo).</string>
+    <string name="land_edit_new_title">Properti Baru</string>
+    <string name="land_edit_edit_title">Edit Properti</string>
+    <string name="land_edit_name">Nama</string>
+    <string name="land_edit_name_placeholder">Mis. Sawah Tegal</string>
+    <string name="land_edit_certificate">Nomor Sertifikat (SHM)</string>
+    <string name="land_edit_current_value_label">Nilai saat ini (opsional)</string>
+    <string name="land_edit_current_value_hint">Update manual sesuai estimasi pasar</string>
+
+    <!-- Gold -->
+    <string name="gold_title">Emas</string>
+    <string name="gold_add_cd">Tambah emas</string>
+    <string name="gold_hero_label_format">NILAI SAAT INI · %1$s gram</string>
+    <string name="gold_hero_value_label">NILAI SAAT INI</string>
+    <string name="gold_profit_format">Profit %1$sRp %2$d</string>
+    <string name="gold_price_card_title">Harga Jual Emas Global</string>
+    <string name="gold_price_card_sub_format">Rp %1$s / gram · update manual</string>
+    <string name="gold_price_card_sub_dual_format">Fisik Rp %1$s · Digital Rp %2$s / gram</string>
+    <string name="gold_empty">Belum ada batch emas. Tap + untuk tambah pembelian pertama.</string>
+    <string name="gold_item_title_format">%1$s gram</string>
+    <string name="gold_item_title_with_serial_format">%1$s gram · %2$s</string>
+    <string name="gold_item_buy_date_format">Beli %1$s</string>
+    <string name="gold_price_sheet_title">Harga Emas Global</string>
+    <string name="gold_price_sheet_intro">Update manual sesuai harga jual emas hari ini (Antam, Pegadaian, dll). Auto-fetch akan tersedia di V2.</string>
+    <string name="gold_price_field_label">Harga per gram</string>
+    <string name="gold_price_field_label_physical">Harga Emas Fisik per gram</string>
+    <string name="gold_price_field_label_digital">Harga Emas Digital per gram</string>
+    <string name="gold_kind_label">Jenis Emas</string>
+    <string name="gold_kind_physical">Fisik</string>
+    <string name="gold_kind_digital">Digital</string>
+    <string name="sort_date_newest">Tanggal · terbaru dulu</string>
+    <string name="sort_date_oldest">Tanggal · terlama dulu</string>
+    <string name="sort_amount_high">Jumlah · terbesar dulu</string>
+    <string name="sort_amount_low">Jumlah · terkecil dulu</string>
+    <string name="sort_action_cd">Urutkan</string>
+    <string name="gold_price_tip">Tip: Update bulanan saja sudah cukup. Harga emas tidak fluktuasi liar harian, dan Sakuwise menyimpan harga ini sebagai snapshot — bisa di-recall kapan saja.</string>
+    <string name="gold_detail_default_title">Detail Emas</string>
+    <string name="gold_field_weight">Berat</string>
+    <string name="gold_field_weight_value_format">%1$s gram</string>
+    <string name="gold_field_buy_date">Tanggal beli</string>
+    <string name="gold_field_buy_price">Harga beli</string>
+    <string name="gold_field_price_per_gram">Harga / gram saat beli</string>
+    <string name="gold_field_serial">Nomor seri</string>
+    <string name="gold_delete">Hapus batch</string>
+    <string name="gold_record_sale">Catat Penjualan</string>
+    <string name="gold_section_detail">DETAIL</string>
+    <string name="gold_add_photo">Tambah foto</string>
+    <string name="gold_sold_label">SUDAH TERJUAL</string>
+    <string name="gold_sold_summary_format">Terjual %1$s</string>
+    <string name="gold_sale_intro">Catat harga jual akhir. Jika akun dipilih, hasil penjualan akan masuk sebagai pemasukan otomatis.</string>
+    <string name="gold_sale_price_label">Harga jual total</string>
+    <string name="gold_sale_note_placeholder">Misal: dijual ke toko emas</string>
+    <string name="gold_sale_account_label">Setor ke akun</string>
+    <string name="gold_sale_account_empty">— Tidak dipilih (catat tanpa pemasukan)</string>
+    <string name="gold_sale_effect_format">Akan masuk sebagai pemasukan ke %1$s.</string>
+    <string name="gold_sale_effect_none">Tidak akan tercatat sebagai pemasukan.</string>
+    <string name="gold_sale_confirm">Simpan &amp; Tandai Terjual</string>
+    <string name="gold_edit_new_title">Emas Baru</string>
+    <string name="gold_edit_edit_title">Edit Emas</string>
+    <string name="gold_edit_weight_label">Berat (gram)</string>
+    <string name="gold_edit_buy_price_label">Harga beli total</string>
+    <string name="gold_edit_date_label">Tanggal beli</string>
+    <string name="land_edit_date_label">Tanggal beli</string>
+    <string name="gold_edit_serial_label">Nomor seri (opsional)</string>
+    <string name="gold_edit_serial_placeholder">Mis. G75228242</string>
+    <string name="gold_edit_note_label">Catatan (opsional)</string>
+    <string name="gold_dash">—</string>
+
+    <!-- Deposit -->
+    <string name="deposit_title">Deposito</string>
+    <string name="deposit_add_cd">Tambah deposito</string>
+    <string name="deposit_hero_label">SALDO SNAPSHOT TERAKHIR</string>
+    <string name="deposit_hero_sub_format">%1$d aset · update saat ada slip</string>
+    <string name="deposit_empty">Belum ada deposito/pensiun. Tap + untuk tambah.</string>
+    <string name="deposit_item_sub_format">%1$s · %2$d snapshot</string>
+    <string name="deposit_detail_default_title">Detail Deposito</string>
+    <string name="deposit_balance_latest_label">SALDO TERBARU</string>
+    <string name="deposit_balance_per_format">Per %1$s</string>
+    <string name="deposit_chart_label">Pertumbuhan</string>
+    <string name="deposit_field_type">Tipe</string>
+    <string name="deposit_field_institution">Institusi</string>
+    <string name="deposit_section_snapshot">Snapshot</string>
+    <string name="deposit_snapshot_add">Snapshot baru</string>
+    <string name="deposit_snapshot_empty">Belum ada snapshot.</string>
+    <string name="deposit_delete">Hapus deposito</string>
+    <string name="deposit_snapshot_sheet_title">Snapshot Baru</string>
+    <string name="deposit_snapshot_balance_label">Saldo terbaru</string>
+    <string name="deposit_snapshot_note_label">Catatan (opsional)</string>
+    <string name="deposit_edit_new_title">Deposito Baru</string>
+    <string name="deposit_edit_edit_title">Edit Deposito</string>
+    <string name="deposit_edit_name_label">Nama</string>
+    <string name="deposit_edit_name_placeholder">Mis. BPJSTK JHT</string>
+    <string name="deposit_edit_institution_label">Institusi (opsional)</string>
+    <string name="deposit_edit_institution_placeholder">Mis. Bank Mandiri</string>
+    <string name="deposit_edit_type_label">Tipe</string>
+
+    <!-- Debt -->
+    <string name="debt_title">Hutang &amp; Piutang</string>
+    <string name="debt_add_cd">Tambah hutang</string>
+    <string name="debt_section_i_owe">Saya Berhutang</string>
+    <string name="debt_section_owed">Dipinjamkan ke Orang</string>
+    <string name="debt_list_empty">Belum ada hutang dicatat. Tap + untuk tambah.</string>
+    <string name="debt_start_format">Mulai %1$s</string>
+    <string name="debt_detail_default_title">Detail Hutang</string>
+    <string name="debt_outstanding_negative">SISA HUTANG</string>
+    <string name="debt_outstanding_positive">BELUM KEMBALI</string>
+    <string name="debt_progress_format">Dibayar %1$s (%2$d%%) dari %3$s</string>
+    <string name="debt_field_principal">Pokok</string>
+    <string name="debt_field_start">Mulai</string>
+    <string name="debt_field_due">Jatuh tempo</string>
+    <string name="debt_due_optional">Pilih (opsional)</string>
+    <string name="debt_due_clear">Hapus tanggal jatuh tempo</string>
+    <string name="debt_field_status">Status</string>
+    <string name="debt_status_open">Terbuka</string>
+    <string name="debt_status_paid">Lunas</string>
+    <string name="debt_section_payments">Pembayaran</string>
+    <string name="debt_chart_label">SISA HUTANG</string>
+    <string name="debt_chart_payments_count_format">%1$d pembayaran</string>
+    <string name="debt_payment_add">Tambah</string>
+    <string name="debt_payments_empty">Belum ada pembayaran.</string>
+    <string name="debt_mark_paid">Tandai Lunas</string>
+    <string name="debt_payment_sheet_title">Tambah Pembayaran</string>
+    <string name="debt_payment_amount">Nominal</string>
+    <string name="debt_payment_note">Catatan (opsional)</string>
+    <string name="debt_payment_account_payer">Akun pembayar</string>
+    <string name="debt_payment_account_receiver">Akun penerima</string>
+    <string name="debt_payment_account_label_format">%1$s (opsional)</string>
+    <string name="debt_payment_account_empty">Tidak terhubung ke akun</string>
+    <string name="debt_payment_effect_expense_format">Akan tercatat sebagai pengeluaran di %1$s.</string>
+    <string name="debt_payment_effect_income_format">Akan tercatat sebagai pemasukan di %1$s.</string>
+    <string name="debt_payment_account_fallback">akun</string>
+    <string name="debt_payment_effect_none">Kosongkan jika cuma catatan (tidak mempengaruhi saldo).</string>
+
+    <!-- PIN settings -->
+    <string name="pin_settings_title">PIN &amp; Biometrik</string>
+    <string name="pin_settings_bio_title">Buka pakai biometrik</string>
+    <string name="pin_settings_bio_sub">Sidik jari / wajah. Aktif kalau perangkat mendukung.</string>
+    <string name="pin_settings_change_title">Ubah PIN device</string>
+    <string name="pin_settings_set_title">Set PIN device</string>
+    <string name="pin_settings_change_sub">6 digit, dipakai kalau biometrik gagal.</string>
+    <string name="pin_settings_set_sub">Belum ada PIN — set sekarang biar aplikasi aman tanpa biometrik.</string>
+    <string name="pin_settings_change_btn">Ubah</string>
+    <string name="pin_settings_set_btn">Set</string>
+    <string name="pin_settings_info">PIN device dipakai untuk buka aplikasi sehari-hari. PIN backup terpisah dipakai cuma saat export file backup — di set lazily saat pertama kali kamu tap Backup.</string>
+    <string name="pin_settings_lock_now">Kunci Sekarang</string>
+    <string name="pin_sheet_verify_title">Verifikasi PIN saat ini</string>
+    <string name="pin_sheet_new_title">PIN baru</string>
+    <string name="pin_sheet_confirm_title">Ulangi PIN baru</string>
+    <string name="pin_sheet_next">Lanjut</string>
+    <string name="pin_sheet_save">Simpan PIN</string>
+    <string name="pin_sheet_err_wrong">PIN salah.</string>
+    <string name="pin_sheet_err_mismatch">PIN tidak cocok dengan langkah sebelumnya.</string>
+
+    <!-- Auto-lock settings -->
+    <string name="autolock_title">Auto-lock</string>
+    <string name="autolock_intro">Setelah berapa lama aplikasi mengunci diri sendiri. Buka pakai PIN atau biometrik.</string>
+    <string name="autolock_opt_instant">Langsung</string>
+    <string name="autolock_opt_instant_sub">Lock saat aplikasi pindah ke background</string>
+    <string name="autolock_opt_1">1 menit</string>
+    <string name="autolock_opt_1_sub">Cocok kalau sering kerja sambil cek HP</string>
+    <string name="autolock_opt_5">5 menit</string>
+    <string name="autolock_opt_5_sub">Default — saldo keseimbangan privacy &amp; kenyamanan</string>
+    <string name="autolock_opt_15">15 menit</string>
+    <string name="autolock_opt_15_sub">Lebih jarang prompt PIN/biometrik</string>
+    <string name="autolock_opt_30">30 menit</string>
+    <string name="autolock_opt_30_sub">Untuk pemakaian intensif sesi panjang</string>
+
+    <!-- Period start settings -->
+    <string name="period_start_title">Tanggal Mulai Periode</string>
+    <string name="period_start_intro">Tanggal berapa tiap bulan sebuah plan-bulanan dimulai. Default tanggal 1 (mengikuti kalender). Atur ke 25 kalau gajian tanggal 25.</string>
+    <string name="period_start_note">Catatan: Untuk bulan Februari (28/29 hari), tanggal mulai yang lebih besar dari hari terakhir bulan jatuh ke hari terakhir bulan tersebut.</string>
+
+    <!-- Language settings -->
+    <string name="language_title">Bahasa</string>
+    <string name="language_intro">Bahasa antarmuka aplikasi. Akan berlaku setelah layar berikutnya dibuka.</string>
+
+    <!-- Allocation editor -->
+    <string name="alloc_save">Simpan</string>
+    <string name="alloc_invalid_total">Total harus pas 100% sebelum bisa disimpan.</string>
+
+    <!-- Profile settings -->
+    <string name="profile_title">Profil</string>
+    <string name="profile_intro">Nama panggilan ini cuma untuk sapaan di Beranda. Sakuwise nggak menyimpan email atau identitas lain.</string>
+    <string name="profile_nickname_label">Nama panggilan</string>
+    <string name="profile_nickname_placeholder">Mis. Gusti</string>
+    <string name="profile_save">Simpan</string>
+    <string name="profile_privacy_note">Privasi: Sakuwise tidak menyimpan nama lengkap, email, NIK, atau identitas lain. Cuma nama panggilan untuk sapaan.</string>
+
+    <!-- About / Legal -->
+    <string name="about_version">Versi 1.0 · Build 1</string>
+    <string name="about_blurb">Sakuwise adalah aplikasi anggaran lokal — local-first, terenkripsi, berkonteks Indonesia. Data kamu tidak pernah meninggalkan HP ini.</string>
+
+    <!-- Gold price settings (full screen) -->
+    <string name="gold_price_settings_title">Harga Emas Global</string>
+    <string name="gold_price_settings_intro">Update manual sesuai harga jual emas hari ini (Antam, Pegadaian, dll). Auto-fetch akan tersedia di V2.</string>
+    <string name="gold_price_tip_prefix">Tip: </string>
+    <string name="gold_price_tip_body">Update bulanan saja sudah cukup. Harga emas tidak fluktuasi liar harian, dan Sakuwise menyimpan harga ini sebagai snapshot — bisa di-recall kapan saja.</string>
+    <string name="gold_price_save">Simpan</string>
+
+    <!-- Reset App -->
+    <string name="reset_title">Reset Aplikasi</string>
+    <string name="reset_hero_title">Hapus semua data dan mulai dari nol</string>
+    <string name="reset_hero_body">Semua akun, transaksi, plan, aset, hutang, dan pengingat akan dihapus permanen. Backup .sakuwise terakhir tidak ikut terhapus dari penyimpanan kamu.</string>
+    <string name="reset_confirm_title">Konfirmasi</string>
+    <string name="reset_confirm_intro_format">Ketik "%1$s" untuk mengaktifkan tombol reset.</string>
+    <string name="reset_confirm_label">Frasa konfirmasi</string>
+    <string name="reset_action">Reset semua data sekarang</string>
+    <string name="reset_cancel">Batal</string>
+
+    <!-- Donate -->
+    <string name="donate_title">Donasi</string>
+    <string name="donate_hero_title">Traktir Kopi</string>
+    <string name="donate_hero_body">Sakuwise gratis untuk semua. Kalau kamu merasa terbantu, traktir kopi sebagai apresiasi.</string>
+    <string name="donate_section_platform">PILIH PLATFORM</string>
+    <string name="donate_footnote">Sakuwise tidak memproses pembayaran di dalam aplikasi. Semua donasi mengalir lewat platform eksternal.</string>
+    <string name="donate_platform_saweria">Saweria</string>
+    <string name="donate_platform_saweria_url">saweria.co/gustiadhitya</string>
+
+    <!-- Backup settings -->
+    <string name="backup_title">Backup &amp; Pemulihan</string>
+    <string name="backup_status_never">Belum pernah backup</string>
+    <string name="backup_status_today">Backup terakhir hari ini</string>
+    <string name="backup_status_overdue_format">Backup tertunda %1$d hari</string>
+    <string name="backup_status_body">Backup berkala melindungi datamu kalau HP hilang. Kalau lebih dari 60 hari, modal blocking akan muncul saat aplikasi dibuka.</string>
+    <string name="backup_now">Backup Sekarang</string>
+    <string name="backup_restore">Pulihkan dari File</string>
+    <string name="backup_how_title">Cara kerja</string>
+    <string name="backup_step1_title">Set PIN backup</string>
+    <string name="backup_step1_body">6 digit, terpisah dari PIN device. Dipakai untuk meng-enkripsi file backup.</string>
+    <string name="backup_step2_title">Aplikasi enkripsi data</string>
+    <string name="backup_step2_body">Semua data → file .sakuwise terenkripsi AES-256-GCM. PIN-mu jadi kunci.</string>
+    <string name="backup_step3_title">Kamu pilih lokasi simpan</string>
+    <string name="backup_step3_body">Storage lokal, USB, atau upload manual ke Google Drive / iCloud. Sakuwise nggak auto-upload.</string>
+    <string name="backup_step4_title">Restore di device lama / baru</string>
+    <string name="backup_step4_body">Pilih file → masukkan PIN backup → semua data balik.</string>
+
+    <!-- Backup PIN flow -->
+    <string name="backup_pin_title_encrypting">Mengenkripsi data...</string>
+    <string name="backup_pin_title_done">Backup tersimpan</string>
+    <string name="backup_pin_title_create">Buat PIN backup</string>
+    <string name="backup_pin_title_confirm">Konfirmasi PIN</string>
+    <string name="backup_pin_intro_enter">PIN 6-digit untuk meng-enkripsi file backup. Catat &amp; simpan di tempat aman — Sakuwise tidak menyimpan PIN ini.</string>
+    <string name="backup_pin_intro_confirm">Masukkan PIN sekali lagi untuk konfirmasi.</string>
+    <string name="backup_pin_err_mismatch">PIN tidak cocok.</string>
+    <string name="backup_pin_next">Lanjut</string>
+    <string name="backup_pin_confirm_start">Konfirmasi &amp; Mulai Backup</string>
+    <string name="backup_pin_warning">⚠ Penting: Kalau PIN ini hilang, file backup tidak bisa di-restore. Sakuwise zero-knowledge — kami tidak punya backdoor.</string>
+    <string name="backup_encrypting_body">AES-256-GCM. Argon2id KDF. Tidak ada data keluar dari HP ini.</string>
+    <string name="backup_done_title">File backup siap</string>
+    <string name="backup_done_size_format">%1$s · %2$d KB</string>
+    <string name="backup_done_finish">Selesai</string>
+
+    <!-- Restore flow -->
+    <string name="restore_title">Pulihkan dari Backup</string>
+    <string name="restore_intro">Pilih file .sakuwise yang sebelumnya kamu simpan, lalu masukkan PIN backup. Restore akan MENGGANTI semua data di aplikasi ini.</string>
+    <string name="restore_no_file">Belum ada file dipilih</string>
+    <string name="restore_change_file">Tap \'Ganti\' untuk pilih file lain</string>
+    <string name="restore_choose_file">Tap \'Pilih file\' untuk browse</string>
+    <string name="restore_btn_pick">Pilih</string>
+    <string name="restore_btn_change">Ganti</string>
+    <string name="restore_pin_label">Masukkan PIN backup</string>
+    <string name="restore_btn_decrypting">Mendekripsi...</string>
+    <string name="restore_btn_restore">Pulihkan Data</string>
+    <string name="restore_warning">⚠ Restore akan MENGGANTI semua data di aplikasi ini dengan data dari file backup. Data yang sekarang ada akan hilang. Pastikan ini yang kamu inginkan.</string>
+    <string name="restore_success_title">Restore selesai</string>
+    <string name="restore_success_body">Data dari file backup sudah diganti ke aplikasi ini. Aplikasi harus dibuka ulang supaya semua tampilan refresh dengan data baru.</string>
+    <string name="restore_relaunch">Buka Ulang Aplikasi</string>
+    <string name="restore_footer">Catatan: PIN aplikasi &amp; nama kamu tidak ikut di-restore — itu cuma ada di install saat ini. Data keuangan (akun, plan, transaksi, aset) sudah balik.</string>
+
+    <!-- AUDIT-CC2: externalized sheet/dialog titles (PLAN-7 EN walkthrough prep) -->
+    <string name="sheet_plan_month_picker_title">Pilih Periode</string>
+    <string name="sheet_plan_add_category_title">Tambah Kategori</string>
+    <string name="sheet_plan_edit_category_title">Ubah Kategori</string>
+    <string name="sheet_plan_delete_category_title">Hapus Kategori?</string>
+    <string name="plan_category_action_edit">Ubah nama kategori</string>
+    <string name="plan_category_action_delete">Hapus kategori</string>
+    <string name="sheet_plan_expected_income_title">Pemasukan Diharapkan</string>
+    <string name="sheet_plan_reset_title">Reset Plan?</string>
+    <string name="sheet_picker_debt_title">Pilih hutang</string>
+    <string name="sheet_picker_income_category_title">Kategori Sumber</string>
+
+    <!-- REQ-2: Google Drive cloud backup (AppData scope) -->
+    <string name="drive_section_title">Cloud Backup (Google Drive)</string>
+    <string name="drive_section_subtitle">File backup tersimpan di folder app-data yang privat — tidak terlihat di Drive biasa.</string>
+    <string name="drive_connect">Hubungkan Google Drive</string>
+    <string name="drive_signed_in_as">Terhubung sebagai %1$s</string>
+    <string name="drive_signout">Logout dari Drive</string>
+    <string name="drive_auto_toggle">Auto-backup ke Drive</string>
+    <string name="drive_auto_toggle_hint">Otomatis upload file backup ke Drive setiap hari</string>
+    <string name="drive_auto_last_success">Auto-backup terakhir: %1$s</string>
+    <string name="drive_auto_last_never">Belum pernah auto-backup — aktifkan lalu buat backup manual dulu</string>
+    <string name="drive_backup_now">Backup ke Drive Sekarang</string>
+    <string name="drive_restore_open">Pulihkan dari Drive</string>
+    <string name="drive_last_backup_format">Backup Drive terakhir: %1$s</string>
+    <string name="drive_last_backup_never">Belum pernah backup ke Drive</string>
+    <string name="drive_list_title">Backup Tersedia di Drive</string>
+    <string name="drive_list_empty">Belum ada file backup di Drive ini.</string>
+    <string name="drive_entry_size_format">%1$d KB</string>
+    <string name="drive_restore_btn">Pulihkan</string>
+    <string name="drive_delete_btn">Hapus</string>
+    <string name="drive_restore_pin_label">PIN backup file ini</string>
+    <string name="drive_restore_confirm">Pulihkan dari Drive</string>
+    <string name="drive_restore_intro">Masukkan PIN backup yang kamu pakai saat membuat file ini. Data sekarang akan TERGANTIKAN.</string>
+
+    <!-- PRD §7.4 + §7.11 — receipt photo attach on the Expense form -->
+    <string name="txn_expense_photo_label">Foto struk</string>
+    <string name="txn_expense_photo_hint">Opsional. Disimpan di HP, tidak ke cloud.</string>
+    <string name="txn_expense_photo_attached">Foto terlampir</string>
+    <string name="txn_expense_photo_camera_cd">Ambil foto dengan kamera</string>
+    <string name="txn_expense_photo_gallery_cd">Pilih foto dari galeri</string>
+    <string name="txn_expense_photo_remove_cd">Hapus foto</string>
+
+    <!-- PRD §7.4 — transfer fee assigned to a plan item -->
+    <string name="txn_transfer_fee_plan_item">Plan item untuk biaya</string>
+    <string name="txn_transfer_fee_plan_item_placeholder">Pilih plan item…</string>
+
+    <!-- PRD §7.12 — 60-day backup blocker modal -->
+    <string name="dashboard_backup60_title">Backup tertunda lama</string>
+    <string name="dashboard_backup60_body_format">Sudah %1$s hari sejak backup terakhir. Backup sekarang untuk amankan datamu.</string>
+    <string name="dashboard_backup60_cta">Backup Sekarang</string>
+    <string name="dashboard_backup60_later">Nanti saja</string>
+
+    <!-- PRD §7.13 — overspending banner -->
+    <string name="dashboard_overspend_title">Pengeluaran melebihi alokasi</string>
+    <string name="dashboard_overspend_body">Salah satu alokasi sudah lewat 100%. Tap untuk cek detail.</string>
+</resources>

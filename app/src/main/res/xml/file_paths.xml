@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider paths for Sakuwise.
+  Only cache-dir is exposed — used by Export PDF (V1.1) so users can open/share
+  the generated report via system intents without granting broad storage perms.
+-->
+<paths>
+    <cache-path name="exports" path="." />
+</paths>
