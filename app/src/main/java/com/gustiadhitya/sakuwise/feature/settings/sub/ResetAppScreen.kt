@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -103,12 +102,16 @@ fun ResetAppScreen(
     val done by viewModel.done.collectAsState()
     var phrase by remember { mutableStateOf("") }
     var showDeleteTxnsDialog by remember { mutableStateOf(false) }
+    var showResetConfirmDialog by remember { mutableStateOf(false) }
 
+    // Only navigate away when done transitions to true — guard against spurious
+    // recompositions on fresh/empty data that could trigger onDone() prematurely.
     LaunchedEffect(done) { if (done) onDone() }
 
     if (showDeleteTxnsDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteTxnsDialog = false },
+            icon = { Icon(Icons.Outlined.DeleteForever, null, tint = sw.danger) },
             title = { Text("Hapus Data Transaksi?", color = sw.ink, style = SwType.H3) },
             text = {
                 Text(
@@ -118,17 +121,61 @@ fun ResetAppScreen(
                 )
             },
             confirmButton = {
-                SwButton(
-                    text = "Hapus Transaksi",
-                    onClick = { showDeleteTxnsDialog = false; viewModel.deleteAllTransactions() },
-                    variant = SwButtonVariant.Danger,
-                )
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteTxnsDialog = false }) {
-                    Text("Batal", color = sw.inkMuted)
+                Column {
+                    SwButton(
+                        text = "Batal",
+                        onClick = { showDeleteTxnsDialog = false },
+                        variant = SwButtonVariant.Primary,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    SwButton(
+                        text = "Hapus Transaksi",
+                        onClick = { showDeleteTxnsDialog = false; viewModel.deleteAllTransactions() },
+                        variant = SwButtonVariant.GhostDanger,
+                    )
                 }
             },
+            dismissButton = null,
+            containerColor = sw.surface,
+        )
+    }
+
+    if (showResetConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetConfirmDialog = false },
+            icon = { Icon(Icons.Outlined.DeleteForever, null, tint = sw.danger) },
+            title = {
+                Text(
+                    stringResource(R.string.reset_confirm_dialog_title),
+                    color = sw.ink,
+                    style = SwType.H3,
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.reset_confirm_dialog_body),
+                    color = sw.inkMuted,
+                    style = SwType.LabelSmall.copy(fontSize = 12.sp),
+                )
+            },
+            // Both buttons are the same size. "Batal" is highlighted (Primary) so users
+            // read the warning before accidentally tapping the destructive action.
+            confirmButton = {
+                Column {
+                    SwButton(
+                        text = stringResource(R.string.reset_confirm_dialog_no),
+                        onClick = { showResetConfirmDialog = false },
+                        variant = SwButtonVariant.Primary,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    SwButton(
+                        text = stringResource(R.string.reset_confirm_dialog_yes),
+                        onClick = { showResetConfirmDialog = false; viewModel.reset() },
+                        variant = SwButtonVariant.GhostDanger,
+                    )
+                }
+            },
+            dismissButton = null,
             containerColor = sw.surface,
         )
     }
@@ -202,7 +249,7 @@ fun ResetAppScreen(
         Spacer(Modifier.height(18.dp))
         SwButton(
             text = stringResource(R.string.reset_action),
-            onClick = { viewModel.reset() },
+            onClick = { showResetConfirmDialog = true },
             variant = SwButtonVariant.Danger,
             enabled = phrase.trim() == ACK_PHRASE,
         )

@@ -15,8 +15,8 @@ android {
         applicationId = "com.gustiadhitya.sakuwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -150,4 +150,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+}
+
+// Convenience task: build release AAB and copy it to a fixed, easy-to-find
+// location at ~/AndroidStudioProjects/Sakuwise/app/release/app-release.aab
+// Usage: ./gradlew exportAab
+tasks.register<Copy>("exportAab") {
+    dependsOn("bundleRelease")
+    val destDir = file("${System.getProperty("user.home")}/AndroidStudioProjects/Sakuwise/app/build/outputs/bundle/release")
+    from(layout.buildDirectory.dir("outputs/bundle/release"))
+    include("app-release.aab")
+    into(destDir)
+    doFirst { destDir.mkdirs() }
+    doLast { println("\n✓ AAB siap di: $destDir/app-release.aab\n") }
 }

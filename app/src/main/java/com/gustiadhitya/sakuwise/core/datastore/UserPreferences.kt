@@ -67,8 +67,8 @@ data class UserPreferences(
             needsPct = 50,
             wantsPct = 30,
             investPct = 20,
-            goldPriceGlobal = 1_050_000L, // sample default — user can change in Settings
-            goldPriceDigital = 1_050_000L,
+            goldPriceGlobal = 2_600_000L, // Fisik default — user can change in Settings
+            goldPriceDigital = 2_500_000L, // Digital default
             lastBackupTimestamp = 0L,
             driveBackupEnabled = false,
             driveAccountEmail = null,

@@ -10,11 +10,15 @@ import com.gustiadhitya.sakuwise.core.cloud.DriveBackupEntry
 import com.gustiadhitya.sakuwise.core.cloud.GoogleDriveBackup
 import com.gustiadhitya.sakuwise.core.crypto.BackupService
 import com.gustiadhitya.sakuwise.core.crypto.BadPinException
+import com.gustiadhitya.sakuwise.core.database.dao.AccountDao
 import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -35,7 +39,13 @@ class BackupViewModel @Inject constructor(
     private val backupService: BackupService,
     private val prefsRepo: UserPreferencesRepository,
     private val drive: GoogleDriveBackup,
+    private val accountDao: AccountDao,
 ) : AndroidViewModel(app) {
+
+    /** True once at least one account exists — used to gate the backup action. */
+    val hasData: StateFlow<Boolean> = accountDao.observeAll()
+        .map { it.isNotEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
     private val _state = MutableStateFlow(BackupUiState())
     val state: StateFlow<BackupUiState> = _state
@@ -187,40 +197,42 @@ class BackupViewModel @Inject constructor(
     }
 
     /**
-     * Upload the most-recent local `.sakuwise` backup to Drive. If no local
-     * backup exists yet, surfaces an error — the user should create one via
-     * the normal backup PIN flow first.
+     * Create a fresh encrypted backup using [pin] and upload it directly to
+     * Drive. Does NOT depend on a pre-existing local backup file — the
+     * encrypted blob is written to a private temp dir, uploaded, then deleted.
      */
-    fun uploadLatestLocalBackupToDrive() {
+    fun backupToDriveWithPin(pin: CharArray) {
         viewModelScope.launch {
             _driveState.value = _driveState.value.copy(busy = true, error = null)
-            val dir = File(app.getExternalFilesDir(null), "backups")
-            val latest = dir.listFiles { f -> f.isFile && f.name.endsWith(".sakuwise") }
-                ?.maxByOrNull { it.lastModified() }
-            if (latest == null) {
+            try {
+                val tempDir = File(app.cacheDir, "drive_backup_temp").apply { mkdirs() }
+                val file = backupService.backup(pin, tempDir)
+                pin.fill(0.toChar())
+                val result = drive.upload(file, file.name)
+                runCatching { file.delete() }
+                result.fold(
+                    onSuccess = {
+                        prefsRepo.markDriveBackupNow(System.currentTimeMillis())
+                        _driveState.value = _driveState.value.copy(
+                            busy = false,
+                            lastMessage = "Backup berhasil diupload ke Google Drive",
+                        )
+                        refreshDriveBackups()
+                    },
+                    onFailure = { t ->
+                        _driveState.value = _driveState.value.copy(
+                            busy = false,
+                            error = "Upload gagal: ${t.message ?: "unknown"}",
+                        )
+                    },
+                )
+            } catch (t: Throwable) {
+                pin.fill(0.toChar())
                 _driveState.value = _driveState.value.copy(
                     busy = false,
-                    error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_no_local_files),
+                    error = "Backup gagal: ${t.message ?: "unknown"}",
                 )
-                return@launch
             }
-            val result = drive.upload(latest, latest.name)
-            result.fold(
-                onSuccess = {
-                    prefsRepo.markDriveBackupNow(System.currentTimeMillis())
-                    _driveState.value = _driveState.value.copy(
-                        busy = false,
-                        lastMessage = "Backup terupload ke Google Drive",
-                    )
-                    refreshDriveBackups()
-                },
-                onFailure = { t ->
-                    _driveState.value = _driveState.value.copy(
-                        busy = false,
-                        error = "Upload gagal: ${t.message ?: "unknown"}",
-                    )
-                },
-            )
         }
     }
 

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
 
-enum class SwButtonVariant { Primary, Secondary, Outline, Ghost, Danger }
+enum class SwButtonVariant { Primary, Secondary, Outline, Ghost, Danger, GhostDanger }
 enum class SwButtonSize(val h: Int, val padH: Int, val fs: Int) {
     Sm(36, 14, 13),
     Md(48, 18, 15),
@@ -47,11 +47,12 @@ fun SwButton(
 ) {
     val sw = SwTheme.colors
     val (bg, fg, border) = when (variant) {
-        SwButtonVariant.Primary   -> Triple(sw.primary, sw.onPrimary, Color.Transparent)
-        SwButtonVariant.Secondary -> Triple(sw.primaryContainer, sw.onPrimaryContainer, Color.Transparent)
-        SwButtonVariant.Outline   -> Triple(Color.Transparent, sw.ink, sw.borderStrong)
-        SwButtonVariant.Ghost     -> Triple(Color.Transparent, sw.primary, Color.Transparent)
-        SwButtonVariant.Danger    -> Triple(sw.danger, Color.White, Color.Transparent)
+        SwButtonVariant.Primary      -> Triple(sw.primary, sw.onPrimary, Color.Transparent)
+        SwButtonVariant.Secondary    -> Triple(sw.primaryContainer, sw.onPrimaryContainer, Color.Transparent)
+        SwButtonVariant.Outline      -> Triple(Color.Transparent, sw.ink, sw.borderStrong)
+        SwButtonVariant.Ghost        -> Triple(Color.Transparent, sw.primary, Color.Transparent)
+        SwButtonVariant.Danger       -> Triple(sw.danger, Color.White, Color.Transparent)
+        SwButtonVariant.GhostDanger  -> Triple(Color.Transparent, sw.danger, Color.Transparent)
     }
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()

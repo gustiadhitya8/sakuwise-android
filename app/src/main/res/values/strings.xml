@@ -128,6 +128,7 @@
     <string name="reconcile_adjustment_plus_format">Penyesuaian +Rp %1$d disimpan</string>
     <string name="reconcile_adjustment_minus_format">Penyesuaian -Rp %1$d disimpan</string>
     <string name="backup_no_local_files">Belum ada file backup lokal. Buat backup dulu lewat tombol Backup Sekarang.</string>
+    <string name="backup_no_data">Belum ada data untuk dibackup. Tambahkan akun atau transaksi terlebih dahulu.</string>
     <string name="export_pdf_no_accounts">Belum ada akun.</string>
     <string name="export_pdf_income_vs_expense">Pemasukan vs Pengeluaran</string>
     <string name="export_pdf_no_transactions">Belum ada transaksi.</string>
@@ -494,7 +495,7 @@
     <string name="reminder_when_hour_label">Jam</string>
     <string name="reminder_when_confirm">Atur pengingat</string>
     <string name="txn_field_account_balance_format">Saldo: %1$s</string>
-    <string name="settings_footer_line1">Sakuwise · v1.0 · Local-first · Tanpa telemetry</string>
+    <string name="settings_footer_line1">Sakuwise · %s · Local-first · Tanpa telemetry</string>
     <string name="settings_footer_line2">Made in Indonesia 🌱</string>
     <string name="accounts_row_sub_rekon_format">%1$s · rekon %2$s</string>
     <string name="accounts_list_hint">Tap akun untuk lihat detail, snapshot history, dan rekonsiliasi.</string>
@@ -763,6 +764,10 @@
     <string name="reset_confirm_label">Frasa konfirmasi</string>
     <string name="reset_action">Reset semua data sekarang</string>
     <string name="reset_cancel">Batal</string>
+    <string name="reset_confirm_dialog_title">Yakin ingin reset?</string>
+    <string name="reset_confirm_dialog_body">Semua data akan terhapus permanen dan tidak bisa dikembalikan. Akun, transaksi, plan, dan aset akan hilang semua. Proses ini tidak bisa dibatalkan.</string>
+    <string name="reset_confirm_dialog_yes">Ya, Hapus Semua</string>
+    <string name="reset_confirm_dialog_no">Batal</string>
 
     <!-- Donate -->
     <string name="donate_title">Donasi</string>
@@ -847,6 +852,10 @@
     <string name="drive_auto_last_success">Auto-backup terakhir: %1$s</string>
     <string name="drive_auto_last_never">Belum pernah auto-backup — aktifkan lalu buat backup manual dulu</string>
     <string name="drive_backup_now">Backup ke Drive Sekarang</string>
+    <string name="drive_backup_pin_intro">Masukkan PIN backup kamu untuk mengenkripsi data sebelum diupload ke Google Drive.</string>
+    <string name="drive_backup_pin_label">PIN Backup</string>
+    <string name="drive_backup_confirm">Enkripsi &amp; Upload</string>
+    <string name="drive_backup_progress">Mengenkripsi &amp; mengupload…</string>
     <string name="drive_restore_open">Pulihkan dari Drive</string>
     <string name="drive_last_backup_format">Backup Drive terakhir: %1$s</string>
     <string name="drive_last_backup_never">Belum pernah backup ke Drive</string>
@@ -858,6 +867,8 @@
     <string name="drive_restore_pin_label">PIN backup file ini</string>
     <string name="drive_restore_confirm">Pulihkan dari Drive</string>
     <string name="drive_restore_intro">Masukkan PIN backup yang kamu pakai saat membuat file ini. Data sekarang akan TERGANTIKAN.</string>
+    <string name="drive_restore_progress">Mengunduh &amp; memulihkan data…</string>
+    <string name="drive_restore_progress_hint">Jangan tutup aplikasi</string>
 
     <!-- PRD §7.4 + §7.11 — receipt photo attach on the Expense form -->
     <string name="txn_expense_photo_label">Foto struk</string>

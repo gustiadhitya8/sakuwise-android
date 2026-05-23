@@ -2,9 +2,12 @@ package com.gustiadhitya.sakuwise.core.crypto
 
 import android.content.Context
 import com.gustiadhitya.sakuwise.core.database.SakuwiseDatabase
+import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -17,14 +20,27 @@ import javax.inject.Singleton
 /**
  * BackupService — orchestrates `.sakuwise` create / restore.
  *
- * **Backup payload layout (inside the AES-GCM-encrypted body):**
+ * **Payload v1 layout (inside the AES-GCM-encrypted body):**
  * ```
  *   4B  payload version (BE u32 = 1)
  *   4B  DEK length (BE u32; must be 32 for AES-256)
  *   N   DEK bytes
  *   M   SQLCipher-encrypted sakuwise.db bytes
  * ```
- * The PIN-derived KEK in [BackupCrypto] wraps this whole body.
+ *
+ * **Payload v2 layout** (adds settings blob so gold prices / plan config
+ * survive a restore without reverting to app defaults):
+ * ```
+ *   4B  payload version (BE u32 = 2)
+ *   4B  DEK length (BE u32)
+ *   N   DEK bytes
+ *   4B  settings JSON length (BE u32; 0 if absent)
+ *   P   settings JSON bytes (UTF-8)
+ *   M   SQLCipher-encrypted sakuwise.db bytes
+ * ```
+ *
+ * v1 backups are still restoreable — the settings block is treated as
+ * absent (goldPriceGlobal/Digital keep their DataStore value).
  *
  * **Why ship the DEK:** the DEK that encrypted the SQLite file is
  * Keystore-bound on the device. After uninstall / reinstall / `pm clear`,
@@ -38,28 +54,33 @@ class BackupService @Inject constructor(
     @ApplicationContext private val context: Context,
     private val database: SakuwiseDatabase,
     private val keyManager: KeyManager,
+    private val prefsRepo: UserPreferencesRepository,
 ) {
 
     private val dbFile: File get() = context.getDatabasePath("sakuwise.db")
 
-    /** Create a `.sakuwise` backup file and return its absolute path. */
+    /** Create a `.sakuwise` v2 backup file and return its absolute path. */
     suspend fun backup(pin: CharArray, destDir: File): File = withContext(Dispatchers.IO) {
         // 1. Force WAL checkpoint so the .db file is a complete copy.
-        //    PRAGMA wal_checkpoint returns rows, so SQLCipher requires query() — not execSQL().
         runCatching {
             database.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").use { it.moveToFirst() }
         }
         // 2. Read raw SQLite bytes (still SQLCipher-encrypted at this layer)
         val rawDb = dbFile.readBytes()
-        // 3. Read the current DEK (this is the key that decrypts the SQLCipher payload)
+        // 3. Read the current DEK
         val dek = keyManager.getOrCreateDek()
         try {
-            // 4. Pack [4B version][4B dekLen][DEK][DB] into the inner payload
-            val payload = packPayload(dek, rawDb)
+            // 4. Serialize current settings (gold prices, plan config, etc.)
+            val prefs = prefsRepo.prefs.first()
+            val settingsJson = serializeSettings(prefs)
+            val settingsBytes = settingsJson.toByteArray(Charsets.UTF_8)
+
+            // 5. Pack [4B version=2][4B dekLen][DEK][4B settingsLen][settings][DB]
+            val payload = packPayload(dek, settingsBytes, rawDb)
             try {
-                // 5. Encrypt the whole payload under the PIN-derived KEK
+                // 6. Encrypt the whole payload under the PIN-derived KEK
                 val encrypted = BackupCrypto.encryptBackup(payload, pin)
-                // 6. Write to destination
+                // 7. Write to destination
                 if (!destDir.exists()) destDir.mkdirs()
                 val outFile = File(destDir, defaultFilename())
                 outFile.writeBytes(encrypted)
@@ -73,17 +94,20 @@ class BackupService @Inject constructor(
     }
 
     /**
-     * Restore from a `.sakuwise` file. Replaces the current DB AND the DEK.
-     * The caller MUST restart the process (force-stop) after this returns so
-     * Room/SQLCipher re-open the swapped files cleanly.
+     * Restore from a `.sakuwise` file (v1 or v2). Replaces the current DB,
+     * the DEK, and (v2 only) the app settings that affect financial
+     * calculations (gold prices, plan config, etc.).
+     *
+     * The caller MUST restart the process after this returns so Room /
+     * SQLCipher re-open the swapped files cleanly.
      */
     suspend fun restore(pin: CharArray, sourceFile: File) = withContext(Dispatchers.IO) {
         val ciphertext = sourceFile.readBytes()
         val payload = BackupCrypto.decryptBackup(ciphertext, pin)
         try {
-            val (dek, dbBytes) = unpackPayload(payload)
+            val (dek, settingsBytes, dbBytes) = unpackPayload(payload)
             try {
-                // 1. Close the current Room/SQLCipher connection so we can swap the file.
+                // 1. Close Room/SQLCipher so we can swap the file.
                 database.close()
                 // 2. Install the original DEK so SQLCipher can decrypt the restored DB.
                 keyManager.installDek(dek)
@@ -91,16 +115,18 @@ class BackupService @Inject constructor(
                 val tmp = File(dbFile.parentFile, "sakuwise.db.restore")
                 tmp.writeBytes(dbBytes)
                 if (dbFile.exists()) dbFile.delete()
-                // Also clear WAL/SHM sidecar files — stale checkpoint state breaks SQLCipher.
+                // Clear WAL/SHM sidecar files — stale checkpoint state breaks SQLCipher.
                 File(dbFile.parentFile, "sakuwise.db-wal").takeIf { it.exists() }?.delete()
                 File(dbFile.parentFile, "sakuwise.db-shm").takeIf { it.exists() }?.delete()
-                // renameTo() can return false silently on some Android filesystem
-                // configurations (e.g. cross-mount-point moves). Fall back to
-                // copyTo+delete so the caller always receives a real exception
-                // instead of silently opening a brand-new empty database.
+                // renameTo() can return false silently on some filesystem configurations.
+                // Fall back to copyTo+delete so the caller always gets a real exception.
                 if (!tmp.renameTo(dbFile)) {
                     tmp.copyTo(dbFile, overwrite = true)
                     tmp.delete()
+                }
+                // 4. Restore settings (v2 only; v1 → settingsBytes is empty → skip)
+                if (settingsBytes.isNotEmpty()) {
+                    applySettings(settingsBytes)
                 }
             } finally {
                 dek.fill(0)
@@ -110,31 +136,108 @@ class BackupService @Inject constructor(
         }
     }
 
-    private fun packPayload(dek: ByteArray, db: ByteArray): ByteArray {
+    // ── Settings serialization ────────────────────────────────────────────
+
+    /**
+     * Serialize the subset of prefs that are meaningful to restore:
+     * - Gold prices (directly affect portfolio valuations)
+     * - Plan config (period start, allocation %)
+     * - UI preferences (auto-lock, theme, language, balance visibility)
+     *
+     * Intentionally excluded (device-specific / security-sensitive):
+     * - biometricEnabled, PIN/credential, onboardingCompleted, nickname
+     * - driveBackupEnabled / driveAccountEmail / timestamps
+     */
+    private fun serializeSettings(prefs: com.gustiadhitya.sakuwise.core.datastore.UserPreferences): String =
+        JSONObject().apply {
+            put("goldPriceGlobal", prefs.goldPriceGlobal)
+            put("goldPriceDigital", prefs.goldPriceDigital)
+            put("planPeriodStartDay", prefs.planPeriodStartDay)
+            put("needsPct", prefs.needsPct)
+            put("wantsPct", prefs.wantsPct)
+            put("investPct", prefs.investPct)
+            put("autoLockMinutes", prefs.autoLockMinutes)
+            put("themeMode", prefs.themeMode)
+            put("language", prefs.language)
+            put("balancesHidden", prefs.balancesHidden)
+        }.toString()
+
+    private suspend fun applySettings(bytes: ByteArray) {
+        val obj = runCatching { JSONObject(bytes.toString(Charsets.UTF_8)) }.getOrNull() ?: return
+        if (obj.has("goldPriceGlobal"))
+            prefsRepo.setGoldPriceGlobal(obj.getLong("goldPriceGlobal"))
+        if (obj.has("goldPriceDigital"))
+            prefsRepo.setGoldPriceDigital(obj.getLong("goldPriceDigital"))
+        if (obj.has("planPeriodStartDay"))
+            runCatching { prefsRepo.setPlanPeriodStartDay(obj.getInt("planPeriodStartDay")) }
+        if (obj.has("needsPct") && obj.has("wantsPct") && obj.has("investPct")) {
+            val n = obj.getInt("needsPct")
+            val w = obj.getInt("wantsPct")
+            val i = obj.getInt("investPct")
+            if (n + w + i == 100) runCatching { prefsRepo.setAllocationPercentages(n, w, i) }
+        }
+        if (obj.has("autoLockMinutes"))
+            runCatching { prefsRepo.setAutoLockMinutes(obj.getInt("autoLockMinutes")) }
+        if (obj.has("themeMode")) {
+            val mode = obj.optString("themeMode", "system")
+            if (mode in setOf("light", "dark", "system"))
+                runCatching { prefsRepo.setThemeMode(mode) }
+        }
+        if (obj.has("language"))
+            runCatching { prefsRepo.setLanguage(obj.getString("language")) }
+        if (obj.has("balancesHidden"))
+            runCatching { prefsRepo.setBalancesHidden(obj.getBoolean("balancesHidden")) }
+    }
+
+    // ── Payload packing ───────────────────────────────────────────────────
+
+    /** v2: [4B ver][4B dekLen][DEK][4B settingsLen][settings][DB] */
+    private fun packPayload(dek: ByteArray, settings: ByteArray, db: ByteArray): ByteArray {
         require(dek.size in 16..64) { "DEK length out of range: ${dek.size}" }
-        val out = ByteArray(HEADER_LEN + dek.size + db.size)
+        val totalLen = V2_HEADER_LEN + dek.size + settings.size + db.size
+        val out = ByteArray(totalLen)
         val buf = ByteBuffer.wrap(out).order(ByteOrder.BIG_ENDIAN)
-        buf.putInt(PAYLOAD_VERSION)
+        buf.putInt(PAYLOAD_VERSION_V2)
         buf.putInt(dek.size)
         buf.put(dek)
+        buf.putInt(settings.size)
+        if (settings.isNotEmpty()) buf.put(settings)
         buf.put(db)
         return out
     }
 
-    private fun unpackPayload(payload: ByteArray): Pair<ByteArray, ByteArray> {
-        require(payload.size > HEADER_LEN) { "Payload too small" }
+    /** Returns (dek, settingsBytes, dbBytes). settingsBytes is empty for v1 backups. */
+    private fun unpackPayload(payload: ByteArray): Triple<ByteArray, ByteArray, ByteArray> {
+        require(payload.size > V1_HEADER_LEN) { "Payload too small" }
         val buf = ByteBuffer.wrap(payload).order(ByteOrder.BIG_ENDIAN)
         val version = buf.int
-        require(version == PAYLOAD_VERSION) {
-            "Backup payload version $version not supported (expected $PAYLOAD_VERSION)"
+
+        return when (version) {
+            PAYLOAD_VERSION_V1 -> {
+                // v1: [4B ver][4B dekLen][DEK][DB]
+                val dekLen = buf.int
+                require(dekLen in 16..64) { "Invalid DEK length: $dekLen" }
+                require(payload.size > V1_HEADER_LEN + dekLen) { "v1 payload truncated" }
+                val dek = ByteArray(dekLen).also { buf.get(it) }
+                val dbLen = payload.size - V1_HEADER_LEN - dekLen
+                val db = ByteArray(dbLen).also { buf.get(it) }
+                Triple(dek, ByteArray(0), db)
+            }
+            PAYLOAD_VERSION_V2 -> {
+                // v2: [4B ver][4B dekLen][DEK][4B settingsLen][settings][DB]
+                val dekLen = buf.int
+                require(dekLen in 16..64) { "Invalid DEK length: $dekLen" }
+                val dek = ByteArray(dekLen).also { buf.get(it) }
+                val settingsLen = buf.int
+                require(settingsLen >= 0) { "Invalid settings length: $settingsLen" }
+                val settings = if (settingsLen > 0) ByteArray(settingsLen).also { buf.get(it) } else ByteArray(0)
+                val dbLen = payload.size - V2_HEADER_LEN - dekLen - settingsLen
+                require(dbLen > 0) { "v2 payload truncated" }
+                val db = ByteArray(dbLen).also { buf.get(it) }
+                Triple(dek, settings, db)
+            }
+            else -> error("Backup payload version $version not supported")
         }
-        val dekLen = buf.int
-        require(dekLen in 16..64) { "Invalid DEK length in payload: $dekLen" }
-        require(payload.size > HEADER_LEN + dekLen) { "Payload truncated" }
-        val dek = ByteArray(dekLen).also { buf.get(it) }
-        val dbLen = payload.size - HEADER_LEN - dekLen
-        val db = ByteArray(dbLen).also { buf.get(it) }
-        return dek to db
     }
 
     private fun defaultFilename(): String {
@@ -143,7 +246,9 @@ class BackupService @Inject constructor(
     }
 
     private companion object {
-        const val PAYLOAD_VERSION = 1
-        const val HEADER_LEN = 8 // 4B version + 4B dekLen
+        const val PAYLOAD_VERSION_V1 = 1
+        const val PAYLOAD_VERSION_V2 = 2
+        const val V1_HEADER_LEN = 8  // 4B version + 4B dekLen
+        const val V2_HEADER_LEN = 12 // 4B version + 4B dekLen + 4B settingsLen
     }
 }

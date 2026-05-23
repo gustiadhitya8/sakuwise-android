@@ -59,6 +59,12 @@ fun OnboardingFlow(
     )
     val ctx = LocalContext.current
     val onChange: (OnboardingUi) -> Unit = { next ->
+        // Capture lang BEFORE update so we can detect if it actually changed.
+        // Do NOT compare against AppCompatDelegate.getApplicationLocales() here —
+        // that string can differ in format ("" vs "id" vs "id-ID") and calling
+        // setApplicationLocales() on every keystroke causes an Activity recreation
+        // that blinks the screen and closes the keyboard (reported bug).
+        val prevLang = viewModel.state.value.lang
         viewModel.update {
             it.copy(
                 lang = next.lang,
@@ -70,12 +76,8 @@ fun OnboardingFlow(
                 accountBalance = next.accountBalance,
             )
         }
-        // Always apply the picked locale — DON'T gate on langChanged. On cold
-        // start the displayed locale may be the system locale even though
-        // DataStore says "id", so user's "tap to confirm" must still write
-        // through to AppCompatDelegate. Idempotent at the AppCompat layer.
-        val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
-        if (current != next.lang) {
+        // Only switch locale when the user explicitly picked a different language.
+        if (next.lang != prevLang) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(next.lang))
         }
     }

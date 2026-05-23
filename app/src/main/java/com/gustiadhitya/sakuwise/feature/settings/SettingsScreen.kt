@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import com.gustiadhitya.sakuwise.BuildConfig
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.app.MainViewModel
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
@@ -220,7 +221,7 @@ fun SettingsScreen(
                 stringResource(R.string.settings_donate_sub),
                 icon = Icons.Outlined.AutoAwesome,
                 onClick = onNavigateToDonate)
-            SettingsRow(stringResource(R.string.settings_about), "v1.0",
+            SettingsRow(stringResource(R.string.settings_about), "v${BuildConfig.VERSION_NAME}",
                 icon = Icons.Outlined.Info,
                 onClick = onNavigateToAbout)
         }
@@ -230,7 +231,7 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth().padding(horizontal = SwSpace.pageH),
         ) {
-            Text(stringResource(R.string.settings_footer_line1),
+            Text(stringResource(R.string.settings_footer_line1, "v${BuildConfig.VERSION_NAME}"),
                 color = sw.inkSubtle,
                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
             Spacer(Modifier.height(4.dp))

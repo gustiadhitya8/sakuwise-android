@@ -2,7 +2,6 @@ package com.gustiadhitya.sakuwise.feature.asset.gold
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -240,7 +239,9 @@ fun GoldListScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .background(if (isSystemInDarkTheme()) sw.warningSoft else sw.warning)
+                // Use warningSoft in dark mode so the bright-amber card doesn't
+                // scream against the near-black bg. Light mode stays full amber.
+                .background(if (sw.isDark) sw.warningSoft else sw.warning)
                 .padding(18.dp),
         ) {
             Box(modifier = Modifier.matchParentSize()) {
@@ -541,7 +542,7 @@ fun GoldDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .background(if (isSystemInDarkTheme()) sw.warningSoft else sw.warning)
+                .background(if (sw.isDark) sw.warningSoft else sw.warning)
                 .padding(18.dp),
         ) {
             Box(modifier = Modifier.matchParentSize()) {
