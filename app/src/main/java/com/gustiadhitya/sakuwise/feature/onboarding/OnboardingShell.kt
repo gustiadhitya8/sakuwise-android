@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -113,11 +114,13 @@ fun OnboardingShell(
             Spacer(Modifier.height(8.dp))
         }
 
-        // Sticky actions — bottom inset trimmed; safe-area handles the rest.
+        // Sticky actions — add navigationBars inset so buttons don't sit behind
+        // the 3-button nav bar on devices that don't use gesture navigation.
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp),
         ) {
             SwButton(

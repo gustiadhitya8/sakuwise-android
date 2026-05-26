@@ -112,10 +112,10 @@ fun ResetAppScreen(
         AlertDialog(
             onDismissRequest = { showDeleteTxnsDialog = false },
             icon = { Icon(Icons.Outlined.DeleteForever, null, tint = sw.danger) },
-            title = { Text("Hapus Data Transaksi?", color = sw.ink, style = SwType.H3) },
+            title = { Text(stringResource(R.string.delete_txns_dialog_title), color = sw.ink, style = SwType.H3) },
             text = {
                 Text(
-                    "Semua transaksi akan dihapus permanen. Plan, akun, dan data aset tidak terpengaruh.",
+                    stringResource(R.string.delete_txns_dialog_body),
                     color = sw.inkMuted,
                     style = SwType.LabelSmall.copy(fontSize = 12.sp),
                 )
@@ -123,13 +123,13 @@ fun ResetAppScreen(
             confirmButton = {
                 Column {
                     SwButton(
-                        text = "Batal",
+                        text = stringResource(R.string.action_cancel),
                         onClick = { showDeleteTxnsDialog = false },
                         variant = SwButtonVariant.Primary,
                     )
                     Spacer(Modifier.height(8.dp))
                     SwButton(
-                        text = "Hapus Transaksi",
+                        text = stringResource(R.string.delete_txns_btn),
                         onClick = { showDeleteTxnsDialog = false; viewModel.deleteAllTransactions() },
                         variant = SwButtonVariant.GhostDanger,
                     )
@@ -185,19 +185,19 @@ fun ResetAppScreen(
         SwCard(padding = PaddingValues(16.dp)) {
             Column {
                 Text(
-                    "Hapus Data Transaksi",
+                    stringResource(R.string.delete_txns_section_title),
                     color = sw.ink,
                     style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Hapus seluruh riwayat transaksi tanpa menghapus Plan, akun, atau data aset. Berguna untuk impor ulang dari awal.",
+                    stringResource(R.string.delete_txns_section_body),
                     color = sw.inkMuted,
                     style = SwType.LabelSmall.copy(fontSize = 12.sp),
                 )
                 Spacer(Modifier.height(12.dp))
                 SwButton(
-                    text = "Hapus Semua Transaksi",
+                    text = stringResource(R.string.delete_txns_action),
                     onClick = { showDeleteTxnsDialog = true },
                     variant = SwButtonVariant.Danger,
                     leading = { Icon(Icons.Outlined.DeleteForever, null, tint = sw.onPrimary, modifier = androidx.compose.ui.Modifier.padding(end = 4.dp)) },

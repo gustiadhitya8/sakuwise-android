@@ -209,10 +209,17 @@ class BackupViewModel @Inject constructor(
                 val file = backupService.backup(pin, tempDir)
                 pin.fill(0.toChar())
                 val result = drive.upload(file, file.name)
-                runCatching { file.delete() }
                 result.fold(
                     onSuccess = {
-                        prefsRepo.markDriveBackupNow(System.currentTimeMillis())
+                        // Persist a local copy so the daily auto-backup worker has a
+                        // file to sync and so the backup-status hero shows a real date.
+                        val localDir = File(app.getExternalFilesDir(null), "backups")
+                            .apply { mkdirs() }
+                        runCatching { file.copyTo(File(localDir, file.name), overwrite = true) }
+                        runCatching { file.delete() }
+                        val now = System.currentTimeMillis()
+                        prefsRepo.markDriveBackupNow(now)
+                        prefsRepo.markBackupNow(now)
                         _driveState.value = _driveState.value.copy(
                             busy = false,
                             lastMessage = "Backup berhasil diupload ke Google Drive",
@@ -220,6 +227,7 @@ class BackupViewModel @Inject constructor(
                         refreshDriveBackups()
                     },
                     onFailure = { t ->
+                        runCatching { file.delete() }
                         _driveState.value = _driveState.value.copy(
                             busy = false,
                             error = "Upload gagal: ${t.message ?: "unknown"}",

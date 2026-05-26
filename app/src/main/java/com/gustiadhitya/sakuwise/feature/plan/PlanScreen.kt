@@ -1337,7 +1337,10 @@ private fun EditPlanItemSheet(
     ) {
         if (allocationBudget > 0L) {
             val plannedExcludingThis = allocationPlanTotal - (existing?.plannedAmount ?: 0L)
-            val sisa = allocationBudget - plannedExcludingThis
+            // Update terencana and sisa in real-time as the user types the amount.
+            val currentAmount = amount.toLongOrNull() ?: 0L
+            val terencana = plannedExcludingThis + currentAmount
+            val sisa = allocationBudget - terencana
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1348,7 +1351,8 @@ private fun EditPlanItemSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    Text("Alokasi $allocationName", color = sw.inkMuted,
+                    Text(stringResource(R.string.plan_stat_allocation, allocationName),
+                        color = sw.inkMuted,
                         style = SwType.Caption.copy(fontSize = 10.sp), maxLines = 1)
                     Spacer(Modifier.height(2.dp))
                     RupiahText(value = allocationBudget, short = false,
@@ -1357,16 +1361,16 @@ private fun EditPlanItemSheet(
                 }
                 Box(Modifier.width(1.dp).height(32.dp).background(sw.border))
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    Text("Terencana", color = sw.inkMuted,
+                    Text(stringResource(R.string.plan_stat_planned), color = sw.inkMuted,
                         style = SwType.Caption.copy(fontSize = 10.sp))
                     Spacer(Modifier.height(2.dp))
-                    RupiahText(value = plannedExcludingThis, short = false,
+                    RupiahText(value = terencana, short = false,
                         style = SwType.Amount.copy(fontSize = 12.sp, fontFeatureSettings = "tnum"),
                         color = sw.inkMuted)
                 }
                 Box(Modifier.width(1.dp).height(32.dp).background(sw.border))
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    Text("Sisa", color = sw.inkMuted,
+                    Text(stringResource(R.string.plan_stat_remaining), color = sw.inkMuted,
                         style = SwType.Caption.copy(fontSize = 10.sp))
                     Spacer(Modifier.height(2.dp))
                     RupiahText(value = sisa.absoluteValue, short = false,
@@ -1476,8 +1480,8 @@ private fun EditPlanItemSheet(
             val borderColor = if (isActive) sw.success.copy(alpha = 0.4f) else sw.border
             val iconTint = if (isActive) sw.success else sw.inkMuted
             val bellIcon = if (isActive) Icons.Outlined.Notifications else Icons.Outlined.NotificationsNone
-            val label = if (isActive) "Pengingat Aktif" else stringResource(R.string.plan_item_schedule_reminder)
-            val sub = if (isActive) "Ketuk untuk ubah jadwal" else "Ketuk untuk atur jadwal notifikasi"
+            val label = if (isActive) stringResource(R.string.reminder_label_active) else stringResource(R.string.plan_item_schedule_reminder)
+            val sub = if (isActive) stringResource(R.string.reminder_sub_active) else stringResource(R.string.reminder_sub_inactive)
             val labelColor = if (isActive) sw.success else sw.ink
 
             Row(

@@ -58,8 +58,11 @@ fun BackupSettingsScreen(
     var pinFlowOpen by remember { mutableStateOf(false) }
     var driveRestoreOpen by remember { mutableStateOf(false) }
 
-    val daysAgo = if (prefs.lastBackupTimestamp == 0L) -1
-        else ((System.currentTimeMillis() - prefs.lastBackupTimestamp) / 86_400_000L).toInt()
+    // Show the most recent of local or Drive backup — so status is "today"
+    // even when the user only uses Drive backup (never saves a local file).
+    val effectiveBackupTs = maxOf(prefs.lastBackupTimestamp, prefs.lastDriveBackupTimestamp)
+    val daysAgo = if (effectiveBackupTs == 0L) -1
+        else ((System.currentTimeMillis() - effectiveBackupTs) / 86_400_000L).toInt()
 
     // Launcher: user picks where to save the encrypted backup file
     val saveFileLauncher = rememberLauncherForActivityResult(

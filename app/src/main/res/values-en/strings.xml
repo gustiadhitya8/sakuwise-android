@@ -764,6 +764,31 @@
     <string name="reset_confirm_label">Confirmation phrase</string>
     <string name="reset_action">Reset all data now</string>
     <string name="reset_cancel">Cancel</string>
+    <string name="reset_confirm_dialog_title">Are you sure?</string>
+    <string name="reset_confirm_dialog_body">All data will be permanently deleted and cannot be recovered. Accounts, transactions, plans, and assets will all be gone. This action cannot be undone.</string>
+    <string name="reset_confirm_dialog_yes">Yes, Delete All</string>
+    <string name="reset_confirm_dialog_no">Cancel</string>
+
+    <!-- Delete transactions (section + dialog) -->
+    <string name="delete_txns_section_title">Delete Transaction Data</string>
+    <string name="delete_txns_section_body">Delete all transaction history without removing Plans, accounts, or asset data. Useful for re-importing from scratch.</string>
+    <string name="delete_txns_action">Delete All Transactions</string>
+    <string name="delete_txns_dialog_title">Delete Transaction Data?</string>
+    <string name="delete_txns_dialog_body">All transactions will be permanently deleted. Plans, accounts, and asset data are not affected.</string>
+    <string name="delete_txns_btn">Delete Transactions</string>
+
+    <!-- Plan item edit — allocation stats row -->
+    <string name="plan_stat_allocation">%1$s budget</string>
+    <string name="plan_stat_planned">Planned</string>
+    <string name="plan_stat_remaining">Remaining</string>
+
+    <!-- Reminder row in plan item edit -->
+    <string name="reminder_label_active">Reminder Active</string>
+    <string name="reminder_sub_active">Tap to change schedule</string>
+    <string name="reminder_sub_inactive">Tap to set notification schedule</string>
+
+    <!-- OCR retry -->
+    <string name="ocr_retake">Retake Photo</string>
 
     <!-- Donate -->
     <string name="donate_title">Donate</string>

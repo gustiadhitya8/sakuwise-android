@@ -200,7 +200,11 @@ fun OcrCaptureScreen(
                     onGallery = { galleryLauncher.launch("image/*") },
                 )
                 is OcrStage.Processing -> ProcessingHero()
-                is OcrStage.Ready -> ReadyBody(draft = s.draft)
+                is OcrStage.Ready -> ReadyBody(
+                    draft = s.draft,
+                    onRetake = { viewModel.reset(); launchCamera() },
+                    onGallery = { viewModel.reset(); galleryLauncher.launch("image/*") },
+                )
                 is OcrStage.Failure -> FailureBody(
                     message = s.message,
                     onRetake = ::launchCamera,
@@ -274,7 +278,7 @@ private fun ProcessingHero() {
  * buttons (proto has none, only the top-right pill drives navigation).
  */
 @Composable
-private fun ReadyBody(draft: ReceiptDraft) {
+private fun ReadyBody(draft: ReceiptDraft, onRetake: () -> Unit, onGallery: () -> Unit) {
     val sw = SwTheme.colors
     val detected = listOf(draft.merchant != null,
         draft.totalAmount != null, draft.date != null).count { it }
@@ -340,6 +344,21 @@ private fun ReadyBody(draft: ReceiptDraft) {
             style = SwType.Body.copy(fontSize = 13.sp, lineHeight = 18.sp),
         )
     }
+    // Retry buttons — allow re-shoot if the parsed result is wrong.
+    Spacer(Modifier.height(12.dp))
+    SwButton(
+        text = stringResource(R.string.ocr_retake),
+        onClick = onRetake,
+        variant = SwButtonVariant.Outline,
+        leading = { Icon(Icons.Outlined.CameraAlt, null, tint = sw.ink, modifier = Modifier.size(16.dp)) },
+    )
+    Spacer(Modifier.height(8.dp))
+    SwButton(
+        text = stringResource(R.string.ocr_pick_from_gallery),
+        onClick = onGallery,
+        variant = SwButtonVariant.Ghost,
+        leading = { Icon(Icons.Outlined.Image, null, tint = sw.primary, modifier = Modifier.size(16.dp)) },
+    )
 }
 
 @Composable

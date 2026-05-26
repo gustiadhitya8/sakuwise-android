@@ -158,7 +158,11 @@ class DashboardViewModel @Inject constructor(
             allocations = planData.allocations,
             planItemNames = planData.planItemNames,
             topCategories = tops.map { TopCategorySpend(name = it.name, amount = it.total) },
-            backupOverdueDays = computeOverdueDays(prefs.lastBackupTimestamp),
+            // Use the most recent of local or Drive backup so the banner doesn't
+            // show "never" when the user has only done Drive backups.
+            backupOverdueDays = computeOverdueDays(
+                maxOf(prefs.lastBackupTimestamp, prefs.lastDriveBackupTimestamp)
+            ),
             notificationsLastSeenAt = prefs.notificationsLastSeenAt,
             balancesHidden = prefs.balancesHidden,
             loading = false,

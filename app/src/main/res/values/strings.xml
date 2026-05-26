@@ -769,6 +769,27 @@
     <string name="reset_confirm_dialog_yes">Ya, Hapus Semua</string>
     <string name="reset_confirm_dialog_no">Batal</string>
 
+    <!-- Delete transactions (section + dialog) -->
+    <string name="delete_txns_section_title">Hapus Data Transaksi</string>
+    <string name="delete_txns_section_body">Hapus seluruh riwayat transaksi tanpa menghapus Plan, akun, atau data aset. Berguna untuk impor ulang dari awal.</string>
+    <string name="delete_txns_action">Hapus Semua Transaksi</string>
+    <string name="delete_txns_dialog_title">Hapus Data Transaksi?</string>
+    <string name="delete_txns_dialog_body">Semua transaksi akan dihapus permanen. Plan, akun, dan data aset tidak terpengaruh.</string>
+    <string name="delete_txns_btn">Hapus Transaksi</string>
+
+    <!-- Plan item edit — allocation stats row -->
+    <string name="plan_stat_allocation">Alokasi %1$s</string>
+    <string name="plan_stat_planned">Terencana</string>
+    <string name="plan_stat_remaining">Sisa</string>
+
+    <!-- Reminder row in plan item edit -->
+    <string name="reminder_label_active">Pengingat Aktif</string>
+    <string name="reminder_sub_active">Ketuk untuk ubah jadwal</string>
+    <string name="reminder_sub_inactive">Ketuk untuk atur jadwal notifikasi</string>
+
+    <!-- OCR retry -->
+    <string name="ocr_retake">Foto Ulang</string>
+
     <!-- Donate -->
     <string name="donate_title">Donasi</string>
     <string name="donate_hero_title">Traktir Kopi</string>
