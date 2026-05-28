@@ -120,7 +120,30 @@ data class Transaction(
     val note: String?,
     val createdAt: Long,
 ) {
-    override fun equals(other: Any?): Boolean = (other as? Transaction)?.id == id
+    // Full structural equality so that a date- or amount-only edit is detected
+    // by StateFlow deduplication (StateFlow uses equals() to decide whether to
+    // emit).  photoBlob is a ByteArray, which compares by reference by default,
+    // so we use contentEquals() explicitly.  hashCode stays id-based (a hash
+    // collision between two versions of the same row is rare and harmless).
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val o = other as? Transaction ?: return false
+        return id == o.id &&
+            date == o.date &&
+            amount == o.amount &&
+            type == o.type &&
+            planItemId == o.planItemId &&
+            sourceAccountId == o.sourceAccountId &&
+            destAccountId == o.destAccountId &&
+            transferFee == o.transferFee &&
+            debtId == o.debtId &&
+            incomeCategoryId == o.incomeCategoryId &&
+            note == o.note &&
+            createdAt == o.createdAt &&
+            (photoBlob === o.photoBlob ||
+                (photoBlob != null && o.photoBlob != null && photoBlob.contentEquals(o.photoBlob)) ||
+                (photoBlob == null && o.photoBlob == null))
+    }
     override fun hashCode(): Int = id.hashCode()
 }
 

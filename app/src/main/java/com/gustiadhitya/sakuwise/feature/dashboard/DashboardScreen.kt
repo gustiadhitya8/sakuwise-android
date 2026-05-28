@@ -861,16 +861,21 @@ private fun DashboardRecentTxns(
                 Column {
                     sortedTxns.forEachIndexed { i, t ->
                         val divider = i < sortedTxns.size - 1
-                        val tone = when (t.type) {
-                            TxnType.Income -> sw.success
-                            TxnType.Transfer -> sw.info
+                        // Reconciliation: positive diff = income-like, negative = expense-like
+                        val isPosiRecon = t.type == TxnType.Reconciliation && t.amount > 0
+                        val isNegaRecon = t.type == TxnType.Reconciliation && t.amount < 0
+                        val tone = when {
+                            t.type == TxnType.Income || isPosiRecon -> sw.success
+                            t.type == TxnType.Transfer -> sw.info
                             else -> sw.ink
                         }
-                        val sign = when (t.type) {
-                            TxnType.Income -> RupiahSign.Positive
-                            TxnType.Expense, TxnType.DebtOutflow -> RupiahSign.Negative
+                        val sign = when {
+                            t.type == TxnType.Income || isPosiRecon -> RupiahSign.Positive
+                            t.type == TxnType.Expense || t.type == TxnType.DebtOutflow || isNegaRecon -> RupiahSign.Negative
                             else -> RupiahSign.None
                         }
+                        // For negative reconciliation show abs value (amount is stored negative)
+                        val displayAmount = if (isNegaRecon) -t.amount else t.amount
                         val planItemName = if (t.type == TxnType.Expense || t.type == TxnType.DebtOutflow)
                             planItemNameLookup(t.planItemId) else null
                         Row(
@@ -883,9 +888,9 @@ private fun DashboardRecentTxns(
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                         ) {
-                            val iconBg = when (t.type) {
-                                TxnType.Income -> sw.success
-                                TxnType.Transfer -> sw.info
+                            val iconBg = when {
+                                t.type == TxnType.Income || isPosiRecon -> sw.success
+                                t.type == TxnType.Transfer -> sw.info
                                 else -> sw.danger
                             }
                             Box(
@@ -896,9 +901,9 @@ private fun DashboardRecentTxns(
                                     .background(iconBg.copy(alpha = 0.12f)),
                             ) {
                                 Icon(
-                                    when (t.type) {
-                                        TxnType.Income -> Icons.Outlined.ArrowCircleUp
-                                        TxnType.Transfer -> Icons.Outlined.SyncAlt
+                                    when {
+                                        t.type == TxnType.Income || isPosiRecon -> Icons.Outlined.ArrowCircleUp
+                                        t.type == TxnType.Transfer -> Icons.Outlined.SyncAlt
                                         else -> Icons.Outlined.ArrowCircleDown
                                     },
                                     null,
@@ -951,7 +956,7 @@ private fun DashboardRecentTxns(
                                 }
                             }
                             RupiahText(
-                                value = t.amount,
+                                value = displayAmount,
                                 sign = sign,
                                 short = false,
                                 style = SwType.Amount.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold),

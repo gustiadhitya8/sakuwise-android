@@ -21,7 +21,9 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Restore
@@ -52,6 +54,7 @@ import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonSize
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
+import com.gustiadhitya.sakuwise.core.designsystem.components.PinInput
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
 import com.gustiadhitya.sakuwise.feature.transaction.ui.SwPickerSheet
 import java.text.SimpleDateFormat
@@ -74,6 +77,9 @@ fun DriveBackupSection(
     val ctx = LocalContext.current
     val driveState by vm.driveState.collectAsState()
     var showDriveBackupPin by remember { mutableStateOf(false) }
+    // PIN setup for auto-backup (shown when toggle is turned ON, or "Ubah" tapped)
+    var showAutoBackupPinSetup by remember { mutableStateOf(false) }
+    var autoBackupPinChangeMode by remember { mutableStateOf(false) }
 
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -200,7 +206,7 @@ fun DriveBackupSection(
                 )
                 Spacer(Modifier.height(12.dp))
 
-                // ③ Auto-backup toggle (secondary setting, below the action buttons)
+                // ③ Auto-backup toggle
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
@@ -219,11 +225,20 @@ fun DriveBackupSection(
                     }
                     Switch(
                         checked = autoBackupEnabled,
-                        onCheckedChange = vm::setDriveAutoBackupEnabled,
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                // Show PIN setup instead of enabling immediately
+                                autoBackupPinChangeMode = false
+                                showAutoBackupPinSetup = true
+                            } else {
+                                vm.disableAutoBackup()
+                            }
+                        },
                     )
                 }
                 if (autoBackupEnabled) {
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(6.dp))
+                    // Status row: last run time
                     val lastAutoLabel = if (lastDriveBackupTimestamp <= 0L)
                         stringResource(R.string.drive_auto_last_never)
                     else stringResource(
@@ -245,6 +260,33 @@ fun DriveBackupSection(
                             lastAutoLabel,
                             color = sw.inkMuted,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp),
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    // PIN status chip
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(sw.successSoft)
+                            .clickable {
+                                autoBackupPinChangeMode = true
+                                showAutoBackupPinSetup = true
+                            }
+                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    ) {
+                        Icon(
+                            if (vm.autoBackupPinStored) Icons.Outlined.Lock else Icons.Outlined.Edit,
+                            null,
+                            tint = sw.success,
+                            modifier = Modifier.size(13.dp),
+                        )
+                        Text(
+                            if (vm.autoBackupPinStored) "PIN backup tersimpan · Ubah"
+                            else "Belum ada PIN — Tap untuk set",
+                            color = sw.success,
+                            style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
                         )
                     }
                 }
@@ -290,11 +332,27 @@ fun DriveBackupSection(
         }
     }
 
-    // PIN sheet for Drive backup — create fresh encrypted backup + upload
+    // PIN sheet for Drive "Cadangkan Sekarang" — one-off upload
     if (showDriveBackupPin) {
         DriveBackupPinSheet(
             vm = vm,
             onDismiss = { showDriveBackupPin = false },
+        )
+    }
+
+    // PIN setup sheet for auto-backup — shown when toggle is turned ON or "Ubah" is tapped
+    if (showAutoBackupPinSetup) {
+        AutoBackupPinSetupSheet(
+            changeMode = autoBackupPinChangeMode,
+            onConfirm = { pin ->
+                if (autoBackupPinChangeMode) {
+                    vm.changeAutoBackupPin(pin)
+                } else {
+                    vm.enableAutoBackupWithPin(pin)
+                }
+                showAutoBackupPinSetup = false
+            },
+            onDismiss = { showAutoBackupPinSetup = false },
         )
     }
 }
@@ -592,6 +650,123 @@ fun DriveRestoreSheet(
         }
     }
 }
+
+/**
+ * Bottom sheet that collects a 6-digit PIN for auto-backup.
+ *
+ * When [changeMode] is false this is the initial setup (toggle just turned ON).
+ * When [changeMode] is true the user tapped "Ubah" on the PIN chip.
+ *
+ * Two-step PIN entry (enter + confirm) mirrors the manual backup PIN flow.
+ * On confirmation [onConfirm] is called with the PIN array; the sheet is
+ * responsible for zeroing it once consumed.
+ */
+@Composable
+private fun AutoBackupPinSetupSheet(
+    changeMode: Boolean,
+    onConfirm: (CharArray) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sw = SwTheme.colors
+    var pin by remember { mutableStateOf("") }
+    var pin2 by remember { mutableStateOf("") }
+    var stage by remember { mutableStateOf(AutoPinStage.Enter) }
+
+    SwPickerSheet(
+        title = if (changeMode) "Ubah PIN Auto-backup" else "Buat PIN Auto-backup",
+        onDismiss = onDismiss,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth().height(96.dp),
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(sw.primaryContainer),
+            ) {
+                Icon(
+                    Icons.Outlined.Lock, null,
+                    tint = sw.primary,
+                    modifier = Modifier.size(32.dp),
+                )
+            }
+        }
+        Text(
+            when (stage) {
+                AutoPinStage.Enter ->
+                    if (changeMode) "Masukkan PIN auto-backup baru (6 digit)."
+                    else "Buat PIN 6 digit untuk mengenkripsi backup otomatis harian.\nSimpan PIN ini — dibutuhkan saat restore."
+                AutoPinStage.Confirm -> "Konfirmasi PIN kamu sekali lagi."
+            },
+            color = sw.inkMuted,
+            style = SwType.Body.copy(fontSize = 13.sp),
+        )
+        Spacer(Modifier.height(16.dp))
+        PinInput(
+            value = if (stage == AutoPinStage.Enter) pin else pin2,
+            onChange = { v ->
+                if (stage == AutoPinStage.Enter) pin = v.take(6) else pin2 = v.take(6)
+            },
+            onComplete = {
+                if (stage == AutoPinStage.Enter) {
+                    stage = AutoPinStage.Confirm
+                } else if (pin == pin2 && pin.length == 6) {
+                    onConfirm(pin.toCharArray())
+                }
+            },
+        )
+        Spacer(Modifier.height(10.dp))
+        if (stage == AutoPinStage.Confirm && pin2.length == 6 && pin != pin2) {
+            Text(
+                "PIN tidak cocok, coba lagi.",
+                color = sw.danger,
+                style = SwType.LabelSmall.copy(fontSize = 12.sp),
+            )
+            Spacer(Modifier.height(8.dp))
+        }
+        com.gustiadhitya.sakuwise.core.designsystem.components.SwButton(
+            text = if (stage == AutoPinStage.Enter) "Lanjut" else "Simpan PIN",
+            onClick = {
+                if (stage == AutoPinStage.Enter) {
+                    if (pin.length == 6) stage = AutoPinStage.Confirm
+                } else {
+                    if (pin == pin2 && pin.length == 6) onConfirm(pin.toCharArray())
+                }
+            },
+            enabled = when (stage) {
+                AutoPinStage.Enter -> pin.length == 6
+                AutoPinStage.Confirm -> pin2.length == 6 && pin == pin2
+            },
+            size = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonSize.Lg,
+        )
+        Spacer(Modifier.height(8.dp))
+        com.gustiadhitya.sakuwise.core.designsystem.components.SwButton(
+            text = "Batal",
+            onClick = onDismiss,
+            variant = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant.Ghost,
+            size = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonSize.Md,
+        )
+        Spacer(Modifier.height(12.dp))
+        // Warning box
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(sw.warningSoft)
+                .padding(10.dp),
+        ) {
+            Text(
+                "⚠️ Simpan PIN ini di tempat yang aman. Tanpa PIN ini kamu tidak bisa memulihkan data dari backup.",
+                color = sw.ink,
+                style = SwType.LabelSmall.copy(fontSize = 11.sp),
+            )
+        }
+    }
+}
+
+private enum class AutoPinStage { Enter, Confirm }
 
 @Composable
 private fun DriveBackupRow(

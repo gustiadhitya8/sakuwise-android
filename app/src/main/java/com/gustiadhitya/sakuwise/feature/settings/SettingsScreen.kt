@@ -83,11 +83,12 @@ fun SettingsScreen(
     val sw = SwTheme.colors
     val prefs by mainVm.prefs.collectAsState()
     val initial = (prefs.userNickname.firstOrNull()?.uppercase() ?: "S")
-    val lastBackupLabel = if (prefs.lastBackupTimestamp == 0L) stringResource(R.string.settings_last_backup_never)
-        else {
-            val daysAgo = ((System.currentTimeMillis() - prefs.lastBackupTimestamp) / 86_400_000L).toInt()
-            stringResource(R.string.settings_days_ago_format, daysAgo)
-        }
+    // Use the most recent of local or Drive backup — same logic as BackupSettingsScreen.
+    val effectiveBackupTs = maxOf(prefs.lastBackupTimestamp, prefs.lastDriveBackupTimestamp)
+    val backupDaysAgo = if (effectiveBackupTs == 0L) -1
+        else ((System.currentTimeMillis() - effectiveBackupTs) / 86_400_000L).toInt()
+    val lastBackupLabel = if (backupDaysAgo < 0) stringResource(R.string.settings_last_backup_never)
+        else stringResource(R.string.settings_days_ago_format, backupDaysAgo)
     val activeStr = stringResource(R.string.settings_active)
     val inactiveStr = stringResource(R.string.settings_inactive)
     val minutesStr = stringResource(R.string.settings_minutes_format, prefs.autoLockMinutes)
@@ -174,9 +175,9 @@ fun SettingsScreen(
                 onClick = onNavigateToAutoLock)
         }
         SettingsGroup(label = stringResource(R.string.settings_group_backup)) {
-            // Backup row uses warning tile + warning sub when there's a real
-            // last-backup timestamp; "Belum pernah" stays neutral.
-            val backupWarn = prefs.lastBackupTimestamp != 0L
+            // Warning tone: never backed up, or last backup is older than 30 days.
+            // Success/neutral when backed up recently (including today = 0 days ago).
+            val backupWarn = backupDaysAgo < 0 || backupDaysAgo > 30
             SettingsRow(stringResource(R.string.settings_backup_restore), lastBackupLabel,
                 icon = Icons.Outlined.CloudUpload,
                 tone = if (backupWarn) RowTone.Warning else RowTone.Neutral,

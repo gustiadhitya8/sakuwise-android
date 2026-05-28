@@ -60,6 +60,7 @@ fun TransferFormScreen(
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
+    val accountBalances by viewModel.accountBalances.collectAsState()
     val planItems by viewModel.planItemOptions.collectAsState()
     var picker by remember { mutableStateOf<TransferPicker?>(null) }
 
@@ -94,8 +95,8 @@ fun TransferFormScreen(
             placeholder = stringResource(R.string.txn_transfer_from_placeholder),
             required = true,
             subtitle = from?.let {
-                stringResource(R.string.txn_field_account_balance_format,
-                    it.initialBalance.toRupiah())
+                val bal = accountBalances[it.id] ?: it.initialBalance
+                stringResource(R.string.txn_field_account_balance_format, bal.toRupiah())
             },
             leadingContent = {
                 com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
@@ -110,8 +111,8 @@ fun TransferFormScreen(
             placeholder = stringResource(R.string.txn_transfer_to_placeholder),
             required = true,
             subtitle = to?.let {
-                stringResource(R.string.txn_field_account_balance_format,
-                    it.initialBalance.toRupiah())
+                val bal = accountBalances[it.id] ?: it.initialBalance
+                stringResource(R.string.txn_field_account_balance_format, bal.toRupiah())
             },
             leadingContent = {
                 com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
@@ -192,6 +193,7 @@ fun TransferFormScreen(
             accounts = accounts,
             selectedId = state.accountId,
             excludeId = state.destAccountId,
+            balances = accountBalances,
             onPick = { viewModel.setAccount(it.id) },
             onDismiss = { picker = null },
         )
@@ -199,6 +201,7 @@ fun TransferFormScreen(
             accounts = accounts,
             selectedId = state.destAccountId,
             excludeId = state.accountId,
+            balances = accountBalances,
             onPick = { viewModel.setDestAccount(it.id) },
             onDismiss = { picker = null },
         )

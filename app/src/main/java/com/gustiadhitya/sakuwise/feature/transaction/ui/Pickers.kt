@@ -191,6 +191,8 @@ fun AccountPickerSheet(
     accounts: List<Account>,
     selectedId: String?,
     excludeId: String? = null,
+    /** Live computed balances keyed by account id — shown as "Saldo: Rp X" subtitle. */
+    balances: Map<String, Long> = emptyMap(),
     onPick: (Account) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -207,6 +209,7 @@ fun AccountPickerSheet(
         LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
             items(visible) { acc ->
                 val isSelected = acc.id == selectedId
+                val liveBalance = balances[acc.id]
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -228,7 +231,10 @@ fun AccountPickerSheet(
                     Column(Modifier.weight(1f)) {
                         Text(acc.name, color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold))
-                        Text(acc.type.displayName(), color = sw.inkMuted,
+                        val subtitle = if (liveBalance != null)
+                            "${acc.type.displayName()} · Saldo ${liveBalance.toRupiahShort()}"
+                        else acc.type.displayName()
+                        Text(subtitle, color = sw.inkMuted,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
                     if (isSelected) {

@@ -1,0 +1,5 @@
+• Auto-backup Google Drive kini berjalan otomatis setiap hari tanpa perlu backup manual dulu
+• Perbaikan: saldo akun di form transaksi kini menampilkan saldo terkini
+• Perbaikan: dashboard langsung update saat tanggal transaksi diubah
+• Perbaikan: rekonsiliasi selisih positif kini tampil hijau (bukan merah)
+• Perbaikan tampilan status backup di halaman Saya

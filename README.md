@@ -52,7 +52,7 @@ Sakuwise is **local-first** by design:
 | **Deposits / Pension** | DPLK, BPJSTK JHT, time deposits — monthly balance snapshots with line chart |
 | **Debt** | Two-way (I-owe / owed-to-me) with payment history; optional account linkage that creates real cash-flow transactions |
 | **OCR Receipts** | On-device ML Kit Text Recognition (no upload) — camera, gallery, or Android share intent → pre-filled expense draft |
-| **Backup & Restore** | One encrypted file, restore on a new device with PIN/passphrase; 30-day yellow banner, 60-day blocking modal |
+| **Backup & Restore** | One encrypted file, restore on a new device with PIN/passphrase; automatic daily Google Drive backup (PIN stored in Keystore); rolling 3-copy local backup; 30-day yellow banner, 60-day blocking modal |
 | **Reminders** | WorkManager-scheduled recurring expense reminders (opt-in, requires POST_NOTIFICATIONS) |
 | **Settings** | Language, biometric, auto-lock (1/5/15/30 min), period start day (1–28), default allocations, global gold sell price, backup management |
 
@@ -113,7 +113,23 @@ Debug APK lands in `app/build/outputs/apk/debug/`. The debug build's `applicatio
 
 ## Project Status
 
-V1 is in dogfooding by the author. Major modules listed above are implemented and exercised on emulator + physical device. Known gaps and the V2 backlog (cloud sync, OCR for income receipts, amortization, iOS port, multi-currency, family sharing) are tracked in the PRD.
+**Current release: v1.0.3 (versionCode 4) — live on Google Play Store.**
+
+V1 is in active use by the author as the primary personal finance tool. All major modules are implemented, exercised on emulator and physical device, and live in production.
+
+### What's in v1.0.3
+- **Auto-backup Drive mandiri** — Google Drive auto-backup now creates a fresh encrypted backup daily without requiring a prior manual backup. The encryption PIN is stored securely in Android Keystore (AES-256-GCM) and retrieved by the WorkManager background job.
+- **Live account balance in pickers** — Account picker and transaction form subtitles now show the live computed balance (income + transfers − expenses − fees + reconciliation), not the stale seed balance.
+- **Dashboard reactivity fix** — Changing a transaction date in history now immediately updates the dashboard. Root cause: `Transaction.equals()` was id-only, causing StateFlow deduplication to swallow field-only edits.
+- **Reconciliation display** — Positive reconciliation (user has more cash than computed) now displays with a green up-arrow, not a red expense icon. Both DashboardScreen and TransactionHistoryScreen are sign-aware.
+- **Backup status colour fix** — The backup row on the Me screen now shows warning yellow only when no backup exists or the last backup is older than 30 days; green/neutral when recent.
+
+### V1.2 backlog
+- Auto-fire recurring-income worker (UseCase already implemented, not yet scheduled)
+- Proper Room Migration 1→2 (currently `fallbackToDestructiveMigration`, safe pre-scale)
+- Full dark-mode visual walkthrough (onboarding verified; detail screens not eye-checked)
+- Inline logo in exported PDF
+- V2: cloud sync, foreign currencies, iOS, family sharing, telemetry-free crash reporting
 
 ## Repository Layout
 
@@ -123,13 +139,13 @@ app/
 │   ├── app/                # Application, MainActivity, AppNavGraph, lock controller
 │   ├── core/
 │   │   ├── common/         # date/rupiah formatters, locale-aware helpers
-│   │   ├── crypto/         # PinStore, KeyManager, BackupService
+│   │   ├── crypto/         # PinStore, KeyManager, BackupService, AutoBackupPinStorage
 │   │   ├── data/           # repository impls + Mappers
 │   │   ├── database/       # Room entities, DAOs, SakuwiseDatabase, migrations
 │   │   ├── datastore/      # UserPreferencesRepository (DataStore)
 │   │   ├── designsystem/   # SwTheme, SwType, SwButton, SwField, SwCard, …
 │   │   ├── domain/         # models + repository interfaces + UseCases
-│   │   └── work/           # NetWorthSnapshotWorker
+│   │   └── work/           # NetWorthSnapshotWorker, DriveAutoBackupWorker
 │   └── feature/
 │       ├── onboarding/     # 4-step flow + locale picker
 │       ├── dashboard/      # main screen

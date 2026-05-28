@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.core.cloud.DriveBackupEntry
 import com.gustiadhitya.sakuwise.core.cloud.GoogleDriveBackup
+import com.gustiadhitya.sakuwise.core.crypto.AutoBackupPinStorage
 import com.gustiadhitya.sakuwise.core.crypto.BackupService
 import com.gustiadhitya.sakuwise.core.crypto.BadPinException
 import com.gustiadhitya.sakuwise.core.database.dao.AccountDao
@@ -40,6 +41,7 @@ class BackupViewModel @Inject constructor(
     private val prefsRepo: UserPreferencesRepository,
     private val drive: GoogleDriveBackup,
     private val accountDao: AccountDao,
+    private val autoBackupPinStorage: AutoBackupPinStorage,
 ) : AndroidViewModel(app) {
 
     /** True once at least one account exists — used to gate the backup action. */
@@ -187,13 +189,46 @@ class BackupViewModel @Inject constructor(
         }
     }
 
-    fun setDriveAutoBackupEnabled(enabled: Boolean) {
-        viewModelScope.launch { prefsRepo.setDriveBackupEnabled(enabled) }
-        if (enabled) {
-            com.gustiadhitya.sakuwise.core.work.DriveAutoBackupWorker.scheduleDaily(app)
-        } else {
-            com.gustiadhitya.sakuwise.core.work.DriveAutoBackupWorker.cancel(app)
+    /** True when a backup PIN is stored — used by the UI to show "PIN tersimpan · Ubah". */
+    val autoBackupPinStored: Boolean get() = autoBackupPinStorage.hasPin()
+
+    /**
+     * Enable auto-backup with a PIN the user just confirmed in the setup sheet.
+     * Saves the PIN to [AutoBackupPinStorage] (Keystore-encrypted) and schedules
+     * the daily worker. The [pin] array is zeroed after saving.
+     */
+    fun enableAutoBackupWithPin(pin: CharArray) {
+        try {
+            autoBackupPinStorage.savePin(pin)
+        } finally {
+            pin.fill(0.toChar())
         }
+        viewModelScope.launch { prefsRepo.setDriveBackupEnabled(true) }
+        com.gustiadhitya.sakuwise.core.work.DriveAutoBackupWorker.scheduleDaily(app)
+    }
+
+    /**
+     * Disable auto-backup and clear the stored PIN so it is not left on disk.
+     * Call when the user toggles auto-backup OFF.
+     */
+    fun disableAutoBackup() {
+        autoBackupPinStorage.clearPin()
+        viewModelScope.launch { prefsRepo.setDriveBackupEnabled(false) }
+        com.gustiadhitya.sakuwise.core.work.DriveAutoBackupWorker.cancel(app)
+    }
+
+    /**
+     * Change the stored auto-backup PIN. Shows the PIN setup sheet again;
+     * once confirmed this replaces the old PIN in [AutoBackupPinStorage].
+     * Worker is re-scheduled with REPLACE so the next run uses the new PIN.
+     */
+    fun changeAutoBackupPin(pin: CharArray) {
+        try {
+            autoBackupPinStorage.savePin(pin)
+        } finally {
+            pin.fill(0.toChar())
+        }
+        com.gustiadhitya.sakuwise.core.work.DriveAutoBackupWorker.scheduleDaily(app)
     }
 
     /**

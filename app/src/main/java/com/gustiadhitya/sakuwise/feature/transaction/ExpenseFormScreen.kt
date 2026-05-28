@@ -75,6 +75,7 @@ fun ExpenseFormScreen(
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
+    val accountBalances by viewModel.accountBalances.collectAsState()
     val planItems by viewModel.planItemOptions.collectAsState()
     val openDebts by viewModel.openOwedDebts.collectAsState()
     var picker by remember { mutableStateOf<ExpensePicker?>(null) }
@@ -163,11 +164,8 @@ fun ExpenseFormScreen(
             onClick = { picker = ExpensePicker.PlanItem },
         )
         val acctSubtitle = account?.let { a ->
-            // Saldo subtitle uses the seed/initial balance until the VM
-            // exposes a live-computed balance for txn forms. Better-than-
-            // nothing and matches the proto's "Saldo: Rp X" affordance.
-            stringResource(R.string.txn_field_account_balance_format,
-                a.initialBalance.toRupiah())
+            val bal = accountBalances[a.id] ?: a.initialBalance
+            stringResource(R.string.txn_field_account_balance_format, bal.toRupiah())
         }
         FieldButton(
             label = stringResource(R.string.txn_field_account),
@@ -255,6 +253,7 @@ fun ExpenseFormScreen(
         ExpensePicker.Account -> AccountPickerSheet(
             accounts = accounts,
             selectedId = state.accountId,
+            balances = accountBalances,
             onPick = { viewModel.setAccount(it.id) },
             onDismiss = { picker = null },
         )

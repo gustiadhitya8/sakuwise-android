@@ -78,6 +78,19 @@ class TxnFormViewModel @Inject constructor(
         viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList(),
     )
 
+    /**
+     * Live computed balance per account id.  Used by the account picker and the
+     * selected-account subtitle so the form always shows the up-to-date saldo
+     * rather than the stale initialBalance seed value.
+     */
+    val accountBalances: StateFlow<Map<String, Long>> =
+        accountRepo.observeActive().flatMapLatest { accts ->
+            if (accts.isEmpty()) flowOf(emptyMap())
+            else combine(accts.map { a -> accountRepo.observeBalance(a.id).map { a.id to it } }) { pairs ->
+                pairs.toMap()
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
     /** Open debts the user owes — eligible for "tautkan ke hutang" on expense form. */
     val openOwedDebts: StateFlow<List<Debt>> = debtRepo.observeAll().map { list ->
         list.filter { it.open && it.direction == DebtDirection.IOwe }

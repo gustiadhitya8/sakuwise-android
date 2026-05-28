@@ -59,6 +59,7 @@ fun IncomeFormScreen(
     val sw = SwTheme.colors
     val state by viewModel.state.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
+    val accountBalances by viewModel.accountBalances.collectAsState()
     val categories by viewModel.incomeCategories.collectAsState()
     var picker by remember { mutableStateOf<IncomePicker?>(null) }
 
@@ -102,8 +103,8 @@ fun IncomeFormScreen(
             placeholder = stringResource(R.string.txn_field_account_placeholder),
             required = true,
             subtitle = account?.let {
-                stringResource(R.string.txn_field_account_balance_format,
-                    it.initialBalance.toRupiah())
+                val bal = accountBalances[it.id] ?: it.initialBalance
+                stringResource(R.string.txn_field_account_balance_format, bal.toRupiah())
             },
             leadingContent = {
                 com.gustiadhitya.sakuwise.feature.transaction.ui.FieldChip {
@@ -163,6 +164,7 @@ fun IncomeFormScreen(
         IncomePicker.Account -> AccountPickerSheet(
             accounts = accounts,
             selectedId = state.accountId,
+            balances = accountBalances,
             onPick = { viewModel.setAccount(it.id) },
             onDismiss = { picker = null },
         )
