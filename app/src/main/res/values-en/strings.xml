@@ -912,4 +912,117 @@
     <!-- PRD §7.13 — overspending banner -->
     <string name="dashboard_overspend_title">Spending exceeds allocation</string>
     <string name="dashboard_overspend_body">An allocation crossed 100%. Tap to see details.</string>
+
+    <!-- i18n audit — shared -->
+    <string name="action_ok">OK</string>
+    <string name="more_items_format">... and %d more</string>
+
+    <!-- i18n audit — Import Transaksi -->
+    <string name="import_title">Import Transactions</string>
+    <string name="import_format_required">Required CSV format:</string>
+    <string name="import_reading_file">Reading file…</string>
+    <string name="import_rows_ready_format">%d rows ready to import</string>
+    <string name="import_rows_skipped_format">%d rows skipped (amount empty/invalid)</string>
+    <string name="import_rows_unresolved_format">%d rows don\'t match a Plan item</string>
+    <string name="import_unresolved_body">Transactions are still imported but not linked to the budget. Make sure the Category and Item names match exactly.</string>
+    <string name="import_parse_warnings">Parsing warnings:</string>
+    <string name="import_no_accounts">No accounts yet. Create an account first.</string>
+    <string name="import_preview_count_format">PREVIEW (%1$d of %2$d)</string>
+    <string name="import_more_txn_format">... and %d more transactions</string>
+    <string name="import_update_mode">Update Mode</string>
+    <string name="import_update_mode_sub">Update existing transaction records</string>
+    <string name="import_importing_format">Importing transactions… %1$d / %2$d</string>
+    <string name="import_please_wait">Please wait, don\'t close this screen.</string>
+    <string name="import_done_title">Import Complete!</string>
+    <string name="import_done_imported_format">%d transactions imported successfully.</string>
+    <string name="import_done_updated_format">%d transactions updated.</string>
+    <string name="import_done_duplicates_format">%d duplicates skipped (already exist).</string>
+    <string name="import_done_invalid_format">%d rows skipped (invalid data).</string>
+    <string name="import_error_title">Failed to read file</string>
+    <string name="import_col_date">Date</string>
+    <string name="import_col_category_item">Category · Item</string>
+    <string name="import_col_account">Account</string>
+    <string name="import_col_amount">Amount</string>
+    <string name="import_no_plan_match">no Plan match</string>
+
+    <!-- i18n audit — Export Transaksi -->
+    <string name="export_title">Export Transactions</string>
+    <string name="export_format_label">FILE FORMAT</string>
+    <string name="export_period_label">PERIOD</string>
+    <string name="export_preparing">Preparing file…</string>
+    <string name="export_ready_title">File ready!</string>
+    <string name="export_ready_body_format">%1$d transactions exported successfully to %2$s.</string>
+    <string name="export_error_title">Export failed</string>
+
+    <!-- i18n audit — Riwayat Transaksi -->
+    <string name="txnhist_prev_month">Previous month</string>
+    <string name="txnhist_next_month">Next month</string>
+    <string name="txnhist_net_balance">Net Balance</string>
+    <string name="txnhist_filter_in">In</string>
+    <string name="txnhist_filter_out">Out</string>
+    <string name="txnhist_search_hint">Search transactions...</string>
+    <string name="txnhist_no_category_data">No category data yet</string>
+    <string name="txnhist_ocr_cd">OCR</string>
+    <string name="txnhist_no_expense_month">No expenses this month</string>
+    <string name="txnhist_highest">highest</string>
+    <string name="txnhist_pick_month">Select Month</string>
+    <string name="txnhist_reset">Reset</string>
+    <string name="txnhist_pct_of_income_format">%d%% of income</string>
+
+    <!-- i18n audit — Plan -->
+    <string name="plan_col_alloc">Allocation</string>
+    <string name="plan_col_plan">Planned</string>
+    <string name="plan_col_actual">Actual</string>
+    <string name="plan_active_badge">ACTIVE</string>
+    <string name="plan_over_format">Over %s</string>
+    <string name="plan_category_name_label">Category name</string>
+    <string name="plan_category_name_placeholder">E.g. Housing</string>
+    <string name="plan_move_up">Move up</string>
+    <string name="plan_move_down">Move down</string>
+    <string name="plan_item_edit">Edit item</string>
+    <string name="plan_item_move_other">Move to another category</string>
+    <string name="plan_move_item_to_format">Move \"%s\" to…</string>
+    <string name="plan_import_template_title">Import Plan Template</string>
+    <string name="plan_template_label">Template</string>
+    <string name="plan_new_period_label">New Plan Period</string>
+    <string name="plan_period_start_label">Start</string>
+
+    <!-- i18n audit — OCR -->
+    <string name="ocr_reading_receipt">Reading receipt…</string>
+    <string name="ocr_read_success">Read successfully</string>
+    <string name="ocr_fields_detected_format">%d fields detected · check before saving</string>
+    <string name="ocr_field_merchant">Merchant</string>
+    <string name="ocr_read_failed">Failed to read receipt</string>
+
+    <!-- i18n audit — Pickers -->
+    <string name="picker_search_account_hint">Search account...</string>
+    <string name="picker_no_account_match">No matching account.</string>
+    <string name="picker_outstanding_format">Outstanding %s</string>
+    <string name="picker_search_item_category_hint">Search item or category...</string>
+
+    <!-- i18n audit — Dashboard -->
+    <string name="dashboard_all_txn_history">All Transaction History</string>
+    <string name="dashboard_accounts_label">ACCOUNTS</string>
+    <string name="dashboard_txn_summary_format">↑ %1$s in · ↓ %2$s out</string>
+    <string name="dashboard_txn_summary_masked">↑ Rp •••• in · ↓ Rp •••• out</string>
+
+    <!-- i18n audit — Assets Hub -->
+    <string name="assets_chart_empty">Trend chart appears after 2 months of use</string>
+    <string name="assets_chart_data_since_format">Data since %s</string>
+
+    <!-- i18n audit — Auto-backup PIN -->
+    <string name="autobackup_pin_change_title">Change Auto-backup PIN</string>
+    <string name="autobackup_pin_create_title">Create Auto-backup PIN</string>
+    <string name="autobackup_pin_stored">Backup PIN saved · Change</string>
+    <string name="autobackup_pin_none">No PIN yet — Tap to set</string>
+    <string name="autobackup_pin_warning">⚠️ Keep this PIN somewhere safe. Without it you cannot restore your data from backup.</string>
+    <string name="autobackup_pin_enter_new">Enter a new auto-backup PIN (6 digits).</string>
+    <string name="autobackup_pin_enter_create">Create a 6-digit PIN to encrypt your daily auto-backup.\nKeep this PIN — you\'ll need it to restore.</string>
+    <string name="autobackup_pin_confirm_prompt">Confirm your PIN once more.</string>
+    <string name="autobackup_pin_mismatch">PINs don\'t match, try again.</string>
+    <string name="autobackup_pin_save">Save PIN</string>
+    <string name="pin_must_be_6_digits">PIN must be 6 digits</string>
+
+    <!-- i18n audit — Expense form -->
+    <string name="expense_field_debt">Debt</string>
 </resources>

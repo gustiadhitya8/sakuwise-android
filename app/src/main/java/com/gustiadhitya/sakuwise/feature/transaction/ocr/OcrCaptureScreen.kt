@@ -161,7 +161,7 @@ fun OcrCaptureScreen(
                     .clickable(onClick = onClose),
             ) {
                 Icon(
-                    Icons.AutoMirrored.Outlined.ArrowBack, "Kembali",
+                    Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back),
                     tint = sw.ink,
                     modifier = Modifier.size(24.dp),
                 )
@@ -183,7 +183,7 @@ fun OcrCaptureScreen(
                         .clickable { onComplete(s.draft) }
                         .padding(horizontal = 16.dp),
                 ) {
-                    Text("Lanjut", color = sw.onPrimary,
+                    Text(stringResource(R.string.action_continue), color = sw.onPrimary,
                         style = SwType.LabelStrong.copy(fontSize = 13.sp,
                             fontWeight = FontWeight.Bold))
                 }
@@ -264,7 +264,7 @@ private fun ProcessingHero() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = sw.primary)
             Spacer(Modifier.height(12.dp))
-            Text("Membaca struk…", color = sw.inkMuted,
+            Text(stringResource(R.string.ocr_reading_receipt), color = sw.inkMuted,
                 style = SwType.Body.copy(fontSize = 14.sp))
         }
     }
@@ -295,10 +295,10 @@ private fun ReadyBody(draft: ReceiptDraft, onRetake: () -> Unit, onGallery: () -
             }
             Spacer(Modifier.size(width = 12.dp, height = 1.dp))
             Column {
-                Text("Berhasil dibaca", color = sw.ink,
+                Text(stringResource(R.string.ocr_read_success), color = sw.ink,
                     style = SwType.LabelStrong.copy(fontSize = 15.sp,
                         fontWeight = FontWeight.Bold))
-                Text("$detected field terdeteksi · cek sebelum simpan",
+                Text(stringResource(R.string.ocr_fields_detected_format, detected),
                     color = sw.inkMuted,
                     style = SwType.LabelSmall.copy(fontSize = 12.sp))
             }
@@ -308,21 +308,21 @@ private fun ReadyBody(draft: ReceiptDraft, onRetake: () -> Unit, onGallery: () -
     val perFieldHigh = draft.confidence == OcrConfidence.High
     val perFieldMed = draft.confidence == OcrConfidence.Medium
     OcrDraftFieldCard(
-        label = "Merchant",
+        label = stringResource(R.string.ocr_field_merchant),
         value = draft.merchant ?: "—",
         present = draft.merchant != null,
         confidence = if (perFieldHigh) "tinggi" else if (perFieldMed) "sedang" else "rendah",
     )
     Spacer(Modifier.height(10.dp))
     OcrDraftFieldCard(
-        label = "Nominal",
+        label = stringResource(R.string.plan_item_amount_label),
         value = draft.totalAmount?.let { "Rp ${it.toRupiahShort(prefix = "")}" } ?: "—",
         present = draft.totalAmount != null,
         confidence = if (perFieldHigh) "tinggi" else if (perFieldMed) "sedang" else "rendah",
     )
     Spacer(Modifier.height(10.dp))
     OcrDraftFieldCard(
-        label = "Tanggal",
+        label = stringResource(R.string.txn_field_date),
         value = draft.date?.toString() ?: "—",
         present = draft.date != null,
         // Date is the weakest signal in IndonesianReceiptParser — bias one
@@ -414,7 +414,7 @@ private fun FailureBody(message: String, onRetake: () -> Unit, onGallery: () -> 
             Icon(Icons.Outlined.WarningAmber, null, tint = sw.danger,
                 modifier = Modifier.size(28.dp))
             Spacer(Modifier.height(8.dp))
-            Text("Gagal membaca struk", color = sw.danger,
+            Text(stringResource(R.string.ocr_read_failed), color = sw.danger,
                 style = SwType.H3.copy(fontSize = 15.sp, fontWeight = FontWeight.Bold))
             Text(message, color = sw.ink,
                 style = SwType.LabelSmall.copy(fontSize = 12.sp))

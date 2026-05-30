@@ -250,15 +250,15 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
                         Spacer(Modifier.weight(1f))
                         Spacer(Modifier.width(28.dp))
                         Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
-                            Text("Alokasi", color = sw.inkMuted,
+                            Text(stringResource(R.string.plan_col_alloc), color = sw.inkMuted,
                                 style = SwType.Caption.copy(fontSize = 10.sp))
                         }
                         Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
-                            Text("Rencana", color = sw.inkMuted,
+                            Text(stringResource(R.string.plan_col_plan), color = sw.inkMuted,
                                 style = SwType.Caption.copy(fontSize = 10.sp))
                         }
                         Box(Modifier.width(62.dp), contentAlignment = Alignment.CenterEnd) {
-                            Text("Aktual", color = sw.inkMuted,
+                            Text(stringResource(R.string.plan_col_actual), color = sw.inkMuted,
                                 style = SwType.Caption.copy(fontSize = 10.sp))
                         }
                     }
@@ -847,7 +847,7 @@ private fun MonthPickerSheet(
                             style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
                     if (active) {
-                        Text("AKTIF",
+                        Text(stringResource(R.string.plan_active_badge),
                             color = sw.onPrimaryContainer,
                             style = SwType.SectionLabel.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold))
                     }
@@ -932,7 +932,7 @@ private fun CategoryCard(
                             style = SwType.LabelSmall.copy(fontSize = 10.sp,
                                 fontFeatureSettings = "tnum"))
                         if (over) {
-                            Text("Over ${(used - plan).toRupiahShort()}",
+                            Text(stringResource(R.string.plan_over_format, (used - plan).toRupiahShort()),
                                 color = sw.danger,
                                 style = SwType.LabelSmall.copy(fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold))
@@ -992,13 +992,13 @@ private fun AddCategorySheet(onSave: (String) -> Unit, onDismiss: () -> Unit) {
     var name by remember { mutableStateOf("") }
     SwPickerSheet(title = stringResource(R.string.sheet_plan_add_category_title), onDismiss = onDismiss) {
         SwField(value = name, onValueChange = { name = it },
-            label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
+            label = stringResource(R.string.plan_category_name_label), placeholder = stringResource(R.string.plan_category_name_placeholder))
         Spacer(Modifier.height(16.dp))
         SwButton(text = stringResource(R.string.action_save),
             onClick = { onSave(name.trim()) },
             enabled = name.isNotBlank())
         Spacer(Modifier.height(8.dp))
-        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+        SwButton(text = stringResource(R.string.action_cancel), onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
 }
 
@@ -1021,8 +1021,8 @@ private fun CategoryActionSheet(
     val sw = SwTheme.colors
     SwPickerSheet(title = categoryName, onDismiss = onDismiss) {
         ActionSheetRow(icon = Icons.Outlined.Edit, label = stringResource(R.string.plan_category_action_edit), onClick = onEdit)
-        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = "Pindah ke atas", onClick = onMoveUp)
-        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = "Pindah ke bawah", onClick = onMoveDown)
+        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = stringResource(R.string.plan_move_up), onClick = onMoveUp)
+        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = stringResource(R.string.plan_move_down), onClick = onMoveDown)
         ActionSheetRow(icon = Icons.Outlined.Delete, label = stringResource(R.string.plan_category_action_delete), danger = true, onClick = onDelete)
     }
 }
@@ -1039,10 +1039,10 @@ private fun ItemActionSheet(
     onDismiss: () -> Unit,
 ) {
     SwPickerSheet(title = itemName, onDismiss = onDismiss) {
-        ActionSheetRow(icon = Icons.Outlined.Edit, label = "Ubah item", onClick = onEdit)
-        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = "Pindah ke atas", onClick = onMoveUp)
-        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = "Pindah ke bawah", onClick = onMoveDown)
-        ActionSheetRow(icon = Icons.Outlined.DriveFileMove, label = "Pindah ke kategori lain", onClick = onMove)
+        ActionSheetRow(icon = Icons.Outlined.Edit, label = stringResource(R.string.plan_item_edit), onClick = onEdit)
+        if (!isFirst) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowUp, label = stringResource(R.string.plan_move_up), onClick = onMoveUp)
+        if (!isLast) ActionSheetRow(icon = Icons.Outlined.KeyboardArrowDown, label = stringResource(R.string.plan_move_down), onClick = onMoveDown)
+        ActionSheetRow(icon = Icons.Outlined.DriveFileMove, label = stringResource(R.string.plan_item_move_other), onClick = onMove)
     }
 }
 
@@ -1055,7 +1055,7 @@ private fun MoveItemSheet(
     onDismiss: () -> Unit,
 ) {
     val sw = SwTheme.colors
-    SwPickerSheet(title = "Pindahkan \"$itemName\" ke…", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.plan_move_item_to_format, itemName), onDismiss = onDismiss) {
         allocations.forEach { allocRow ->
             val allocId = com.gustiadhitya.sakuwise.core.domain.model.AllocationId.fromName(allocRow.allocation.name)
             val allocColor = when (allocId) {
@@ -1130,13 +1130,13 @@ private fun EditCategorySheet(
     var name by remember { mutableStateOf(initialName) }
     SwPickerSheet(title = stringResource(R.string.sheet_plan_edit_category_title), onDismiss = onDismiss) {
         SwField(value = name, onValueChange = { name = it },
-            label = "Nama kategori", placeholder = "Mis. Tempat Tinggal")
+            label = stringResource(R.string.plan_category_name_label), placeholder = stringResource(R.string.plan_category_name_placeholder))
         Spacer(Modifier.height(16.dp))
         SwButton(text = stringResource(R.string.action_save),
             onClick = { onSave(name.trim()) },
             enabled = name.isNotBlank() && name.trim() != initialName)
         Spacer(Modifier.height(8.dp))
-        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+        SwButton(text = stringResource(R.string.action_cancel), onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
 }
 
@@ -1739,7 +1739,7 @@ private fun ImportTemplateSheet(
         java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate().format(fmt)
     } ?: "Pilih tanggal"
 
-    SwPickerSheet(title = "Impor Template Plan", onDismiss = onDismiss) {
+    SwPickerSheet(title = stringResource(R.string.plan_import_template_title), onDismiss = onDismiss) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -1752,19 +1752,19 @@ private fun ImportTemplateSheet(
                 tint = sw.onPrimaryContainer, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(12.dp))
             Column {
-                Text("Template", color = sw.onPrimaryContainer.copy(alpha = 0.7f),
+                Text(stringResource(R.string.plan_template_label), color = sw.onPrimaryContainer.copy(alpha = 0.7f),
                     style = SwType.Caption.copy(fontSize = 11.sp))
                 Text(templateLabel, color = sw.onPrimaryContainer,
                     style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
             }
         }
         Spacer(Modifier.height(16.dp))
-        Text("Periode Plan Baru", color = sw.inkMuted,
+        Text(stringResource(R.string.plan_new_period_label), color = sw.inkMuted,
             style = SwType.Caption.copy(fontSize = 12.sp))
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Mulai", color = sw.inkSubtle, style = SwType.Caption.copy(fontSize = 10.sp))
+                Text(stringResource(R.string.plan_period_start_label), color = sw.inkSubtle, style = SwType.Caption.copy(fontSize = 10.sp))
                 Spacer(Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
@@ -1781,7 +1781,7 @@ private fun ImportTemplateSheet(
                 }
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text("Selesai", color = sw.inkSubtle, style = SwType.Caption.copy(fontSize = 10.sp))
+                Text(stringResource(R.string.action_done), color = sw.inkSubtle, style = SwType.Caption.copy(fontSize = 10.sp))
                 Spacer(Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
@@ -1807,25 +1807,25 @@ private fun ImportTemplateSheet(
                 tint = Color.White, modifier = Modifier.size(16.dp)) },
         )
         Spacer(Modifier.height(8.dp))
-        SwButton(text = "Batal", onClick = onDismiss, variant = SwButtonVariant.Ghost)
+        SwButton(text = stringResource(R.string.action_cancel), onClick = onDismiss, variant = SwButtonVariant.Ghost)
     }
 
     if (showStartPicker) {
         DatePickerDialog(
             onDismissRequest = { showStartPicker = false },
             confirmButton = {
-                TextButton(onClick = { startMs = startState.selectedDateMillis; showStartPicker = false }) { Text("OK") }
+                TextButton(onClick = { startMs = startState.selectedDateMillis; showStartPicker = false }) { Text(stringResource(R.string.action_ok)) }
             },
-            dismissButton = { TextButton(onClick = { showStartPicker = false }) { Text("Batal") } },
+            dismissButton = { TextButton(onClick = { showStartPicker = false }) { Text(stringResource(R.string.action_cancel)) } },
         ) { DatePicker(state = startState) }
     }
     if (showEndPicker) {
         DatePickerDialog(
             onDismissRequest = { showEndPicker = false },
             confirmButton = {
-                TextButton(onClick = { endMs = endState.selectedDateMillis; showEndPicker = false }) { Text("OK") }
+                TextButton(onClick = { endMs = endState.selectedDateMillis; showEndPicker = false }) { Text(stringResource(R.string.action_ok)) }
             },
-            dismissButton = { TextButton(onClick = { showEndPicker = false }) { Text("Batal") } },
+            dismissButton = { TextButton(onClick = { showEndPicker = false }) { Text(stringResource(R.string.action_cancel)) } },
         ) { DatePicker(state = endState) }
     }
 }

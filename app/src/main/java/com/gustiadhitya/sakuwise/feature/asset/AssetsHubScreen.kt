@@ -390,7 +390,7 @@ private fun NetWorthTrendCard(seriesAll: List<Pair<java.time.LocalDate, Long>>) 
                     Icon(Icons.Outlined.TrendingUp, null,
                         tint = sw.inkSubtle, modifier = Modifier.size(28.dp))
                     Text(
-                        "Grafik tren muncul setelah 2 bulan pemakaian",
+                        stringResource(R.string.assets_chart_empty),
                         color = sw.inkSubtle,
                         style = SwType.LabelSmall.copy(fontSize = 12.sp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -399,7 +399,7 @@ private fun NetWorthTrendCard(seriesAll: List<Pair<java.time.LocalDate, Long>>) 
                         val fmtStart = java.time.format.DateTimeFormatter.ofPattern(
                             "MMMM yyyy", java.util.Locale.getDefault())
                         Text(
-                            "Data sejak ${seriesAll.first().first.format(fmtStart)}",
+                            stringResource(R.string.assets_chart_data_since_format, seriesAll.first().first.format(fmtStart)),
                             color = sw.inkMuted,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp),
                         )

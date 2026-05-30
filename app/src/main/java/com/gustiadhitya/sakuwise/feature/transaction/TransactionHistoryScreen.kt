@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -178,7 +179,7 @@ fun TransactionHistoryScreen(
                 .padding(horizontal = 4.dp, vertical = 4.dp),
         ) {
             IconButton(onClick = onClose) {
-                Icon(Icons.Outlined.ArrowBack, contentDescription = "Kembali", tint = sw.ink)
+                Icon(Icons.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back), tint = sw.ink)
             }
             Text(
                 "Riwayat Transaksi",
@@ -197,7 +198,7 @@ fun TransactionHistoryScreen(
                 .padding(horizontal = SwSpace.pageH, vertical = 4.dp),
         ) {
             IconButton(onClick = { viewModel.prevMonth() }) {
-                Icon(Icons.Outlined.ChevronLeft, contentDescription = "Bulan sebelumnya", tint = sw.ink)
+                Icon(Icons.Outlined.ChevronLeft, contentDescription = stringResource(R.string.txnhist_prev_month), tint = sw.ink)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -224,7 +225,7 @@ fun TransactionHistoryScreen(
             ) {
                 Icon(
                     Icons.Outlined.ChevronRight,
-                    contentDescription = "Bulan berikutnya",
+                    contentDescription = stringResource(R.string.txnhist_next_month),
                     tint = if (canGoNext) sw.ink else sw.inkMuted,
                 )
             }
@@ -272,19 +273,19 @@ fun TransactionHistoryScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         SummaryCell(
-                            label = "Pemasukan",
+                            label = stringResource(R.string.dashboard_metric_income),
                             value = monthIncome,
                             sign = RupiahSign.Positive,
                             color = sw.success,
                         )
                         SummaryCell(
-                            label = "Pengeluaran",
+                            label = stringResource(R.string.dashboard_metric_expense),
                             value = monthExpense,
                             sign = RupiahSign.Negative,
                             color = sw.danger,
                         )
                         SummaryCell(
-                            label = "Saldo Bersih",
+                            label = stringResource(R.string.txnhist_net_balance),
                             value = net,
                             sign = if (net >= 0) RupiahSign.Positive else RupiahSign.Negative,
                             color = if (net >= 0) sw.success else sw.danger,
@@ -303,10 +304,10 @@ fun TransactionHistoryScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                FilterChip(label = "Semua", selected = typeFilter == null, onClick = { viewModel.setTypeFilter(null) })
-                FilterChip(label = "Masuk", selected = typeFilter == TxnType.Income, onClick = { viewModel.setTypeFilter(TxnType.Income) })
-                FilterChip(label = "Keluar", selected = typeFilter == TxnType.Expense, onClick = { viewModel.setTypeFilter(TxnType.Expense) })
-                FilterChip(label = "Transfer", selected = typeFilter == TxnType.Transfer, onClick = { viewModel.setTypeFilter(TxnType.Transfer) })
+                FilterChip(label = stringResource(R.string.plan_filter_all), selected = typeFilter == null, onClick = { viewModel.setTypeFilter(null) })
+                FilterChip(label = stringResource(R.string.txnhist_filter_in), selected = typeFilter == TxnType.Income, onClick = { viewModel.setTypeFilter(TxnType.Income) })
+                FilterChip(label = stringResource(R.string.txnhist_filter_out), selected = typeFilter == TxnType.Expense, onClick = { viewModel.setTypeFilter(TxnType.Expense) })
+                FilterChip(label = stringResource(R.string.addtxn_transfer), selected = typeFilter == TxnType.Transfer, onClick = { viewModel.setTypeFilter(TxnType.Transfer) })
                 Spacer(Modifier.weight(1f))
                 BadgedBox(
                     badge = {
@@ -355,7 +356,7 @@ fun TransactionHistoryScreen(
                     cursorBrush = SolidColor(sw.primary),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     decorationBox = { inner ->
-                        if (query.isEmpty()) Text("Cari transaksi...", color = sw.inkMuted, style = SwType.Body.copy(fontSize = 14.sp))
+                        if (query.isEmpty()) Text(stringResource(R.string.txnhist_search_hint), color = sw.inkMuted, style = SwType.Body.copy(fontSize = 14.sp))
                         inner()
                     },
                     modifier = Modifier.weight(1f),
@@ -414,7 +415,7 @@ fun TransactionHistoryScreen(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier.fillMaxWidth().padding(24.dp),
                                     ) {
-                                        Text("Belum ada data kategori",
+                                        Text(stringResource(R.string.txnhist_no_category_data),
                                             color = sw2.inkMuted,
                                             style = SwType.LabelSmall.copy(fontSize = 12.sp))
                                     }
@@ -566,7 +567,7 @@ fun TransactionHistoryScreen(
                                                 Spacer(Modifier.width(4.dp))
                                                 Icon(
                                                     Icons.Outlined.CameraAlt,
-                                                    contentDescription = "OCR",
+                                                    contentDescription = stringResource(R.string.txnhist_ocr_cd),
                                                     tint = sw.inkMuted,
                                                     modifier = Modifier.size(14.dp),
                                                 )
@@ -660,7 +661,7 @@ private fun DailyExpenseChart(
             contentAlignment = Alignment.Center,
             modifier = modifier.fillMaxWidth().height(100.dp),
         ) {
-            Text("Belum ada pengeluaran bulan ini",
+            Text(stringResource(R.string.txnhist_no_expense_month),
                 color = sw.inkMuted,
                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
         }
@@ -744,7 +745,7 @@ private fun DailyExpenseChart(
                         .background(sw.primaryContainer)
                         .padding(horizontal = 6.dp, vertical = 2.dp),
                 ) {
-                    Text("tertinggi",
+                    Text(stringResource(R.string.txnhist_highest),
                         color = sw.onPrimaryContainer,
                         style = SwType.LabelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold))
                 }
@@ -792,7 +793,7 @@ private fun MonthPickerDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Pilih Bulan", style = SwType.H3, color = sw.ink)
+            Text(stringResource(R.string.txnhist_pick_month), style = SwType.H3, color = sw.ink)
         },
         text = {
             Column {
@@ -851,7 +852,7 @@ private fun MonthPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Tutup", color = sw.inkMuted)
+                Text(stringResource(R.string.action_close), color = sw.inkMuted)
             }
         },
         containerColor = sw.surface,
@@ -904,7 +905,7 @@ private fun FilterSheet(
                     )
                     if (hasActiveFilters) {
                         TextButton(onClick = { onClear(); onDismiss() }) {
-                            Text("Reset", color = sw.danger, style = SwType.LabelSmall.copy(fontSize = 13.sp))
+                            Text(stringResource(R.string.txnhist_reset), color = sw.danger, style = SwType.LabelSmall.copy(fontSize = 13.sp))
                         }
                     }
                     IconButton(onClick = onDismiss) {
@@ -998,7 +999,7 @@ private fun FilterSheet(
                                     fontSize = 14.sp,
                                     fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
                                 ))
-                            Text("${alloc.targetPct}% dari pendapatan",
+                            Text(stringResource(R.string.txnhist_pct_of_income_format, alloc.targetPct),
                                 color = sw.inkMuted, style = SwType.Caption.copy(fontSize = 11.sp))
                         }
                     }

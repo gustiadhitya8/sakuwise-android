@@ -912,4 +912,117 @@
     <!-- PRD §7.13 — overspending banner -->
     <string name="dashboard_overspend_title">Pengeluaran melebihi alokasi</string>
     <string name="dashboard_overspend_body">Salah satu alokasi sudah lewat 100%. Tap untuk cek detail.</string>
+
+    <!-- i18n audit — shared -->
+    <string name="action_ok">OK</string>
+    <string name="more_items_format">... dan %d lainnya</string>
+
+    <!-- i18n audit — Import Transaksi -->
+    <string name="import_title">Import Transaksi</string>
+    <string name="import_format_required">Format CSV yang diperlukan:</string>
+    <string name="import_reading_file">Membaca file…</string>
+    <string name="import_rows_ready_format">%d baris siap diimpor</string>
+    <string name="import_rows_skipped_format">%d baris dilewati (amount kosong/tidak valid)</string>
+    <string name="import_rows_unresolved_format">%d baris tidak cocok dengan item di Plan</string>
+    <string name="import_unresolved_body">Transaksi tetap diimpor tapi tidak terhubung ke anggaran. Pastikan nama Kategori dan Item sama persis.</string>
+    <string name="import_parse_warnings">Peringatan parsing:</string>
+    <string name="import_no_accounts">Belum ada akun. Buat akun terlebih dahulu.</string>
+    <string name="import_preview_count_format">PRATINJAU (%1$d dari %2$d)</string>
+    <string name="import_more_txn_format">... dan %d transaksi lainnya</string>
+    <string name="import_update_mode">Mode Perbarui</string>
+    <string name="import_update_mode_sub">Perbarui catatan transaksi yang sudah ada</string>
+    <string name="import_importing_format">Mengimpor transaksi… %1$d / %2$d</string>
+    <string name="import_please_wait">Mohon tunggu, jangan tutup layar ini.</string>
+    <string name="import_done_title">Import Selesai!</string>
+    <string name="import_done_imported_format">%d transaksi berhasil diimpor.</string>
+    <string name="import_done_updated_format">%d transaksi diperbarui.</string>
+    <string name="import_done_duplicates_format">%d duplikat dilewati (sudah ada).</string>
+    <string name="import_done_invalid_format">%d baris dilewati (data tidak valid).</string>
+    <string name="import_error_title">Gagal membaca file</string>
+    <string name="import_col_date">Tgl</string>
+    <string name="import_col_category_item">Kategori · Item</string>
+    <string name="import_col_account">Akun</string>
+    <string name="import_col_amount">Jumlah</string>
+    <string name="import_no_plan_match">tidak cocok Plan</string>
+
+    <!-- i18n audit — Export Transaksi -->
+    <string name="export_title">Export Transaksi</string>
+    <string name="export_format_label">FORMAT FILE</string>
+    <string name="export_period_label">PERIODE</string>
+    <string name="export_preparing">Menyiapkan file…</string>
+    <string name="export_ready_title">File siap!</string>
+    <string name="export_ready_body_format">%1$d transaksi berhasil diekspor ke %2$s.</string>
+    <string name="export_error_title">Gagal mengekspor</string>
+
+    <!-- i18n audit — Riwayat Transaksi -->
+    <string name="txnhist_prev_month">Bulan sebelumnya</string>
+    <string name="txnhist_next_month">Bulan berikutnya</string>
+    <string name="txnhist_net_balance">Saldo Bersih</string>
+    <string name="txnhist_filter_in">Masuk</string>
+    <string name="txnhist_filter_out">Keluar</string>
+    <string name="txnhist_search_hint">Cari transaksi...</string>
+    <string name="txnhist_no_category_data">Belum ada data kategori</string>
+    <string name="txnhist_ocr_cd">OCR</string>
+    <string name="txnhist_no_expense_month">Belum ada pengeluaran bulan ini</string>
+    <string name="txnhist_highest">tertinggi</string>
+    <string name="txnhist_pick_month">Pilih Bulan</string>
+    <string name="txnhist_reset">Reset</string>
+    <string name="txnhist_pct_of_income_format">%d%% dari pendapatan</string>
+
+    <!-- i18n audit — Plan -->
+    <string name="plan_col_alloc">Alokasi</string>
+    <string name="plan_col_plan">Rencana</string>
+    <string name="plan_col_actual">Aktual</string>
+    <string name="plan_active_badge">AKTIF</string>
+    <string name="plan_over_format">Over %s</string>
+    <string name="plan_category_name_label">Nama kategori</string>
+    <string name="plan_category_name_placeholder">Mis. Tempat Tinggal</string>
+    <string name="plan_move_up">Pindah ke atas</string>
+    <string name="plan_move_down">Pindah ke bawah</string>
+    <string name="plan_item_edit">Ubah item</string>
+    <string name="plan_item_move_other">Pindah ke kategori lain</string>
+    <string name="plan_move_item_to_format">Pindahkan \"%s\" ke…</string>
+    <string name="plan_import_template_title">Impor Template Plan</string>
+    <string name="plan_template_label">Template</string>
+    <string name="plan_new_period_label">Periode Plan Baru</string>
+    <string name="plan_period_start_label">Mulai</string>
+
+    <!-- i18n audit — OCR -->
+    <string name="ocr_reading_receipt">Membaca struk…</string>
+    <string name="ocr_read_success">Berhasil dibaca</string>
+    <string name="ocr_fields_detected_format">%d field terdeteksi · cek sebelum simpan</string>
+    <string name="ocr_field_merchant">Merchant</string>
+    <string name="ocr_read_failed">Gagal membaca struk</string>
+
+    <!-- i18n audit — Pickers -->
+    <string name="picker_search_account_hint">Cari akun...</string>
+    <string name="picker_no_account_match">Tidak ada akun yang cocok.</string>
+    <string name="picker_outstanding_format">Sisa %s</string>
+    <string name="picker_search_item_category_hint">Cari item atau kategori...</string>
+
+    <!-- i18n audit — Dashboard -->
+    <string name="dashboard_all_txn_history">Semua Riwayat Transaksi</string>
+    <string name="dashboard_accounts_label">AKUN</string>
+    <string name="dashboard_txn_summary_format">↑ %1$s masuk · ↓ %2$s keluar</string>
+    <string name="dashboard_txn_summary_masked">↑ Rp •••• masuk · ↓ Rp •••• keluar</string>
+
+    <!-- i18n audit — Assets Hub -->
+    <string name="assets_chart_empty">Grafik tren muncul setelah 2 bulan pemakaian</string>
+    <string name="assets_chart_data_since_format">Data sejak %s</string>
+
+    <!-- i18n audit — Auto-backup PIN -->
+    <string name="autobackup_pin_change_title">Ubah PIN Auto-backup</string>
+    <string name="autobackup_pin_create_title">Buat PIN Auto-backup</string>
+    <string name="autobackup_pin_stored">PIN backup tersimpan · Ubah</string>
+    <string name="autobackup_pin_none">Belum ada PIN — Tap untuk set</string>
+    <string name="autobackup_pin_warning">⚠️ Simpan PIN ini di tempat yang aman. Tanpa PIN ini kamu tidak bisa memulihkan data dari backup.</string>
+    <string name="autobackup_pin_enter_new">Masukkan PIN auto-backup baru (6 digit).</string>
+    <string name="autobackup_pin_enter_create">Buat PIN 6 digit untuk mengenkripsi backup otomatis harian.\nSimpan PIN ini — dibutuhkan saat restore.</string>
+    <string name="autobackup_pin_confirm_prompt">Konfirmasi PIN kamu sekali lagi.</string>
+    <string name="autobackup_pin_mismatch">PIN tidak cocok, coba lagi.</string>
+    <string name="autobackup_pin_save">Simpan PIN</string>
+    <string name="pin_must_be_6_digits">PIN harus 6 digit</string>
+
+    <!-- i18n audit — Expense form -->
+    <string name="expense_field_debt">Hutang</string>
 </resources>

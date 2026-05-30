@@ -54,7 +54,6 @@ import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonSize
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
-import com.gustiadhitya.sakuwise.core.designsystem.components.PinInput
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
 import com.gustiadhitya.sakuwise.feature.transaction.ui.SwPickerSheet
 import java.text.SimpleDateFormat
@@ -283,8 +282,8 @@ fun DriveBackupSection(
                             modifier = Modifier.size(13.dp),
                         )
                         Text(
-                            if (vm.autoBackupPinStored) "PIN backup tersimpan · Ubah"
-                            else "Belum ada PIN — Tap untuk set",
+                            if (vm.autoBackupPinStored) stringResource(R.string.autobackup_pin_stored)
+                            else stringResource(R.string.autobackup_pin_none),
                             color = sw.success,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
                         )
@@ -371,6 +370,7 @@ private fun DriveBackupPinSheet(
     val driveState by vm.driveState.collectAsState()
     var pin by remember { mutableStateOf("") }
     var pinError by remember { mutableStateOf<String?>(null) }
+    val pinMust6 = stringResource(R.string.pin_must_be_6_digits)
 
     // Auto-dismiss once upload succeeds
     LaunchedEffect(driveState.lastMessage) {
@@ -424,7 +424,7 @@ private fun DriveBackupPinSheet(
             SwButton(
                 text = stringResource(R.string.drive_backup_confirm),
                 onClick = {
-                    if (pin.length != 6) { pinError = "PIN harus 6 digit"; return@SwButton }
+                    if (pin.length != 6) { pinError = pinMust6; return@SwButton }
                     pinError = null
                     vm.backupToDriveWithPin(pin.toCharArray())
                 },
@@ -440,7 +440,7 @@ private fun DriveBackupPinSheet(
             )
             Spacer(Modifier.height(8.dp))
             SwButton(
-                text = "Batal",
+                text = stringResource(R.string.action_cancel),
                 onClick = onDismiss,
                 variant = SwButtonVariant.Ghost,
                 size = SwButtonSize.Md,
@@ -640,7 +640,7 @@ fun DriveRestoreSheet(
                     )
                     Spacer(Modifier.height(8.dp))
                     SwButton(
-                        text = "Batal",
+                        text = stringResource(R.string.action_cancel),
                         onClick = { selected = null; pin = ""; pinError = null },
                         variant = SwButtonVariant.Ghost,
                         size = SwButtonSize.Md,
@@ -673,7 +673,7 @@ private fun AutoBackupPinSetupSheet(
     var stage by remember { mutableStateOf(AutoPinStage.Enter) }
 
     SwPickerSheet(
-        title = if (changeMode) "Ubah PIN Auto-backup" else "Buat PIN Auto-backup",
+        title = if (changeMode) stringResource(R.string.autobackup_pin_change_title) else stringResource(R.string.autobackup_pin_create_title),
         onDismiss = onDismiss,
     ) {
         Box(
@@ -697,9 +697,9 @@ private fun AutoBackupPinSetupSheet(
         Text(
             when (stage) {
                 AutoPinStage.Enter ->
-                    if (changeMode) "Masukkan PIN auto-backup baru (6 digit)."
-                    else "Buat PIN 6 digit untuk mengenkripsi backup otomatis harian.\nSimpan PIN ini — dibutuhkan saat restore."
-                AutoPinStage.Confirm -> "Konfirmasi PIN kamu sekali lagi."
+                    if (changeMode) stringResource(R.string.autobackup_pin_enter_new)
+                    else stringResource(R.string.autobackup_pin_enter_create)
+                AutoPinStage.Confirm -> stringResource(R.string.autobackup_pin_confirm_prompt)
             },
             color = sw.inkMuted,
             style = SwType.Body.copy(fontSize = 13.sp),
@@ -721,14 +721,14 @@ private fun AutoBackupPinSetupSheet(
         Spacer(Modifier.height(10.dp))
         if (stage == AutoPinStage.Confirm && pin2.length == 6 && pin != pin2) {
             Text(
-                "PIN tidak cocok, coba lagi.",
+                stringResource(R.string.autobackup_pin_mismatch),
                 color = sw.danger,
                 style = SwType.LabelSmall.copy(fontSize = 12.sp),
             )
             Spacer(Modifier.height(8.dp))
         }
         com.gustiadhitya.sakuwise.core.designsystem.components.SwButton(
-            text = if (stage == AutoPinStage.Enter) "Lanjut" else "Simpan PIN",
+            text = if (stage == AutoPinStage.Enter) stringResource(R.string.action_continue) else stringResource(R.string.autobackup_pin_save),
             onClick = {
                 if (stage == AutoPinStage.Enter) {
                     if (pin.length == 6) stage = AutoPinStage.Confirm
@@ -744,7 +744,7 @@ private fun AutoBackupPinSetupSheet(
         )
         Spacer(Modifier.height(8.dp))
         com.gustiadhitya.sakuwise.core.designsystem.components.SwButton(
-            text = "Batal",
+            text = stringResource(R.string.action_cancel),
             onClick = onDismiss,
             variant = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant.Ghost,
             size = com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonSize.Md,
@@ -758,7 +758,7 @@ private fun AutoBackupPinSetupSheet(
                 .padding(10.dp),
         ) {
             Text(
-                "⚠️ Simpan PIN ini di tempat yang aman. Tanpa PIN ini kamu tidak bisa memulihkan data dari backup.",
+                stringResource(R.string.autobackup_pin_warning),
                 color = sw.ink,
                 style = SwType.LabelSmall.copy(fontSize = 11.sp),
             )

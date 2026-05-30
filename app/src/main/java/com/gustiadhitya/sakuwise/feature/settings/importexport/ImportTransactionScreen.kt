@@ -41,12 +41,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toRupiahShort
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
@@ -71,7 +73,7 @@ fun ImportTransactionScreen(
         uri?.let { viewModel.parseFile(it) }
     }
 
-    SimpleSettingsScreen(title = "Import Transaksi", onBack = onBack) {
+    SimpleSettingsScreen(title = stringResource(R.string.import_title), onBack = onBack) {
 
         Text(
             "Import transaksi dari file CSV (delimiter titik koma). Format: Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan.",
@@ -111,7 +113,7 @@ fun ImportTransactionScreen(
                 Spacer(Modifier.height(16.dp))
                 SwCard {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Format CSV yang diperlukan:", color = sw.ink,
+                        Text(stringResource(R.string.import_format_required), color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
                         Spacer(Modifier.height(4.dp))
                         FormatHintRow("Tanggal", "YYYYMMDD  (mis. 20260503)")
@@ -139,7 +141,7 @@ fun ImportTransactionScreen(
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth(),
                         color = sw.primary, trackColor = sw.track)
                 }
-                Text("Membaca file…", color = sw.inkMuted,
+                Text(stringResource(R.string.import_reading_file), color = sw.inkMuted,
                     style = SwType.Body.copy(fontSize = 13.sp),
                     modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             }
@@ -155,10 +157,10 @@ fun ImportTransactionScreen(
                     Icon(Icons.Outlined.CheckCircle, null, tint = sw.success, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
                     Column {
-                        Text("${s.rows.size} baris siap diimpor", color = sw.success,
+                        Text(stringResource(R.string.import_rows_ready_format, s.rows.size), color = sw.success,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold))
                         if (s.skipped > 0)
-                            Text("${s.skipped} baris dilewati (amount kosong/tidak valid)",
+                            Text(stringResource(R.string.import_rows_skipped_format, s.skipped),
                                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
                 }
@@ -176,10 +178,10 @@ fun ImportTransactionScreen(
                             Icon(Icons.Outlined.Warning, null, tint = sw2.warning, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Column {
-                                Text("${s.unresolvedItems} baris tidak cocok dengan item di Plan",
+                                Text(stringResource(R.string.import_rows_unresolved_format, s.unresolvedItems),
                                     color = sw2.warning,
                                     style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
-                                Text("Transaksi tetap diimpor tapi tidak terhubung ke anggaran. Pastikan nama Kategori dan Item sama persis.",
+                                Text(stringResource(R.string.import_unresolved_body),
                                     color = sw2.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
                             }
                         }
@@ -189,7 +191,7 @@ fun ImportTransactionScreen(
                                 modifier = Modifier.padding(start = 26.dp))
                         }
                         if (s.unresolvedItemDescriptions.size > 8)
-                            Text("• ... dan ${s.unresolvedItemDescriptions.size - 8} lainnya",
+                            Text("• " + stringResource(R.string.more_items_format, s.unresolvedItemDescriptions.size - 8),
                                 color = sw2.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 11.sp),
                                 modifier = Modifier.padding(start = 26.dp))
@@ -207,14 +209,14 @@ fun ImportTransactionScreen(
                     Spacer(Modifier.height(8.dp))
                     SwCard {
                         Column {
-                            Text("Peringatan parsing:", color = sw.warning,
+                            Text(stringResource(R.string.import_parse_warnings), color = sw.warning,
                                 style = SwType.LabelStrong.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold))
                             s.errors.take(5).forEach { err ->
                                 Text("• $err", color = sw.inkMuted,
                                     style = SwType.LabelSmall.copy(fontSize = 11.sp))
                             }
                             if (s.errors.size > 5)
-                                Text("... dan ${s.errors.size - 5} lainnya", color = sw.inkMuted,
+                                Text(stringResource(R.string.more_items_format, s.errors.size - 5), color = sw.inkMuted,
                                     style = SwType.LabelSmall.copy(fontSize = 11.sp))
                         }
                     }
@@ -236,7 +238,7 @@ fun ImportTransactionScreen(
                         modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
 
                     if (accounts.isEmpty()) {
-                        Text("Belum ada akun. Buat akun terlebih dahulu.", color = sw.danger,
+                        Text(stringResource(R.string.import_no_accounts), color = sw.danger,
                             style = SwType.LabelSmall.copy(fontSize = 12.sp))
                     } else {
                         SwCard(padding = PaddingValues(0.dp)) {
@@ -269,7 +271,7 @@ fun ImportTransactionScreen(
                 }
 
                 // Preview table (first 10)
-                Text("PRATINJAU (${minOf(s.rows.size, 10)} dari ${s.rows.size})", color = sw.inkSubtle,
+                Text(stringResource(R.string.import_preview_count_format, minOf(s.rows.size, 10), s.rows.size), color = sw.inkSubtle,
                     style = SwType.SectionLabel.copy(fontSize = 11.sp),
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
 
@@ -278,7 +280,7 @@ fun ImportTransactionScreen(
                         PreviewHeaderRow()
                         s.rows.take(10).forEach { row -> PreviewDataRow(row) }
                         if (s.rows.size > 10) {
-                            Text("... dan ${s.rows.size - 10} transaksi lainnya",
+                            Text(stringResource(R.string.import_more_txn_format, s.rows.size - 10),
                                 color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 11.sp),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
@@ -297,9 +299,9 @@ fun ImportTransactionScreen(
                         .padding(horizontal = 14.dp, vertical = 4.dp),
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Mode Perbarui", color = sw.ink,
+                        Text(stringResource(R.string.import_update_mode), color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
-                        Text("Perbarui catatan transaksi yang sudah ada",
+                        Text(stringResource(R.string.import_update_mode_sub),
                             color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
                     Switch(
@@ -331,14 +333,14 @@ fun ImportTransactionScreen(
             is ImportUiState.Importing -> {
                 val progress = if (s.total > 0) s.done.toFloat() / s.total else 0f
                 Spacer(Modifier.height(8.dp))
-                Text("Mengimpor transaksi… ${s.done} / ${s.total}",
+                Text(stringResource(R.string.import_importing_format, s.done, s.total),
                     color = sw.ink, style = SwType.LabelStrong.copy(fontSize = 14.sp))
                 Spacer(Modifier.height(12.dp))
                 LinearProgressIndicator(progress = { progress },
                     modifier = Modifier.fillMaxWidth(),
                     color = sw.primary, trackColor = sw.track)
                 Spacer(Modifier.height(8.dp))
-                Text("Mohon tunggu, jangan tutup layar ini.",
+                Text(stringResource(R.string.import_please_wait),
                     color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
             }
 
@@ -352,28 +354,28 @@ fun ImportTransactionScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.CheckCircle, null, tint = sw.success, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Import Selesai!", color = sw.success,
+                            Text(stringResource(R.string.import_done_title), color = sw.success,
                                 style = SwType.H2.copy(fontSize = 17.sp, fontWeight = FontWeight.Bold))
                         }
                         Spacer(Modifier.height(8.dp))
                         if (s.imported > 0)
-                            Text("${s.imported} transaksi berhasil diimpor.", color = sw.ink,
+                            Text(stringResource(R.string.import_done_imported_format, s.imported), color = sw.ink,
                                 style = SwType.Body.copy(fontSize = 13.sp))
                         if (s.updated > 0)
-                            Text("${s.updated} transaksi diperbarui.", color = sw.ink,
+                            Text(stringResource(R.string.import_done_updated_format, s.updated), color = sw.ink,
                                 style = SwType.Body.copy(fontSize = 13.sp))
                         if (s.duplicates > 0)
-                            Text("${s.duplicates} duplikat dilewati (sudah ada).", color = sw.inkMuted,
+                            Text(stringResource(R.string.import_done_duplicates_format, s.duplicates), color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
                         if (s.skipped - s.duplicates > 0)
-                            Text("${s.skipped - s.duplicates} baris dilewati (data tidak valid).", color = sw.inkMuted,
+                            Text(stringResource(R.string.import_done_invalid_format, s.skipped - s.duplicates), color = sw.inkMuted,
                                 style = SwType.LabelSmall.copy(fontSize = 12.sp))
                     }
                 }
                 Spacer(Modifier.height(16.dp))
                 SwButton(text = "Import File Lain", onClick = { viewModel.reset() }, variant = SwButtonVariant.Outline)
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Selesai", onClick = onBack, variant = SwButtonVariant.Ghost)
+                SwButton(text = stringResource(R.string.action_done), onClick = onBack, variant = SwButtonVariant.Ghost)
             }
 
             // ── Error ─────────────────────────────────────────────────
@@ -386,7 +388,7 @@ fun ImportTransactionScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.ErrorOutline, null, tint = sw.danger, modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Gagal membaca file", color = sw.danger,
+                            Text(stringResource(R.string.import_error_title), color = sw.danger,
                                 style = SwType.H2.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
                         }
                         Spacer(Modifier.height(6.dp))
@@ -441,16 +443,16 @@ private fun PreviewHeaderRow() {
         modifier = Modifier.fillMaxWidth().background(sw.surface)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text("Tgl", color = sw.inkSubtle,
+        Text(stringResource(R.string.import_col_date), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.width(44.dp))
-        Text("Kategori · Item", color = sw.inkSubtle,
+        Text(stringResource(R.string.import_col_category_item), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.weight(1f))
-        Text("Akun", color = sw.inkSubtle,
+        Text(stringResource(R.string.import_col_account), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.width(56.dp))
-        Text("Jumlah", color = sw.inkSubtle,
+        Text(stringResource(R.string.import_col_amount), color = sw.inkSubtle,
             style = SwType.Caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold))
     }
 }
@@ -484,7 +486,7 @@ private fun PreviewDataRow(row: ImportRow) {
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             if (row.kategori != null && row.planItemId == null) {
-                Text("tidak cocok Plan", color = sw.warning,
+                Text(stringResource(R.string.import_no_plan_match), color = sw.warning,
                     style = SwType.Caption.copy(fontSize = 10.sp))
             }
         }

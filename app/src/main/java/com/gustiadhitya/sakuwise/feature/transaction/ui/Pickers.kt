@@ -199,11 +199,11 @@ fun AccountPickerSheet(
     val sw = SwTheme.colors
     var query by remember { mutableStateOf("") }
     SwPickerSheet(title = stringResource(R.string.picker_choose_account), onDismiss = onDismiss) {
-        SearchField(query = query, onQueryChange = { query = it }, placeholder = "Cari akun...")
+        SearchField(query = query, onQueryChange = { query = it }, placeholder = stringResource(R.string.picker_search_account_hint))
         Spacer(Modifier.height(8.dp))
         val visible = accounts.filter { it.id != excludeId && (query.isEmpty() || it.name.contains(query, ignoreCase = true)) }
         if (visible.isEmpty()) {
-            Text("Tidak ada akun yang cocok.", color = sw.inkMuted,
+            Text(stringResource(R.string.picker_no_account_match), color = sw.inkMuted,
                 style = SwType.LabelSmall.copy(fontSize = 13.sp), modifier = Modifier.padding(vertical = 8.dp))
         }
         LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
@@ -279,7 +279,7 @@ fun DebtPickerSheet(
                     Column(Modifier.weight(1f)) {
                         Text(debt.counterparty, color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold))
-                        Text("Sisa ${outstanding.toRupiahShort()}",
+                        Text(stringResource(R.string.picker_outstanding_format, outstanding.toRupiahShort()),
                             color = sw.inkMuted,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
@@ -317,7 +317,7 @@ fun PlanItemPickerSheet(
             Text(stringResource(R.string.picker_no_plan_items), color = sw.inkMuted, style = SwType.Body)
             return@SwPickerSheet
         }
-        SearchField(query = query, onQueryChange = { query = it; filterState.value = null }, placeholder = "Cari item atau kategori...")
+        SearchField(query = query, onQueryChange = { query = it; filterState.value = null }, placeholder = stringResource(R.string.picker_search_item_category_hint))
         Spacer(Modifier.height(8.dp))
         // Hide allocation filter chips while searching — query already cross-cuts all allocations
         if (query.isEmpty()) {

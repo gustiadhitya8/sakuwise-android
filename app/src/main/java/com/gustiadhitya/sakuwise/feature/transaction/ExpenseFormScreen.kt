@@ -239,7 +239,7 @@ fun ExpenseFormScreen(
         }
         if (state.debtId != null) {
             FieldButton(
-                label = "Hutang",
+                label = stringResource(R.string.expense_field_debt),
                 value = state.debtLabel.orEmpty(),
                 placeholder = stringResource(R.string.expense_pick_debt_placeholder),
                 leadingIcon = Icons.Outlined.Link,

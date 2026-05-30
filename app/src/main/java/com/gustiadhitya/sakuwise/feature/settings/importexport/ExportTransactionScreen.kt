@@ -35,10 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButton
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwButtonVariant
 import com.gustiadhitya.sakuwise.core.designsystem.components.SwCard
@@ -59,7 +61,7 @@ fun ExportTransactionScreen(
     var period by remember { mutableStateOf(ExportPeriod.CurrentMonth) }
     var format by remember { mutableStateOf(ExportFormat.Csv) }
 
-    SimpleSettingsScreen(title = "Export Transaksi", onBack = onBack) {
+    SimpleSettingsScreen(title = stringResource(R.string.export_title), onBack = onBack) {
 
         Text(
             "Export semua transaksi ke file CSV atau XLSX untuk dibuka di Excel / Google Sheets.",
@@ -69,7 +71,7 @@ fun ExportTransactionScreen(
         Spacer(Modifier.height(16.dp))
 
         // ── Format selector ─────────────────────────────────────
-        Text("FORMAT FILE", color = sw.inkSubtle,
+        Text(stringResource(R.string.export_format_label), color = sw.inkSubtle,
             style = SwType.SectionLabel.copy(fontSize = 11.sp),
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
 
@@ -93,7 +95,7 @@ fun ExportTransactionScreen(
         Spacer(Modifier.height(18.dp))
 
         // ── Period selector ─────────────────────────────────────
-        Text("PERIODE", color = sw.inkSubtle,
+        Text(stringResource(R.string.export_period_label), color = sw.inkSubtle,
             style = SwType.SectionLabel.copy(fontSize = 11.sp),
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
 
@@ -132,7 +134,7 @@ fun ExportTransactionScreen(
                         color = sw.primary,
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("Menyiapkan file…", color = sw.inkMuted,
+                    Text(stringResource(R.string.export_preparing), color = sw.inkMuted,
                         style = SwType.LabelStrong.copy(fontSize = 14.sp))
                 }
             }
@@ -149,11 +151,11 @@ fun ExportTransactionScreen(
                             Icon(Icons.Outlined.Description, null,
                                 tint = sw.success, modifier = Modifier.size(22.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("File siap!", color = sw.success,
+                            Text(stringResource(R.string.export_ready_title), color = sw.success,
                                 style = SwType.H2.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text("${s.count} transaksi berhasil diekspor ke ${s.format.name}.",
+                        Text(stringResource(R.string.export_ready_body_format, s.count, s.format.name),
                             color = sw.ink, style = SwType.LabelSmall.copy(fontSize = 12.sp))
                     }
                 }
@@ -208,7 +210,7 @@ fun ExportTransactionScreen(
                             Icon(Icons.Outlined.ErrorOutline, null,
                                 tint = sw.danger, modifier = Modifier.size(22.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Gagal mengekspor", color = sw.danger,
+                            Text(stringResource(R.string.export_error_title), color = sw.danger,
                                 style = SwType.H2.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold))
                         }
                         Spacer(Modifier.height(6.dp))
@@ -218,7 +220,7 @@ fun ExportTransactionScreen(
                 Spacer(Modifier.height(12.dp))
                 SwButton(text = "Coba Lagi", onClick = { viewModel.export(period, format) })
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Batal", onClick = { viewModel.clear() }, variant = SwButtonVariant.Ghost)
+                SwButton(text = stringResource(R.string.action_cancel), onClick = { viewModel.clear() }, variant = SwButtonVariant.Ghost)
             }
         }
     }

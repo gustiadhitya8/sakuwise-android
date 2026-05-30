@@ -696,13 +696,13 @@ private fun DashboardHistoryLink(
                 }
                 Spacer(Modifier.size(width = 14.dp, height = 1.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Semua Riwayat Transaksi", color = sw.ink,
+                    Text(stringResource(R.string.dashboard_all_txn_history), color = sw.ink,
                         style = SwType.LabelStrong.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                     if (hide) {
-                        Text("↑ Rp •••• masuk · ↓ Rp •••• keluar",
+                        Text(stringResource(R.string.dashboard_txn_summary_masked),
                             color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     } else {
-                        Text("↑ ${income.toRupiahShort()} masuk · ↓ ${expense.toRupiahShort()} keluar",
+                        Text(stringResource(R.string.dashboard_txn_summary_format, income.toRupiahShort(), expense.toRupiahShort()),
                             color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 11.sp))
                     }
                 }
@@ -729,7 +729,7 @@ private fun DashboardAccountsStrip(
                 .padding(horizontal = SwSpace.pageH)
                 .padding(top = 4.dp, bottom = 4.dp),
         ) {
-            Text("AKUN", color = sw.inkSubtle, style = SwType.SectionLabel)
+            Text(stringResource(R.string.dashboard_accounts_label), color = sw.inkSubtle, style = SwType.SectionLabel)
             if (!hide) {
                 Text(total.toRupiahShort(), color = sw.ink,
                     style = SwType.LabelStrong.copy(fontSize = 13.sp,

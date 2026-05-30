@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
 
@@ -55,7 +57,7 @@ fun SwTopBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Kembali",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = sw.ink,
                 )
             }
