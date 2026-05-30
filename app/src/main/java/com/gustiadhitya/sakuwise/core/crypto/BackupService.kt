@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -75,8 +73,8 @@ class BackupService @Inject constructor(
             val settingsJson = serializeSettings(prefs)
             val settingsBytes = settingsJson.toByteArray(Charsets.UTF_8)
 
-            // 5. Pack [4B version=2][4B dekLen][DEK][4B settingsLen][settings][DB]
-            val payload = packPayload(dek, settingsBytes, rawDb)
+            // 5. Pack the versioned payload (see BackupPayload for the layout).
+            val payload = BackupPayload.pack(dek, settingsBytes, rawDb)
             try {
                 // 6. Encrypt the whole payload under the PIN-derived KEK
                 val encrypted = BackupCrypto.encryptBackup(payload, pin)
@@ -105,7 +103,7 @@ class BackupService @Inject constructor(
         val ciphertext = sourceFile.readBytes()
         val payload = BackupCrypto.decryptBackup(ciphertext, pin)
         try {
-            val (dek, settingsBytes, dbBytes) = unpackPayload(payload)
+            val (dek, settingsBytes, dbBytes) = BackupPayload.unpack(payload)
             try {
                 // 1. Close Room/SQLCipher so we can swap the file.
                 database.close()
@@ -189,66 +187,8 @@ class BackupService @Inject constructor(
             runCatching { prefsRepo.setBalancesHidden(obj.getBoolean("balancesHidden")) }
     }
 
-    // ── Payload packing ───────────────────────────────────────────────────
-
-    /** v2: [4B ver][4B dekLen][DEK][4B settingsLen][settings][DB] */
-    private fun packPayload(dek: ByteArray, settings: ByteArray, db: ByteArray): ByteArray {
-        require(dek.size in 16..64) { "DEK length out of range: ${dek.size}" }
-        val totalLen = V2_HEADER_LEN + dek.size + settings.size + db.size
-        val out = ByteArray(totalLen)
-        val buf = ByteBuffer.wrap(out).order(ByteOrder.BIG_ENDIAN)
-        buf.putInt(PAYLOAD_VERSION_V2)
-        buf.putInt(dek.size)
-        buf.put(dek)
-        buf.putInt(settings.size)
-        if (settings.isNotEmpty()) buf.put(settings)
-        buf.put(db)
-        return out
-    }
-
-    /** Returns (dek, settingsBytes, dbBytes). settingsBytes is empty for v1 backups. */
-    private fun unpackPayload(payload: ByteArray): Triple<ByteArray, ByteArray, ByteArray> {
-        require(payload.size > V1_HEADER_LEN) { "Payload too small" }
-        val buf = ByteBuffer.wrap(payload).order(ByteOrder.BIG_ENDIAN)
-        val version = buf.int
-
-        return when (version) {
-            PAYLOAD_VERSION_V1 -> {
-                // v1: [4B ver][4B dekLen][DEK][DB]
-                val dekLen = buf.int
-                require(dekLen in 16..64) { "Invalid DEK length: $dekLen" }
-                require(payload.size > V1_HEADER_LEN + dekLen) { "v1 payload truncated" }
-                val dek = ByteArray(dekLen).also { buf.get(it) }
-                val dbLen = payload.size - V1_HEADER_LEN - dekLen
-                val db = ByteArray(dbLen).also { buf.get(it) }
-                Triple(dek, ByteArray(0), db)
-            }
-            PAYLOAD_VERSION_V2 -> {
-                // v2: [4B ver][4B dekLen][DEK][4B settingsLen][settings][DB]
-                val dekLen = buf.int
-                require(dekLen in 16..64) { "Invalid DEK length: $dekLen" }
-                val dek = ByteArray(dekLen).also { buf.get(it) }
-                val settingsLen = buf.int
-                require(settingsLen >= 0) { "Invalid settings length: $settingsLen" }
-                val settings = if (settingsLen > 0) ByteArray(settingsLen).also { buf.get(it) } else ByteArray(0)
-                val dbLen = payload.size - V2_HEADER_LEN - dekLen - settingsLen
-                require(dbLen > 0) { "v2 payload truncated" }
-                val db = ByteArray(dbLen).also { buf.get(it) }
-                Triple(dek, settings, db)
-            }
-            else -> error("Backup payload version $version not supported")
-        }
-    }
-
     private fun defaultFilename(): String {
         val ts = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.ROOT).format(Date())
         return "sakuwise-backup-$ts.sakuwise"
-    }
-
-    private companion object {
-        const val PAYLOAD_VERSION_V1 = 1
-        const val PAYLOAD_VERSION_V2 = 2
-        const val V1_HEADER_LEN = 8  // 4B version + 4B dekLen
-        const val V2_HEADER_LEN = 12 // 4B version + 4B dekLen + 4B settingsLen
     }
 }
