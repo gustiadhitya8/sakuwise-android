@@ -47,7 +47,7 @@ object TransactionCsvParser {
         val dateIdx     = col("tanggal", "date")
         val typeIdx     = col("tipe", "type")
         val kategoriIdx = col("kategori", "category")
-        val itemIdx     = col("item")
+        val itemIdx     = col("item")   // same word in both ID and EN
         val amountIdx   = col("jumlah", "amount")
         val noteIdx     = col("catatan", "note")
         val akunIdx     = col("akun", "account")
