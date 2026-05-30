@@ -85,12 +85,18 @@ object BackupPayload {
             PAYLOAD_VERSION_V2 -> {
                 val dekLen = buf.int
                 require(dekLen in 16..64) { "Invalid DEK length: $dekLen" }
+                require(payload.size >= V2_HEADER_LEN + dekLen) { "v2 payload truncated" }
                 val dek = ByteArray(dekLen).also { buf.get(it) }
                 val settingsLen = buf.int
-                require(settingsLen >= 0) { "Invalid settings length: $settingsLen" }
+                // Bytes left for settings + DB after the header and DEK. Compared
+                // by SUBTRACTION (never addition) so a maliciously huge settingsLen
+                // can't integer-overflow the bound. settingsLen must leave at least
+                // one DB byte, so the comparison is strict (<). This yields a clean
+                // "truncated" error instead of a raw BufferUnderflowException.
+                val remainingForSettingsAndDb = payload.size - V2_HEADER_LEN - dekLen
+                require(settingsLen in 0 until remainingForSettingsAndDb) { "v2 payload truncated" }
                 val settings = if (settingsLen > 0) ByteArray(settingsLen).also { buf.get(it) } else ByteArray(0)
-                val dbLen = payload.size - V2_HEADER_LEN - dekLen - settingsLen
-                require(dbLen > 0) { "v2 payload truncated" }
+                val dbLen = remainingForSettingsAndDb - settingsLen
                 val db = ByteArray(dbLen).also { buf.get(it) }
                 Decoded(dek, settings, db)
             }

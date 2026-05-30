@@ -77,4 +77,18 @@ class BackupPayloadVersioningTest {
             BackupPayload.unpack(bytes(0x00, 0x00))
         }
     }
+
+    /** A v2 payload that declares a settingsLen larger than the file must fail
+     *  cleanly (IllegalArgumentException "truncated"), not a raw buffer underflow. */
+    @Test
+    fun v2_corruptSettingsLen_throwsCleanly() {
+        val buf = java.nio.ByteBuffer.allocate(44).order(java.nio.ByteOrder.BIG_ENDIAN)
+        buf.putInt(BackupPayload.PAYLOAD_VERSION_V2)
+        buf.putInt(32)            // dekLen
+        buf.put(dek)              // 32-byte DEK
+        buf.putInt(Int.MAX_VALUE) // settingsLen far larger than remaining bytes
+        assertThrows(IllegalArgumentException::class.java) {
+            BackupPayload.unpack(buf.array())
+        }
+    }
 }
