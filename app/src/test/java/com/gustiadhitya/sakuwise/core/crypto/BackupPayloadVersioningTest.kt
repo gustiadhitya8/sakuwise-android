@@ -1,6 +1,8 @@
 package com.gustiadhitya.sakuwise.core.crypto
 
-import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 /**
@@ -25,9 +27,9 @@ class BackupPayloadVersioningTest {
 
         val decoded = BackupPayload.unpack(packed)
 
-        assertThat(decoded.dek).isEqualTo(dek)
-        assertThat(decoded.settings).isEqualTo(settings)
-        assertThat(decoded.db).isEqualTo(db)
+        assertArrayEquals(dek, decoded.dek)
+        assertArrayEquals(settings, decoded.settings)
+        assertArrayEquals(db, decoded.db)
     }
 
     @Test
@@ -36,9 +38,9 @@ class BackupPayloadVersioningTest {
 
         val decoded = BackupPayload.unpack(packed)
 
-        assertThat(decoded.dek).isEqualTo(dek)
-        assertThat(decoded.settings).isEmpty()
-        assertThat(decoded.db).isEqualTo(db)
+        assertArrayEquals(dek, decoded.dek)
+        assertEquals(0, decoded.settings.size)
+        assertArrayEquals(db, decoded.db)
     }
 
     /** The critical backward-compat case: an old (v1) backup must still read. */
@@ -48,27 +50,31 @@ class BackupPayloadVersioningTest {
 
         val decoded = BackupPayload.unpack(legacy)
 
-        assertThat(decoded.dek).isEqualTo(dek)
-        assertThat(decoded.db).isEqualTo(db)
+        assertArrayEquals(dek, decoded.dek)
+        assertArrayEquals(db, decoded.db)
         // v1 had no settings block → restored as defaults (empty).
-        assertThat(decoded.settings).isEmpty()
+        assertEquals(0, decoded.settings.size)
     }
 
     @Test
     fun currentVersion_isV2() {
-        assertThat(BackupPayload.CURRENT_VERSION).isEqualTo(BackupPayload.PAYLOAD_VERSION_V2)
+        assertEquals(BackupPayload.PAYLOAD_VERSION_V2, BackupPayload.CURRENT_VERSION)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun unknownVersion_throws() {
-        // version=99, dekLen=32, then junk
-        val buf = java.nio.ByteBuffer.allocate(64).order(java.nio.ByteOrder.BIG_ENDIAN)
+        // version=99, dekLen=32, then the DEK bytes
+        val buf = java.nio.ByteBuffer.allocate(40).order(java.nio.ByteOrder.BIG_ENDIAN)
         buf.putInt(99); buf.putInt(32); buf.put(dek)
-        BackupPayload.unpack(buf.array())
+        assertThrows(IllegalStateException::class.java) {
+            BackupPayload.unpack(buf.array())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun truncatedPayload_throws() {
-        BackupPayload.unpack(bytes(0x00, 0x00))
+        assertThrows(IllegalArgumentException::class.java) {
+            BackupPayload.unpack(bytes(0x00, 0x00))
+        }
     }
 }
