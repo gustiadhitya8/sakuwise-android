@@ -169,6 +169,10 @@
     <string name="settings_export_reset_sub">Wipe everything and start over</string>
     <string name="settings_export_pdf">Export PDF</string>
     <string name="settings_export_pdf_sub">Generate a compact report to share or archive</string>
+    <string name="settings_export_csv">Export CSV / XLSX</string>
+    <string name="settings_export_csv_sub">Export transactions to a spreadsheet</string>
+    <string name="settings_import_csv">Import CSV</string>
+    <string name="settings_import_csv_sub">Import transactions from a CSV file</string>
 
     <!-- Export PDF screen (V1.1 / M49) -->
     <string name="export_pdf_title">Export PDF</string>
@@ -1009,6 +1013,7 @@
     <!-- i18n audit — Assets Hub -->
     <string name="assets_chart_empty">Trend chart appears after 2 months of use</string>
     <string name="assets_chart_data_since_format">Data since %s</string>
+    <string name="assets_pct_of_total_format">%1$.1f%% of total</string>
 
     <!-- i18n audit — Auto-backup PIN -->
     <string name="autobackup_pin_change_title">Change Auto-backup PIN</string>

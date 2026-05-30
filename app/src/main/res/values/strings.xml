@@ -169,6 +169,10 @@
     <string name="settings_export_reset_sub">Hapus semua data, mulai dari nol</string>
     <string name="settings_export_pdf">Ekspor PDF</string>
     <string name="settings_export_pdf_sub">Buat laporan ringkas untuk dibagikan atau diarsipkan</string>
+    <string name="settings_export_csv">Ekspor CSV / XLSX</string>
+    <string name="settings_export_csv_sub">Ekspor transaksi ke spreadsheet</string>
+    <string name="settings_import_csv">Impor CSV</string>
+    <string name="settings_import_csv_sub">Impor transaksi dari file CSV</string>
 
     <!-- Export PDF screen (V1.1 / M49) -->
     <string name="export_pdf_title">Ekspor PDF</string>
@@ -1009,6 +1013,7 @@
     <!-- i18n audit — Assets Hub -->
     <string name="assets_chart_empty">Grafik tren muncul setelah 2 bulan pemakaian</string>
     <string name="assets_chart_data_since_format">Data sejak %s</string>
+    <string name="assets_pct_of_total_format">%1$.1f%% dari total</string>
 
     <!-- i18n audit — Auto-backup PIN -->
     <string name="autobackup_pin_change_title">Ubah PIN Auto-backup</string>

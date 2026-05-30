@@ -186,12 +186,12 @@ fun SettingsScreen(
                 stringResource(R.string.settings_export_pdf_sub),
                 icon = Icons.Outlined.Description,
                 onClick = onNavigateToExport)
-            SettingsRow("Export CSV / XLSX",
-                "Export transaksi ke spreadsheet",
+            SettingsRow(stringResource(R.string.settings_export_csv),
+                stringResource(R.string.settings_export_csv_sub),
                 icon = Icons.Outlined.FileDownload,
                 onClick = onNavigateToExportCsv)
-            SettingsRow("Import CSV",
-                "Impor transaksi dari file CSV",
+            SettingsRow(stringResource(R.string.settings_import_csv),
+                stringResource(R.string.settings_import_csv_sub),
                 icon = Icons.Outlined.FileUpload,
                 onClick = onNavigateToImportCsv)
             SettingsRow(stringResource(R.string.settings_export_reset),

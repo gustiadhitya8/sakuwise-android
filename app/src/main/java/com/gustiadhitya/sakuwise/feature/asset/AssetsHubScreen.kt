@@ -604,7 +604,7 @@ private fun AssetClassCard(
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "%.1f%% dari total".format(contributionPct),
+                    stringResource(R.string.assets_pct_of_total_format, contributionPct),
                     color = tint,
                     style = SwType.LabelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold),
                 )
