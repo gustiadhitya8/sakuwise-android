@@ -56,6 +56,12 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+    // Expose the exported Room schema JSON to instrumented tests so
+    // MigrationTestHelper can load schema 5 as a baseline (Item 1, v1.0.4).
+    sourceSets {
+        getByName("androidTest").assets.srcDirs(files("$projectDir/schemas"))
+    }
+
     buildFeatures {
         compose = true
         buildConfig = true

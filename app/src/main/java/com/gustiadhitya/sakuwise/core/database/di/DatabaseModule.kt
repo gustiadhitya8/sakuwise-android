@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.RoomDatabase
 import com.gustiadhitya.sakuwise.core.crypto.KeyManager
 import com.gustiadhitya.sakuwise.core.database.SakuwiseDatabase
+import com.gustiadhitya.sakuwise.core.database.SakuwiseMigrations
 import com.gustiadhitya.sakuwise.core.database.dao.AccountDao
 import com.gustiadhitya.sakuwise.core.database.dao.DebtDao
 import com.gustiadhitya.sakuwise.core.database.dao.DepositDao
