@@ -1,5 +1,7 @@
-• Auto-backup Google Drive kini berjalan otomatis setiap hari tanpa perlu backup manual dulu
-• Perbaikan: saldo akun di form transaksi kini menampilkan saldo terkini
-• Perbaikan: dashboard langsung update saat tanggal transaksi diubah
-• Perbaikan: rekonsiliasi selisih positif kini tampil hijau (bukan merah)
-• Perbaikan tampilan status backup di halaman Saya
+Rilis penguatan fondasi — fokus keamanan data & kualitas, tanpa ubah fitur:
+
+• Migrasi database kini aman & teruji — data tidak terhapus saat update berikutnya
+• Backup lama tetap bisa dipulihkan di versi baru (format backup diberi versi & diuji)
+• Export ↔ Import CSV/XLSX konsisten — bisa bolak-balik tanpa kehilangan data
+• Mode English tidak lagi bocor teks Indonesia
+• Startup lebih cepat + pemantauan crash via Android Vitals tanpa pelacakan

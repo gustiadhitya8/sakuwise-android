@@ -1,5 +1,7 @@
-• Google Drive auto-backup now runs daily automatically — no manual backup required
-• Fix: account balance in transaction forms now shows live balance
-• Fix: dashboard updates immediately when a transaction date is changed
-• Fix: positive reconciliation now correctly shown in green (not red)
-• Fix: backup status color on the Me screen
+A hardening release — focused on data safety & quality, no feature changes:
+
+• Database migrations are now explicit & tested — your data won't be wiped on a future update
+• Older backups still restore on new versions (backup format is versioned & tested)
+• CSV/XLSX export ↔ import now match exactly — lossless round-trip
+• English mode no longer leaks Indonesian text
+• Faster cold start (baseline profile) + crash monitoring via Android Vitals, no tracking
