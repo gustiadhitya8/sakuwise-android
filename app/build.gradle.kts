@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -152,11 +153,37 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
 
+    // Static analysis: ktlint formatting rules run inside detekt via this plugin
+    detektPlugins(libs.detekt.formatting)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.room.testing)
+}
+
+// Static analysis (Item 5, v1.0.4). `./gradlew detekt` runs detekt rules +
+// ktlint formatting rules (via detekt-formatting). A baseline freezes the
+// pre-existing legacy issues so only NEW issues fail the build / CI.
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+    parallel = true
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+    reports {
+        html.required.set(true)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
+}
+tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "17"
 }
 
 // Convenience task: build release AAB and copy it to a fixed, easy-to-find

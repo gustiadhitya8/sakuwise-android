@@ -1,0 +1,71 @@
+# Detekt config for Sakuwise (v1.0.4). buildUponDefaultConfig = true, so this
+# only overrides/relaxes a few rules that don't fit a Compose + single-module
+# Android app. Legacy violations are frozen in detekt-baseline.xml; only NEW
+# issues fail the build.
+
+build:
+  maxIssues: 0   # with the baseline, any NEW issue fails
+
+formatting:
+  active: true
+  android: true
+  # ktlint rules (via detekt-formatting). Keep autocorrectable style as
+  # warnings-as-errors only for new code; baseline covers existing.
+  MaximumLineLength:
+    active: true
+    maxLineLength: 140
+  ArgumentListWrapping:
+    active: false   # noisy with Compose builders
+  Wrapping:
+    active: false
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 120          # Compose screens are long by nature
+  LongParameterList:
+    active: true
+    functionThreshold: 9    # Composable params + ViewModel ctors
+    constructorThreshold: 9
+    ignoreDefaultParameters: true
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 25
+  TooManyFunctions:
+    active: false           # design-system + screen files group many composables
+  LargeClass:
+    active: true
+    threshold: 600
+
+style:
+  MagicNumber:
+    active: false           # dp/sp design tokens everywhere
+  UnusedPrivateMember:
+    active: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  ReturnCount:
+    active: true
+    max: 6
+  ForbiddenComment:
+    active: false           # TODO/FIXME allowed during development
+
+naming:
+  FunctionNaming:
+    active: true
+    # Composables are PascalCase by convention.
+    functionPattern: '([a-z][a-zA-Z0-9]*)|([A-Z][a-zA-Z0-9]*)'
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false           # catch(Exception) is common around platform APIs
+  SwallowedException:
+    active: true
+
+empty-blocks:
+  EmptyCatchBlock:
+    active: true
+
+comments:
+  active: false             # don't require KDoc everywhere
