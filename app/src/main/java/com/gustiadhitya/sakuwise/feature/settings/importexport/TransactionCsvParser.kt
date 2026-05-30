@@ -124,7 +124,14 @@ object TransactionCsvParser {
 
     private fun parseDate(s: String): LocalDate? {
         for (fmt in DATE_FORMATS) {
-            try { return LocalDate.parse(s, fmt) } catch (_: Exception) {}
+            // Intentional: probe each supported format; a parse miss is expected
+            // control flow (we fall through to the next format), NOT a swallowed
+            // crash. Returns null if none match, which the caller handles.
+            try {
+                return LocalDate.parse(s, fmt)
+            } catch (_: java.time.format.DateTimeParseException) {
+                // try next format
+            }
         }
         return null
     }
