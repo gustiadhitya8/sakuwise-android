@@ -57,8 +57,8 @@ class ExportTransactionsUseCase @Inject constructor(
             val incomeLookup   = transactionRepo.observeIncomeCategories().first()
                                      .associate { it.id to it.name }
 
-            // Headers match TransactionCsvParser.template() exactly.
-            val headers = listOf("Tanggal", "Tipe", "Kategori", "Item", "Akun", "Jumlah", "Catatan")
+            // Single source of truth — same schema the importer expects.
+            val headers = TransactionCsvParser.CANONICAL_HEADERS_ID
             val rows    = txns.map { buildRow(it, nameById, planItemLookup, incomeLookup) }
 
             val exportsDir = File(context.cacheDir, "exports").apply { mkdirs() }

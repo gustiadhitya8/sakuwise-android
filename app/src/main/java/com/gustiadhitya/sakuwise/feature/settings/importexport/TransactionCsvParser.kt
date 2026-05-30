@@ -24,6 +24,16 @@ data class ParseResult(
 
 object TransactionCsvParser {
 
+    /**
+     * Canonical column schema, in order. Export writes exactly these columns
+     * in this order, and the import template uses them, so export → import is
+     * lossless by construction. The parser accepts either the ID or EN header
+     * names (and is order-independent), but keeping export aligned to this
+     * single source prevents schema drift. (Item 8, v1.0.4.)
+     */
+    val CANONICAL_HEADERS_ID = listOf("Tanggal", "Tipe", "Kategori", "Item", "Akun", "Jumlah", "Catatan")
+    val CANONICAL_HEADERS_EN = listOf("Date", "Type", "Category", "Item", "Account", "Amount", "Note")
+
     private val DATE_FORMATS = listOf(
         DateTimeFormatter.ofPattern("yyyyMMdd"),
         DateTimeFormatter.ofPattern("yyyy-MM-dd"),
@@ -101,7 +111,7 @@ object TransactionCsvParser {
     // Generates a UTF-8 BOM CSV template with bilingual headers and two example rows.
     fun template(): ByteArray {
         val lines = listOf(
-            "Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan",
+            CANONICAL_HEADERS_ID.joinToString(";"),
             "20260503;Expense;Bulanan Gusti;Makan;BCA;45000;ShopeeFood: Egg Roll, Basgor, Nugger",
             "20260503;Expense;Bulanan Gusti;Kopi;Gopay;18000;Lawson: Caffe Latte",
             "20260501;Income;;;BCA;5000000;Gaji Mei",
