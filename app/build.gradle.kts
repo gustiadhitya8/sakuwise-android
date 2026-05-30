@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -152,6 +153,10 @@ dependencies {
     }
 
     debugImplementation(libs.androidx.ui.tooling)
+
+    // Baseline profile: runtime installer + the profile producer module (Item 4)
+    implementation(libs.androidx.profileinstaller)
+    baselineProfile(project(":baselineprofile"))
 
     // Static analysis: ktlint formatting rules run inside detekt via this plugin
     detektPlugins(libs.detekt.formatting)

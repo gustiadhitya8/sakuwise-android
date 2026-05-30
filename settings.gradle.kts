@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Sakuwise"
 include(":app")
+include(":baselineprofile")
