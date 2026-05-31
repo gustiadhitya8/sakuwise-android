@@ -173,7 +173,7 @@ class GoogleDriveBackup @Inject constructor(
         // AccountManager by Google Play Services. Constructing Account(email,
         // "com.google") manually fails with CommonStatusCodes.INTERNAL_ERROR (8)
         // when GMS can't find a matching entry in AccountManager — which is the
-        // root cause of the user-visible "Upload gagal: 8" error.
+        // root cause of the user-visible upload error with status code 8.
         val platformAccount = account.account ?: return null
         val credential = GoogleAccountCredential.usingOAuth2(
             appContext,

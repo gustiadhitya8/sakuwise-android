@@ -43,7 +43,7 @@ class ExportPdfViewModel @Inject constructor(
             result.fold(
                 onSuccess = { uri -> _state.value = ExportState.Ready(uri) },
                 onFailure = { t ->
-                    _state.value = ExportState.Failure(t.message ?: "Tidak diketahui")
+                    _state.value = ExportState.Failure(t.message ?: context.getString(R.string.export_err_unknown))
                 },
             )
         }

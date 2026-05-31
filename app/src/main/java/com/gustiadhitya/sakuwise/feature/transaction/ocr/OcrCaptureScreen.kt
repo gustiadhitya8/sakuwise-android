@@ -84,7 +84,7 @@ class OcrCaptureViewModel @Inject constructor(
             }
                 .onSuccess { _stage.value = OcrStage.Ready(it) }
                 .onFailure {
-                    _stage.value = OcrStage.Failure(it.message ?: "OCR gagal — coba foto ulang.")
+                    _stage.value = OcrStage.Failure(it.message ?: "")
                 }
         }
     }
@@ -167,7 +167,7 @@ fun OcrCaptureScreen(
                 )
             }
             Text(
-                if (stage is OcrStage.Ready) "Review Struk" else "Scan Struk",
+                if (stage is OcrStage.Ready) stringResource(R.string.ocr_review_title) else stringResource(R.string.ocr_scan_title),
                 color = sw.ink,
                 style = SwType.H1.copy(fontSize = 19.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(start = 8.dp).weight(1f),
@@ -206,7 +206,7 @@ fun OcrCaptureScreen(
                     onGallery = { viewModel.reset(); galleryLauncher.launch("image/*") },
                 )
                 is OcrStage.Failure -> FailureBody(
-                    message = s.message,
+                    message = s.message.ifBlank { stringResource(R.string.ocr_failed_retry) },
                     onRetake = ::launchCamera,
                     onGallery = { galleryLauncher.launch("image/*") },
                 )
@@ -236,7 +236,7 @@ private fun IdleBody(onCamera: () -> Unit, onGallery: () -> Unit) {
         }
     }
     Spacer(Modifier.height(16.dp))
-    SwButton(text = "Foto Struk", onClick = onCamera,
+    SwButton(text = stringResource(R.string.ocr_photo_receipt), onClick = onCamera,
         leading = {
             Icon(Icons.Outlined.CameraAlt, null,
                 tint = sw.onPrimary, modifier = Modifier.size(16.dp))
@@ -282,7 +282,7 @@ private fun ReadyBody(draft: ReceiptDraft, onRetake: () -> Unit, onGallery: () -
     val sw = SwTheme.colors
     val detected = listOf(draft.merchant != null,
         draft.totalAmount != null, draft.date != null).count { it }
-    // Success banner — green chip + "Berhasil dibaca" + "N field terdeteksi".
+    // Success banner — green chip + read-success title + detected-field count.
     SwCard(padding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -421,7 +421,7 @@ private fun FailureBody(message: String, onRetake: () -> Unit, onGallery: () -> 
         }
     }
     Spacer(Modifier.height(16.dp))
-    SwButton(text = "Foto Ulang", onClick = onRetake)
+    SwButton(text = stringResource(R.string.ocr_retake), onClick = onRetake)
     Spacer(Modifier.height(8.dp))
     SwButton(text = stringResource(R.string.ocr_pick_from_gallery), onClick = onGallery,
         variant = SwButtonVariant.Outline)

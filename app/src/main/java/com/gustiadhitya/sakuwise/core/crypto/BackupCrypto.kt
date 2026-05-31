@@ -83,7 +83,7 @@ object BackupCrypto {
         val salt = fileBytes.copyOfRange(8, 24)
         val nonce = fileBytes.copyOfRange(24, 36)
         val ctLen = ByteBuffer.wrap(fileBytes, 36, 4).order(ByteOrder.BIG_ENDIAN).int
-        require(ctLen in 1..(fileBytes.size - 40)) { "Ukuran ciphertext tidak valid." }
+        require(ctLen in 1..(fileBytes.size - 40)) { "Invalid ciphertext length." }
         val ct = fileBytes.copyOfRange(40, 40 + ctLen)
 
         val kek = deriveKek(pin, salt)
@@ -93,7 +93,7 @@ object BackupCrypto {
             return try {
                 cipher.doFinal(ct)
             } catch (t: javax.crypto.AEADBadTagException) {
-                throw BadPinException("PIN salah atau file rusak.")
+                throw BadPinException("Wrong PIN or corrupted file.")
             }
         } finally {
             kek.fill(0)
@@ -126,3 +126,6 @@ object BackupCrypto {
 }
 
 class BadPinException(message: String) : Exception(message)
+
+/** Thrown when a backup file's schema version is newer than this app supports. */
+class BackupVersionTooNewException(message: String) : Exception(message)

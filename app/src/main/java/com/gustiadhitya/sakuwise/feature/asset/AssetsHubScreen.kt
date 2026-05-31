@@ -159,8 +159,8 @@ fun AssetsHubScreen(
                 // Growth pill — per screens-assets.jsx, sits BELOW the total
                 // with marginTop:8 + bg = rgba(255,255,255,0.16). Inline-flex.
                 // Always renders so the layout matches the prototype; falls
-                // back to "+0,0% sejak hari ini" when the snapshot table
-                // doesn't yet have ≥ 2 distinct days of data.
+                // back to a zero-growth "since today" pill when the snapshot
+                // table doesn't yet have >= 2 distinct days of data.
                 Spacer(Modifier.height(8.dp))
                 val series = state.netWorthTrend
                 val first = series.firstOrNull()?.second ?: 0L
@@ -172,7 +172,7 @@ fun AssetsHubScreen(
                 val sinceLabel = if (series.isNotEmpty()) {
                     // Use the oldest real monthly point as the "since" reference.
                     // Even with only 1 month of data, this is more informative
-                    // than "sejak hari ini".
+                    // than a plain "since today" label.
                     series.first().first.format(
                         java.time.format.DateTimeFormatter.ofPattern("MMM yy", java.util.Locale.getDefault()),
                     )

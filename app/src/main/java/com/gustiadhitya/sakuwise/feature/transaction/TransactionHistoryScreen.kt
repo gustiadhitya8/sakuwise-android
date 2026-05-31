@@ -127,10 +127,11 @@ fun TransactionHistoryScreen(
     var showFilterSheet by remember { mutableStateOf(false) }
 
     // Category expense summary — only expenses, grouped by categoryName
-    val categorySummary = remember(transactions, planItemMeta) {
+    val fallbackCategory = stringResource(R.string.txnhist_fallback_category)
+    val categorySummary = remember(transactions, planItemMeta, fallbackCategory) {
         transactions
             .filter { it.type == TxnType.Expense && it.planItemId != null }
-            .groupBy { planItemMeta[it.planItemId]?.categoryName ?: "Lainnya" }
+            .groupBy { planItemMeta[it.planItemId]?.categoryName ?: fallbackCategory }
             .map { (cat, txns) -> cat to txns.sumOf { it.amount } }
             .sortedByDescending { it.second }
     }
@@ -182,7 +183,7 @@ fun TransactionHistoryScreen(
                 Icon(Icons.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back), tint = sw.ink)
             }
             Text(
-                "Riwayat Transaksi",
+                stringResource(R.string.txnhist_title),
                 style = SwType.H3,
                 color = sw.ink,
                 modifier = Modifier.weight(1f),
@@ -374,7 +375,7 @@ fun TransactionHistoryScreen(
             if (dailyExpenses.isNotEmpty() || categorySummary.isNotEmpty()) {
                 val sw2 = SwTheme.colors
                 Column(modifier = Modifier.padding(horizontal = SwSpace.pageH)) {
-                    SwSectionLabel(text = "Pengeluaran")
+                    SwSectionLabel(text = stringResource(R.string.txnhist_section_expense))
                     SwCard(padding = PaddingValues(0.dp)) {
                         Column {
                             // Tab row
@@ -384,7 +385,7 @@ fun TransactionHistoryScreen(
                                     .padding(horizontal = 12.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                listOf("TREN HARIAN", "PER KATEGORI").forEachIndexed { idx, label ->
+                                listOf(stringResource(R.string.txnhist_tab_daily), stringResource(R.string.txnhist_tab_category)).forEachIndexed { idx, label ->
                                     val active = spendingTab == idx
                                     Box(
                                         contentAlignment = Alignment.Center,
@@ -471,7 +472,7 @@ fun TransactionHistoryScreen(
             // Transaction list header + sort
             Column(modifier = Modifier.padding(horizontal = SwSpace.pageH).padding(bottom = 14.dp)) {
                 SwSectionLabel(
-                    text = "Transaksi (${sorted.size})",
+                    text = stringResource(R.string.txnhist_section_txns_format, sorted.size),
                     trailing = if (sorted.isNotEmpty()) {
                         {
                             SwSortMenu(
@@ -486,7 +487,7 @@ fun TransactionHistoryScreen(
                 if (sorted.isEmpty()) {
                     SwCard {
                         Text(
-                            "Belum ada transaksi bulan ini.",
+                            stringResource(R.string.txnhist_empty),
                             color = sw.inkMuted,
                             style = SwType.Body,
                         )
@@ -545,14 +546,14 @@ fun TransactionHistoryScreen(
                                         )
                                     }
                                     Spacer(Modifier.width(12.dp))
-                                    val fallbackLabel = when (t.type) {
-                                        TxnType.Income -> "Pemasukan"
-                                        TxnType.Expense -> "Pengeluaran"
-                                        TxnType.Transfer -> "Transfer"
-                                        TxnType.DebtInflow -> "Utang Masuk"
-                                        TxnType.DebtOutflow -> "Cicilan Utang"
-                                        TxnType.Reconciliation -> "Rekonsiliasi"
-                                    }
+                                    val fallbackLabel = stringResource(when (t.type) {
+                                        TxnType.Income -> R.string.txntype_income
+                                        TxnType.Expense -> R.string.txntype_expense
+                                        TxnType.Transfer -> R.string.addtxn_transfer
+                                        TxnType.DebtInflow -> R.string.txnhist_type_debt_in
+                                        TxnType.DebtOutflow -> R.string.txnhist_type_debt_payment
+                                        TxnType.Reconciliation -> R.string.txntype_reconciliation
+                                    })
                                     Column(Modifier.weight(1f)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
@@ -898,7 +899,7 @@ private fun FilterSheet(
                         .padding(horizontal = 20.dp, vertical = 4.dp),
                 ) {
                     Text(
-                        "Filter Transaksi",
+                        stringResource(R.string.txnhist_filter_title),
                         style = SwType.H3.copy(fontWeight = FontWeight.Bold),
                         color = sw.ink,
                         modifier = Modifier.weight(1f),
@@ -919,7 +920,7 @@ private fun FilterSheet(
             if (accounts.isNotEmpty()) {
                 item {
                     Text(
-                        "AKUN",
+                        stringResource(R.string.txnhist_filter_section_accounts),
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                         color = sw.inkSubtle,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),

@@ -54,7 +54,7 @@ class BackupViewModel @Inject constructor(
 
     fun startBackup(pin: CharArray) {
         if (pin.size != 6) {
-            _state.value = BackupUiState(errorMessage = "PIN harus 6 digit.")
+            _state.value = BackupUiState(errorMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_pin_6digit))
             return
         }
         _state.value = BackupUiState(stage = Stage.Encrypting)
@@ -72,7 +72,7 @@ class BackupViewModel @Inject constructor(
                     resultFileSize = file.length(),
                 )
             } catch (t: Throwable) {
-                _state.value = BackupUiState(errorMessage = "Backup gagal: ${t.message ?: "unknown"}")
+                _state.value = BackupUiState(errorMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_backup_failed_format, t.message ?: "unknown"))
             }
         }
     }
@@ -86,7 +86,7 @@ class BackupViewModel @Inject constructor(
             try {
                 app.contentResolver.openOutputStream(uri)?.use { out ->
                     src.inputStream().use { it.copyTo(out) }
-                } ?: error("Tidak bisa membuka lokasi simpan")
+                } ?: error(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_open_save_location))
                 runCatching { src.delete() }
                 _pendingBackupFile = null
                 prefsRepo.markBackupNow(System.currentTimeMillis())
@@ -99,7 +99,7 @@ class BackupViewModel @Inject constructor(
                     resultFileSize = size,
                 )
             } catch (t: Throwable) {
-                _state.value = BackupUiState(errorMessage = "Simpan gagal: ${t.message ?: "unknown"}")
+                _state.value = BackupUiState(errorMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_save_failed_format, t.message ?: "unknown"))
             }
         }
     }
@@ -115,9 +115,11 @@ class BackupViewModel @Inject constructor(
                 // launch MainActivity (BAL-allowed since user-initiated).
                 _restoreState.value = RestoreState.Success
             } catch (t: BadPinException) {
-                onError(t.message ?: "PIN salah.")
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_pin_wrong))
+            } catch (t: com.gustiadhitya.sakuwise.core.crypto.BackupVersionTooNewException) {
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_version_too_new))
             } catch (t: Throwable) {
-                onError("Restore gagal: ${t.message ?: "unknown"}")
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_restore_failed_format, t.message ?: "unknown"))
             }
         }
     }
@@ -166,12 +168,12 @@ class BackupViewModel @Inject constructor(
             result.fold(
                 onSuccess = { email ->
                     prefsRepo.setDriveAccountEmail(email)
-                    _driveState.value = _driveState.value.copy(busy = false, lastMessage = "Terhubung sebagai $email")
+                    _driveState.value = _driveState.value.copy(busy = false, lastMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_connected_as_format, email))
                 },
                 onFailure = { t ->
                     _driveState.value = _driveState.value.copy(
                         busy = false,
-                        error = "Sign-in gagal: ${t.message ?: "unknown"}",
+                        error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_signin_failed_format, t.message ?: "unknown"),
                     )
                 },
             )
@@ -189,7 +191,7 @@ class BackupViewModel @Inject constructor(
         }
     }
 
-    /** True when a backup PIN is stored — used by the UI to show "PIN tersimpan · Ubah". */
+    /** True when a backup PIN is stored — used by the UI to show the stored-PIN chip. */
     val autoBackupPinStored: Boolean get() = autoBackupPinStorage.hasPin()
 
     /**
@@ -257,7 +259,7 @@ class BackupViewModel @Inject constructor(
                         prefsRepo.markBackupNow(now)
                         _driveState.value = _driveState.value.copy(
                             busy = false,
-                            lastMessage = "Backup berhasil diupload ke Google Drive",
+                            lastMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_drive_upload_success),
                         )
                         refreshDriveBackups()
                     },
@@ -265,7 +267,7 @@ class BackupViewModel @Inject constructor(
                         runCatching { file.delete() }
                         _driveState.value = _driveState.value.copy(
                             busy = false,
-                            error = "Upload gagal: ${t.message ?: "unknown"}",
+                            error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_upload_failed_format, t.message ?: "unknown"),
                         )
                     },
                 )
@@ -273,7 +275,7 @@ class BackupViewModel @Inject constructor(
                 pin.fill(0.toChar())
                 _driveState.value = _driveState.value.copy(
                     busy = false,
-                    error = "Backup gagal: ${t.message ?: "unknown"}",
+                    error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_backup_failed_format, t.message ?: "unknown"),
                 )
             }
         }
@@ -291,7 +293,7 @@ class BackupViewModel @Inject constructor(
                 onFailure = { t ->
                     _driveState.value = _driveState.value.copy(
                         busy = false,
-                        error = "Daftar Drive gagal: ${t.message ?: "unknown"}",
+                        error = app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_list_failed_format, t.message ?: "unknown"),
                     )
                 },
             )
@@ -309,7 +311,7 @@ class BackupViewModel @Inject constructor(
                 val target = File(app.cacheDir, "drive-restore-${entry.id}.sakuwise")
                 val dl = drive.download(entry.id, target)
                 dl.getOrElse { t ->
-                    onError("Download gagal: ${t.message ?: "unknown"}")
+                    onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_download_failed_format, t.message ?: "unknown"))
                     return@launch
                 }
                 backupService.restore(pin, target)
@@ -317,9 +319,11 @@ class BackupViewModel @Inject constructor(
                 runCatching { target.delete() }
                 _restoreState.value = RestoreState.Success
             } catch (t: BadPinException) {
-                onError(t.message ?: "PIN salah.")
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_pin_wrong))
+            } catch (t: com.gustiadhitya.sakuwise.core.crypto.BackupVersionTooNewException) {
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_version_too_new))
             } catch (t: Throwable) {
-                onError("Restore gagal: ${t.message ?: "unknown"}")
+                onError(app.getString(com.gustiadhitya.sakuwise.R.string.backup_err_restore_failed_format, t.message ?: "unknown"))
             }
         }
     }
@@ -329,7 +333,7 @@ class BackupViewModel @Inject constructor(
             _driveState.value = _driveState.value.copy(busy = true, error = null)
             drive.delete(entry.id).fold(
                 onSuccess = {
-                    _driveState.value = _driveState.value.copy(busy = false, lastMessage = "Backup dihapus")
+                    _driveState.value = _driveState.value.copy(busy = false, lastMessage = app.getString(com.gustiadhitya.sakuwise.R.string.backup_deleted))
                     refreshDriveBackups()
                 },
                 onFailure = { t ->

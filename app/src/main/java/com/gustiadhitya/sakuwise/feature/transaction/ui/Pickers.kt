@@ -148,7 +148,7 @@ private fun FilterPill(label: String, active: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String = "Cari...") {
+private fun SearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String = stringResource(R.string.picker_search_hint)) {
     val sw = SwTheme.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -191,7 +191,7 @@ fun AccountPickerSheet(
     accounts: List<Account>,
     selectedId: String?,
     excludeId: String? = null,
-    /** Live computed balances keyed by account id — shown as "Saldo: Rp X" subtitle. */
+    /** Live computed balances keyed by account id — shown as a balance subtitle. */
     balances: Map<String, Long> = emptyMap(),
     onPick: (Account) -> Unit,
     onDismiss: () -> Unit,
@@ -232,7 +232,7 @@ fun AccountPickerSheet(
                         Text(acc.name, color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold))
                         val subtitle = if (liveBalance != null)
-                            "${acc.type.displayName()} · Saldo ${liveBalance.toRupiahShort()}"
+                            stringResource(R.string.picker_account_subtitle_format, acc.type.displayName(), liveBalance.toRupiahShort())
                         else acc.type.displayName()
                         Text(subtitle, color = sw.inkMuted,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp))
@@ -345,7 +345,7 @@ fun PlanItemPickerSheet(
         }
         if (visible.isEmpty()) {
             Text(
-                if (query.isNotEmpty()) "Tidak ada item yang cocok untuk \"$query\"."
+                if (query.isNotEmpty()) stringResource(R.string.picker_no_match_format, query)
                 else stringResource(R.string.picker_no_plan_items_for_filter),
                 color = sw.inkMuted, style = SwType.LabelSmall.copy(fontSize = 12.sp),
                 modifier = Modifier.padding(vertical = 8.dp),

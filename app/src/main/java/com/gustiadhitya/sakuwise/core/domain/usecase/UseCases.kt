@@ -217,8 +217,8 @@ class AddTransferUseCase @Inject constructor(private val repo: TransactionReposi
      *     from the Transfer row (so AccountDao doesn't double-subtract) and
      *     write a sibling Expense Transaction(amount=fee, planItemId=…,
      *     sourceAccount=fromAccount). The Expense row is then aggregated
-     *     into the plan period totals like any other expense, satisfying
-     *     "fee terhitung sebagai pengeluaran terhadap plan item".
+     *     into the plan period totals like any other expense, so the fee
+     *     counts as an expense against the plan item.
      */
     suspend operator fun invoke(
         amount: Long,
@@ -432,7 +432,10 @@ class AddDebtPaymentUseCase @Inject constructor(
                     sourceAccountId = accountId, destAccountId = null,
                     transferFee = null, debtId = debtId,
                     photoBlob = null, incomeCategoryId = null,
-                    note = note ?: "Pembayaran hutang",
+                    // Leave note null when the user didn't enter one — the UI
+                    // resolves a localized fallback label (txntype_debt_outflow)
+                    // from the transaction type, keeping the domain layer pure.
+                    note = note,
                     createdAt = System.currentTimeMillis(),
                 ),
             )

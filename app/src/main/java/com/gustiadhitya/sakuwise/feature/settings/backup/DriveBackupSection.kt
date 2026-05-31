@@ -331,7 +331,7 @@ fun DriveBackupSection(
         }
     }
 
-    // PIN sheet for Drive "Cadangkan Sekarang" — one-off upload
+    // PIN sheet for Drive backup-now — one-off upload
     if (showDriveBackupPin) {
         DriveBackupPinSheet(
             vm = vm,
@@ -357,7 +357,7 @@ fun DriveBackupSection(
 }
 
 /**
- * PIN entry sheet shown when the user taps "Cadangkan Sekarang" in the Drive
+ * PIN entry sheet shown when the user taps the backup-now action in the Drive
  * section. Creates a fresh encrypted backup and uploads it directly to Drive —
  * no pre-existing local backup file required.
  */
@@ -450,7 +450,7 @@ private fun DriveBackupPinSheet(
 }
 
 /**
- * Sheet listing existing Drive backups. Tapping "Pulihkan" opens a PIN entry
+ * Sheet listing existing Drive backups. Tapping restore opens a PIN entry
  * sub-stage; once PIN is in and confirmed, [BackupViewModel.restoreFromDrive]
  * does the download + decrypt + DB swap and the parent screen flips to the
  * existing post-restore success card.

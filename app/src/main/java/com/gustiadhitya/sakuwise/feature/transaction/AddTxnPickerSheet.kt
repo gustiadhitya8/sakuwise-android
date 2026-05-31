@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
@@ -81,7 +82,7 @@ fun AddTxnPickerSheet(
                         .clip(RoundedCornerShape(10.dp))
                         .clickable(onClick = onDismiss),
                 ) {
-                    Icon(Icons.Outlined.Close, "Tutup",
+                    Icon(Icons.Outlined.Close, stringResource(R.string.action_close),
                         tint = sw.inkMuted, modifier = Modifier.size(22.dp))
                 }
             }

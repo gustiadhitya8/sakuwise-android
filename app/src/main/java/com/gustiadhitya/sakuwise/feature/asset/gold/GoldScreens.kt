@@ -593,8 +593,8 @@ fun GoldDetailScreen(
         Spacer(Modifier.height(20.dp))
         var showSellSheet by remember { mutableStateOf(false) }
         if (g.status == com.gustiadhitya.sakuwise.core.domain.model.AssetStatus.Held) {
-            // Proto: Secondary "Tambah foto" with camera icon, then Outline
-            // "Catat penjualan" with arrow_up_right.
+            // Proto: Secondary add-photo with camera icon, then Outline
+            // record-sale with arrow_up_right.
             SwButton(
                 text = stringResource(R.string.gold_add_photo),
                 onClick = { /* photo flow handled via edit screen */ onEdit() },

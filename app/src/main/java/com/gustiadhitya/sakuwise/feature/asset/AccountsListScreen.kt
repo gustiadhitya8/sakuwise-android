@@ -175,9 +175,9 @@ fun AccountsListScreen(
                             tint = sw.info, modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.size(width = 10.dp, height = 1.dp))
-                        // Build an AnnotatedString that bolds the "Tap akun"
-                        // lead phrase per proto, then appends the rest of the
-                        // sentence in regular weight.
+                        // Build an AnnotatedString that bolds the lead phrase
+                        // per proto, then appends the rest of the sentence in
+                        // regular weight.
                         val lead = stringResource(R.string.accounts_list_hint_lead)
                         val full = stringResource(R.string.accounts_list_hint)
                         val tail = full.removePrefix(lead).trimStart()

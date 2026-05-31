@@ -7,6 +7,7 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.common.toAbsoluteId
 import com.gustiadhitya.sakuwise.core.common.toRupiah
 import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
@@ -122,9 +123,11 @@ class ExportPdfUseCase @Inject constructor(
             try {
                 val ctx = RenderContext(
                     pdf = pdf,
-                    nickname = prefs.userNickname.ifBlank { "Teman" },
+                    nickname = prefs.userNickname.ifBlank { context.getString(R.string.default_nickname) },
                     periodStart = periodStart,
                     periodEnd = periodEnd,
+                    exportedAtFormat = context.getString(R.string.export_pdf_exported_at_format, "%1\$s"),
+                    pageLabelFormat = context.getString(R.string.export_pdf_page_label_format, "%1\$d"),
                 )
                 ctx.beginPage()
                 renderHeader(ctx)
@@ -164,6 +167,8 @@ class ExportPdfUseCase @Inject constructor(
         val nickname: String,
         val periodStart: LocalDate,
         val periodEnd: LocalDate,
+        val exportedAtFormat: String,
+        val pageLabelFormat: String,
     ) {
         var pageNo: Int = 0
         var page: PdfDocument.Page? = null
@@ -185,9 +190,9 @@ class ExportPdfUseCase @Inject constructor(
                 isAntiAlias = true; textSize = 8f
                 typeface = Typeface.DEFAULT; color = INK_SUBTLE
             }
-            val left = "Diekspor pada ${LocalDate.now().toAbsoluteId()}"
+            val left = String.format(exportedAtFormat, LocalDate.now().toAbsoluteId())
             canvas.drawText(left, MARGIN, footY, footerPaint)
-            val right = "Halaman $pageNo"
+            val right = String.format(pageLabelFormat, pageNo)
             canvas.drawText(
                 right,
                 PAGE_W - MARGIN - footerPaint.measureText(right),
@@ -236,24 +241,24 @@ class ExportPdfUseCase @Inject constructor(
 
         // Right-aligned report meta
         val labelPaint = textPaint(8f, Typeface.DEFAULT_BOLD, INK_SUBTLE)
-        val periodLabel = "LAPORAN " +
-            "${ctx.periodStart.toAbsoluteId()} — ${ctx.periodEnd.toAbsoluteId()}"
+        val periodLabel = "${ctx.periodStart.toAbsoluteId()} — ${ctx.periodEnd.toAbsoluteId()}"
         val rightX = PAGE_W - MARGIN
+        val reportTitle = context.getString(R.string.export_pdf_report_title)
         canvas.drawText(
-            "LAPORAN KEUANGAN",
-            rightX - labelPaint.measureText("LAPORAN KEUANGAN"),
+            reportTitle,
+            rightX - labelPaint.measureText(reportTitle),
             ctx.y + 6f,
             labelPaint,
         )
         val periodPaint = textPaint(10f, Typeface.DEFAULT_BOLD, INK)
         canvas.drawText(
-            periodLabel.removePrefix("LAPORAN "),
-            rightX - periodPaint.measureText(periodLabel.removePrefix("LAPORAN ")),
+            periodLabel,
+            rightX - periodPaint.measureText(periodLabel),
             ctx.y + 19f,
             periodPaint,
         )
         val ownerPaint = textPaint(9f, Typeface.DEFAULT, INK_MUTED)
-        val ownerLine = "Untuk: ${ctx.nickname}"
+        val ownerLine = context.getString(R.string.export_pdf_for_format, ctx.nickname)
         canvas.drawText(
             ownerLine,
             rightX - ownerPaint.measureText(ownerLine),
@@ -275,7 +280,7 @@ class ExportPdfUseCase @Inject constructor(
         nw: ComputeNetWorthUseCase.NetWorth,
     ) {
         ctx.ensureRoom(110f)
-        sectionTitle(ctx, "Net Worth")
+        sectionTitle(ctx, context.getString(R.string.export_pdf_net_worth))
 
         val page = ctx.page!!
         val canvas = page.canvas
@@ -286,7 +291,7 @@ class ExportPdfUseCase @Inject constructor(
             8f, 8f, fillPaint(BRAND_GREEN),
         )
         val labelPaint = textPaint(8f, Typeface.DEFAULT_BOLD, Color.WHITE)
-        canvas.drawText("TOTAL NET WORTH", MARGIN + 12f, ctx.y + 14f, labelPaint)
+        canvas.drawText(context.getString(R.string.export_pdf_total_net_worth), MARGIN + 12f, ctx.y + 14f, labelPaint)
         val totalPaint = textPaint(22f, Typeface.DEFAULT_BOLD, Color.WHITE)
         canvas.drawText(
             nw.total.toRupiah(),
@@ -297,11 +302,11 @@ class ExportPdfUseCase @Inject constructor(
 
         // Breakdown rows
         val rows = listOf(
-            "Akun" to nw.accountsTotal,
-            "Emas" to nw.goldTotal,
-            "Properti / Tanah" to nw.landTotal,
-            "Deposito" to nw.depositTotal,
-            "− Hutang" to -nw.debtsTotal,
+            context.getString(R.string.export_pdf_accounts) to nw.accountsTotal,
+            context.getString(R.string.export_pdf_gold) to nw.goldTotal,
+            context.getString(R.string.export_pdf_land) to nw.landTotal,
+            context.getString(R.string.export_pdf_deposit) to nw.depositTotal,
+            context.getString(R.string.export_pdf_minus_debt) to -nw.debtsTotal,
         )
         for ((label, value) in rows) {
             ctx.ensureRoom(16f)
@@ -316,13 +321,17 @@ class ExportPdfUseCase @Inject constructor(
         balances: Map<String, Long>,
     ) {
         ctx.ensureRoom(40f)
-        sectionTitle(ctx, "Akun")
+        sectionTitle(ctx, context.getString(R.string.export_pdf_accounts))
         if (accounts.isEmpty()) {
             mutedLine(ctx, context.getString(com.gustiadhitya.sakuwise.R.string.export_pdf_no_accounts))
             return
         }
         // Header row
-        tableHeader(ctx, listOf("Nama" to 0.45f, "Tipe" to 0.25f, "Saldo" to 0.30f))
+        tableHeader(ctx, listOf(
+            context.getString(R.string.export_pdf_name) to 0.45f,
+            context.getString(R.string.export_pdf_type) to 0.25f,
+            context.getString(R.string.export_pdf_balance) to 0.30f,
+        ))
         for (acc in accounts) {
             ctx.ensureRoom(18f)
             tableRow(
@@ -351,7 +360,7 @@ class ExportPdfUseCase @Inject constructor(
             MARGIN, ctx.y, MARGIN + cellW, ctx.y + cellH,
             6f, 6f, fillPaint(SOFT_BG),
         )
-        canvas.drawText("PEMASUKAN", MARGIN + 10f, ctx.y + 14f,
+        canvas.drawText(context.getString(R.string.export_pdf_income), MARGIN + 10f, ctx.y + 14f,
             textPaint(8f, Typeface.DEFAULT_BOLD, INK_SUBTLE))
         canvas.drawText(income.toRupiah(), MARGIN + 10f, ctx.y + 38f,
             textPaint(16f, Typeface.DEFAULT_BOLD, BRAND_GREEN))
@@ -362,7 +371,7 @@ class ExportPdfUseCase @Inject constructor(
             xExp, ctx.y, xExp + cellW, ctx.y + cellH,
             6f, 6f, fillPaint(SOFT_BG),
         )
-        canvas.drawText("PENGELUARAN", xExp + 10f, ctx.y + 14f,
+        canvas.drawText(context.getString(R.string.export_pdf_expense), xExp + 10f, ctx.y + 14f,
             textPaint(8f, Typeface.DEFAULT_BOLD, INK_SUBTLE))
         canvas.drawText(expense.toRupiah(), xExp + 10f, ctx.y + 38f,
             textPaint(16f, Typeface.DEFAULT_BOLD, DANGER_RED))
@@ -370,7 +379,7 @@ class ExportPdfUseCase @Inject constructor(
         ctx.y += cellH + 8f
 
         val delta = income - expense
-        val deltaLabel = if (delta >= 0) "Surplus" else "Defisit"
+        val deltaLabel = if (delta >= 0) context.getString(R.string.export_pdf_surplus) else context.getString(R.string.export_pdf_deficit)
         val deltaColor = if (delta >= 0) BRAND_GREEN else DANGER_RED
         keyValueRow(ctx, deltaLabel, delta.toRupiah(), valueColor = deltaColor, bold = true)
         ctx.y += 10f
@@ -381,9 +390,9 @@ class ExportPdfUseCase @Inject constructor(
         cats: List<com.gustiadhitya.sakuwise.core.domain.repository.TopExpenseCategory>,
     ) {
         ctx.ensureRoom(40f)
-        sectionTitle(ctx, "Top Pengeluaran")
+        sectionTitle(ctx, context.getString(R.string.export_pdf_top_expenses))
         if (cats.isEmpty()) {
-            mutedLine(ctx, "Tidak ada pengeluaran di periode ini.")
+            mutedLine(ctx, context.getString(R.string.export_pdf_no_expenses))
             return
         }
         val max = cats.maxOf { it.total }.coerceAtLeast(1L)
@@ -428,9 +437,9 @@ class ExportPdfUseCase @Inject constructor(
         rows: List<PlanItemRow>,
     ) {
         ctx.ensureRoom(40f)
-        sectionTitle(ctx, "Rencana vs Aktual per Item")
+        sectionTitle(ctx, context.getString(R.string.export_pdf_plan_vs_actual))
         if (rows.isEmpty()) {
-            mutedLine(ctx, "Tidak ada item rencana untuk periode ini.")
+            mutedLine(ctx, context.getString(R.string.export_pdf_no_plan_items))
             return
         }
 
@@ -446,10 +455,10 @@ class ExportPdfUseCase @Inject constructor(
         ctx.page!!.canvas.let { c ->
             c.drawRoundRect(MARGIN, ctx.y, MARGIN + tableW, ctx.y + 24f, 5f, 5f, fillPaint(BRAND_GREEN))
             val hp = textPaint(8f, Typeface.DEFAULT_BOLD, Color.WHITE)
-            c.drawText("Item / Kategori", MARGIN + 8f, ctx.y + 16f, hp)
-            val rLabel = "Rencana"
+            c.drawText(context.getString(R.string.export_pdf_item_category), MARGIN + 8f, ctx.y + 16f, hp)
+            val rLabel = context.getString(R.string.export_pdf_planned)
             c.drawText(rLabel, MARGIN + cItem + cPlan - hp.measureText(rLabel) - 4f, ctx.y + 16f, hp)
-            val aLabel = "Aktual"
+            val aLabel = context.getString(R.string.export_pdf_actual)
             c.drawText(aLabel, MARGIN + cItem + cPlan + cAct - hp.measureText(aLabel) - 4f, ctx.y + 16f, hp)
             val pLabel = "%"
             c.drawText(pLabel, MARGIN + tableW - hp.measureText(pLabel) - 6f, ctx.y + 16f, hp)
@@ -519,7 +528,7 @@ class ExportPdfUseCase @Inject constructor(
         ctx.page!!.canvas.let { c ->
             c.drawRoundRect(MARGIN, ctx.y, MARGIN + tableW, ctx.y + 22f, 0f, 0f, fillPaint(TOTAL_BG))
             val tp = textPaint(9f, Typeface.DEFAULT_BOLD, INK)
-            c.drawText("TOTAL", MARGIN + 8f, ctx.y + 15f, tp)
+            c.drawText(context.getString(R.string.export_pdf_total), MARGIN + 8f, ctx.y + 15f, tp)
             val psStr = totalPlan.toRupiah()
             c.drawText(psStr, MARGIN + cItem + cPlan - tp.measureText(psStr) - 4f, ctx.y + 15f, tp)
             val actColor = if (totalActual > totalPlan) DANGER_RED else BRAND_GREEN
@@ -663,21 +672,25 @@ class ExportPdfUseCase @Inject constructor(
         return text.substring(0, end) + "…"
     }
 
-    private fun typeLabel(type: AccountType): String = when (type) {
-        AccountType.Cash -> "Tunai"
-        AccountType.Bank -> "Bank"
-        AccountType.EWallet -> "E-Wallet"
-        AccountType.Other -> "Lainnya"
-    }
+    private fun typeLabel(type: AccountType): String = context.getString(
+        when (type) {
+            AccountType.Cash -> R.string.export_pdf_acctype_cash
+            AccountType.Bank -> R.string.export_pdf_acctype_bank
+            AccountType.EWallet -> R.string.export_pdf_acctype_ewallet
+            AccountType.Other -> R.string.export_pdf_acctype_other
+        },
+    )
 
-    private fun typeShort(type: TxnType): String = when (type) {
-        TxnType.Income -> "Masuk"
-        TxnType.Expense -> "Keluar"
-        TxnType.Transfer -> "Transfer"
-        TxnType.DebtInflow -> "Hutang+"
-        TxnType.DebtOutflow -> "Bayar"
-        TxnType.Reconciliation -> "Recon"
-    }
+    private fun typeShort(type: TxnType): String = context.getString(
+        when (type) {
+            TxnType.Income -> R.string.export_pdf_txntype_income
+            TxnType.Expense -> R.string.export_pdf_txntype_expense
+            TxnType.Transfer -> R.string.export_pdf_txntype_transfer
+            TxnType.DebtInflow -> R.string.export_pdf_txntype_debt
+            TxnType.DebtOutflow -> R.string.export_pdf_txntype_payment
+            TxnType.Reconciliation -> R.string.export_pdf_txntype_recon
+        },
+    )
 
     private companion object {
         // A4 portrait in PostScript points (1pt = 1/72 in).

@@ -91,12 +91,12 @@ class TxnFormViewModel @Inject constructor(
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
-    /** Open debts the user owes — eligible for "tautkan ke hutang" on expense form. */
+    /** Open debts the user owes — eligible for the link-to-debt toggle on expense form. */
     val openOwedDebts: StateFlow<List<Debt>> = debtRepo.observeAll().map { list ->
         list.filter { it.open && it.direction == DebtDirection.IOwe }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    /** Income categories — picker source for the income form's "Kategori Sumber". */
+    /** Income categories — picker source for the income form's source-category field. */
     val incomeCategories: StateFlow<List<IncomeCategory>> =
         transactionRepo.observeIncomeCategories()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())

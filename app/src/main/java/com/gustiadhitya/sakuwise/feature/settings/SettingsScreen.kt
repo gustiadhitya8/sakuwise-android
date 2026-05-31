@@ -138,7 +138,7 @@ fun SettingsScreen(
                 }
                 Spacer(Modifier.size(width = 14.dp, height = 1.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(prefs.userNickname.ifBlank { "Teman" },
+                    Text(prefs.userNickname.ifBlank { stringResource(R.string.default_nickname) },
                         color = sw.onPrimaryHero,
                         style = SwType.H2.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold))
                     Text(
@@ -306,7 +306,7 @@ private fun SettingsRow(
             }
         }
         if (badge != null) {
-            // Soft green badge per proto "Aktif" pill (51-settings-hub.png).
+            // Soft green badge per proto status pill (51-settings-hub.png).
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier

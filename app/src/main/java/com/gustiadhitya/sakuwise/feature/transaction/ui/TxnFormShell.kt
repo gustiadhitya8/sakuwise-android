@@ -85,7 +85,7 @@ fun TxnFormShell(
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onCancel),
             ) {
-                Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Batal", tint = sw.ink)
+                Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_cancel), tint = sw.ink)
             }
             Text(
                 title,
@@ -217,8 +217,8 @@ fun TxnFormShell(
  *
  * The proto shows two visual variants:
  *  1. Plain: label only (single line).
- *  2. Rich: chip/dot + primary text + a muted subtitle (e.g. "Makan di Luar
- *     · Wants" for plan items, "Saldo: Rp 280.000" for accounts).
+ *  2. Rich: chip/dot + primary text + a muted subtitle (e.g. category and
+ *     allocation for plan items, balance for accounts).
  *
  * `subtitle` and `leadingContent` cover variant 2; if both are null we fall
  * back to the plain row (matches old API for callers we haven't migrated).
@@ -227,7 +227,7 @@ fun TxnFormShell(
 fun FieldButton(
     label: String,
     value: String,
-    placeholder: String = "Pilih…",
+    placeholder: String = stringResource(R.string.field_button_placeholder),
     required: Boolean = false,
     leadingIcon: ImageVector? = null,
     subtitle: String? = null,

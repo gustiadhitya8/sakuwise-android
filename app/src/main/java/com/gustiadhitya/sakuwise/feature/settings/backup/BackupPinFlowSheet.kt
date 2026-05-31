@@ -133,7 +133,7 @@ fun BackupPinFlowSheet(
                 }
                 Text(
                     if (state.stage == Stage.PickLocation)
-                        "Enkripsi selesai. Pilih lokasi penyimpanan…"
+                        stringResource(R.string.backup_pick_location_body)
                     else stringResource(R.string.backup_encrypting_body),
                     color = sw.inkMuted, style = SwType.Body.copy(fontSize = 13.sp),
                 )

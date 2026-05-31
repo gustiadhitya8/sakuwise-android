@@ -99,7 +99,7 @@ class PlanTemplateManager @Inject constructor(
         val text = context.contentResolver.openInputStream(uri)
             ?.bufferedReader(Charsets.UTF_8)
             ?.readText()
-            ?: error("Tidak bisa membuka file template")
+            ?: error(context.getString(com.gustiadhitya.sakuwise.R.string.plan_template_open_error))
         return json.decodeFromString(text)
     }
 

@@ -125,7 +125,7 @@ private fun DashboardContent(
 ) {
     val sw = SwTheme.colors
     val hide = state.balancesHidden
-    val nickname = state.nickname.ifBlank { "Teman" }
+    val nickname = state.nickname.ifBlank { stringResource(R.string.default_nickname) }
     val initial = (nickname.firstOrNull()?.uppercase() ?: "S")
 
     // PRD §7.13 — overspending banner fires when ANY allocation has used > plan.
@@ -511,7 +511,7 @@ private fun DashboardHero(
                 ) {
                     Icon(
                         if (hide) Icons.Outlined.VisibilityOff else Icons.Outlined.RemoveRedEye,
-                        contentDescription = if (hide) "Tampilkan saldo" else "Sembunyikan saldo",
+                        contentDescription = if (hide) stringResource(R.string.dashboard_show_balance) else stringResource(R.string.dashboard_hide_balance),
                         tint = sw.onPrimaryHero, modifier = Modifier.size(18.dp),
                     )
                 }
@@ -1021,7 +1021,7 @@ private fun DashboardBanner(overdueDays: Int, onTap: () -> Unit) {
 
 /**
  * Top-expense categories tile. Per prototype screens-dashboard.jsx:154-170:
- * - SectionLabel "Pengeluaran Teratas" (uppercase) — matches other dashboard sections
+ * - SectionLabel top-expenses (uppercase) — matches other dashboard sections
  * - No rank prefix
  * - 6dp bar tinted to a per-rank palette (primary/accent/warning/info/danger)
  * - Right-aligned amount in the SAME palette color

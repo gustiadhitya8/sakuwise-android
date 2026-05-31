@@ -75,7 +75,7 @@ fun IncomeFormScreen(
         heroLabel = stringResource(R.string.txn_income_amount_label),
         amount = state.amount,
         onAmountChange = viewModel::setAmount,
-        heroSubtitle = account?.let { "ke akun ${it.name}" },
+        heroSubtitle = account?.let { stringResource(R.string.txn_income_to_account_format, it.name) },
         onCancel = onClose,
         saveLabel = stringResource(R.string.action_save),
         saveEnabled = state.amount > 0 && state.accountId != null

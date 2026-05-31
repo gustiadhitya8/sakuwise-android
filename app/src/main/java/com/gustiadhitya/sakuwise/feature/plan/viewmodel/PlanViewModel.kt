@@ -314,7 +314,7 @@ class PlanViewModel @Inject constructor(
      * "Start from scratch" path — creates the plan + the 3 default allocation
      * buckets (Kebutuhan / Keinginan / Investasi) but NO categories. Used by
      * the empty-state CTA so the user can immediately add their first category
-     * via the existing "+ Tambah kategori" buttons that are scoped per
+     * via the existing add-category buttons that are scoped per
      * allocation. Without this step the per-allocation add buttons can't render
      * because there are no allocation containers yet.
      */

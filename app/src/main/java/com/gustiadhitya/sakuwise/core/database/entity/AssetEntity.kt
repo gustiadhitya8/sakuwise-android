@@ -68,7 +68,7 @@ data class LandTaxPaymentEntity(
 data class AssetDepositEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val typeLabel: String,       // "DPLK" | "BPJSTK" | "Deposito" | "Other"
+    val typeLabel: String,       // DPLK | BPJSTK | TimeDeposit | Other (enum code)
     val institutionInfo: String?,
     val note: String?,
     val status: String,          // "active" | "closed"

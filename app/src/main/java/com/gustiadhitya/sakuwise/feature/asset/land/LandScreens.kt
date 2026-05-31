@@ -437,7 +437,7 @@ fun LandDetailScreen(
             }
         }
         Spacer(Modifier.height(16.dp))
-        // "PEMBAYARAN PAJAK (PBB)" label with "+ Tambah" link on the right.
+        // Tax-payments (PBB) label with an add link on the right.
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)) {
             Text(stringResource(R.string.land_section_tax).uppercase(), color = sw.inkSubtle,
