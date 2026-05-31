@@ -63,19 +63,27 @@ Sakuwise is **local-first** by design:
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/v104_dashboard.png" alt="Dashboard" width="22%">
-  <img src="screenshots/v104_plan2.png" alt="Plan" width="22%">
-  <img src="screenshots/v104_assets.png" alt="Assets & Wealth" width="22%">
-  <img src="screenshots/v104_me.png" alt="Settings" width="22%">
+  <img src="screenshots/sc_dashboard.png"  alt="Beranda / Dashboard" width="22%">
+  <img src="screenshots/sc_plan.png"        alt="Plan & Alokasi"     width="22%">
+  <img src="screenshots/sc_assets.png"      alt="Aset & Kekayaan"   width="22%">
+  <img src="screenshots/sc_settings.png"    alt="Saya / Settings"   width="22%">
 </p>
 
 <p align="center">
-  <img src="screenshots/v105_lock.png" alt="Lock Screen" width="22%">
+  <img src="screenshots/sc_dashboard2.png"  alt="Transaksi Terbaru" width="22%">
+  <img src="screenshots/sc_history.png"     alt="Riwayat Transaksi" width="22%">
+  <img src="screenshots/v105_lock.png"      alt="Lock Screen"       width="22%">
 </p>
 
-From left to right: **Dashboard** (SISA ANGGARAN hero · daily budget · income vs expense · recent transactions · backup banner) · **Plan** (period chip · allocation filter · category breakdown) · **Assets & Wealth** (TOTAL KEKAYAAN hero + trend chart + four asset-class cards: Akun, Emas, Properti, Deposito) · **Settings** (profile card · Plan / Security / Backup sections). Below: **Lock Screen** (PIN keypad · biometric shortcut — content is also masked in the Recents thumbnail).
+**Beranda** — hero card SISA ANGGARAN dengan anggaran harian, progress alokasi Kebutuhan/Keinginan/Investasi, strip Aset & Kekayaan.  
+**Plan** — periode aktif, expected income, breakdown alokasi 50/30/20, per-kategori planned vs aktual.  
+**Aset & Kekayaan** — total net worth hero, tren kekayaan, empat kelas aset (Akun, Emas, Properti, Deposito).  
+**Saya** — profil, PIN & Biometrik, Auto-lock, Backup & Data, Ekspor PDF/CSV.  
+**Transaksi terbaru** — transaksi tersortir dengan label kategori plan, +/− color coding.  
+**Riwayat Transaksi** — month picker, ringkasan Pemasukan/Pengeluaran/Saldo, filter chips, search, pengeluaran per kategori.  
+**Lock Screen** — PIN keypad kustom; biometric shortcut; konten juga ter-mask di Recents/app-switcher.
 
-Screenshots captured in English locale on Android emulator (API 36).
+Screenshots diambil dalam Bahasa Indonesia.
 
 ## Technical Architecture
 
