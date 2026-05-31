@@ -13,8 +13,17 @@ captures/
 *.keystore
 google-services.json
 
-# Generated schema exports (Room) — opt back in via app/schemas/.gitkeep if you want them tracked
-app/schemas/
+# Room schema exports — MUST be tracked so MigrationTestHelper can read them in CI
+# (Previously gitignored by mistake; re-enabled here)
+# app/schemas/   ← intentionally NOT ignored
+
+# Sensitive test artifacts and backup files — never commit these
+*.sakuwise
+*.csv
+*.xlsx
+test-scratch/
+restore-dumps/
+*.log
 
 # Test reports + Paparazzi golden diff outputs
 **/build/reports/

@@ -116,11 +116,21 @@ class BackupService @Inject constructor(
                 // Clear WAL/SHM sidecar files — stale checkpoint state breaks SQLCipher.
                 File(dbFile.parentFile, "sakuwise.db-wal").takeIf { it.exists() }?.delete()
                 File(dbFile.parentFile, "sakuwise.db-shm").takeIf { it.exists() }?.delete()
-                // renameTo() can return false silently on some filesystem configurations.
-                // Fall back to copyTo+delete so the caller always gets a real exception.
+                // renameTo() is atomic on the same filesystem; fall back to
+                // copyTo+delete when it fails (cross-partition or FAT quirks).
+                // If this block throws, the DB file is gone and the user must
+                // re-restore. Caller surfaces the exception as an actionable error.
                 if (!tmp.renameTo(dbFile)) {
-                    tmp.copyTo(dbFile, overwrite = true)
-                    tmp.delete()
+                    try {
+                        tmp.copyTo(dbFile, overwrite = true)
+                        tmp.delete()
+                    } catch (e: Exception) {
+                        throw BackupRestoreException(
+                            "File swap failed after original DB was deleted. " +
+                                "Restore the backup again to recover.",
+                            e,
+                        )
+                    }
                 }
                 // 4. Restore settings (v2 only; v1 → settingsBytes is empty → skip)
                 if (settingsBytes.isNotEmpty()) {

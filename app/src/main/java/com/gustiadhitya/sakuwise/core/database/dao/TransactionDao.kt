@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import com.gustiadhitya.sakuwise.core.database.entity.IncomeCategoryEntity
 import com.gustiadhitya.sakuwise.core.database.entity.TransactionEntity
@@ -28,6 +29,13 @@ interface TransactionDao {
 
     @Upsert
     suspend fun upsert(transaction: TransactionEntity)
+
+    /** Atomically write a transfer row and an optional sibling fee-expense row. */
+    @Transaction
+    suspend fun upsertTransferWithFee(transfer: TransactionEntity, fee: TransactionEntity?) {
+        upsert(transfer)
+        if (fee != null) upsert(fee)
+    }
 
     @Query("DELETE FROM transactions WHERE id = :id")
     suspend fun delete(id: String)

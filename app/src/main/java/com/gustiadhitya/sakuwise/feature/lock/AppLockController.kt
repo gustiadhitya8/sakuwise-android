@@ -34,6 +34,11 @@ class AppLockController @Inject constructor(
     private val _locked = MutableStateFlow(true) // start locked
     val locked: StateFlow<Boolean> = _locked
 
+    // True while the app is in the background. Used to mask content in the
+    // Recents/task-switcher thumbnail, independent of the auto-lock timer.
+    private val _backgrounded = MutableStateFlow(false)
+    val backgrounded: StateFlow<Boolean> = _backgrounded
+
     private var lastBackgroundedAt: Long = 0L
 
     /** Combined: true when the lock screen should overlay the app. */
@@ -45,6 +50,7 @@ class AppLockController @Inject constructor(
 
     fun onAppBackgrounded() {
         lastBackgroundedAt = System.currentTimeMillis()
+        _backgrounded.value = true
         // For "Langsung" (0 min) we lock the moment the app goes to background
         // so the lock is already up the instant the user returns. Without this,
         // user has to wait for onForegrounded → prefs.first() → recompose,
@@ -57,6 +63,7 @@ class AppLockController @Inject constructor(
     }
 
     fun onAppForegrounded() {
+        _backgrounded.value = false
         scope.launch {
             val autoLockMin = prefsRepo.prefs.first().autoLockMinutes
             val elapsedMin = (System.currentTimeMillis() - lastBackgroundedAt) / 60_000

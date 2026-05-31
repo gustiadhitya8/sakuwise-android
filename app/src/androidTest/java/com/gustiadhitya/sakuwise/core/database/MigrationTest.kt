@@ -3,6 +3,7 @@ package com.gustiadhitya.sakuwise.core.database
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Ignore
 import org.junit.Rule
@@ -55,6 +56,72 @@ class MigrationTest {
         // No migration runs (already at 5); this validates the exported 5.json
         // matches the runtime schema produced by the entities.
         helper.runMigrationsAndValidate(testDb, 5, true, *SakuwiseMigrations.ALL)
+    }
+
+    /**
+     * A1 (v1.0.5) — upgrade-with-data test for the 4→5 migration.
+     *
+     * Seeds an account row and a gold row into a v4 schema DB, then runs the
+     * full migration chain to v5, and asserts every seeded row survived with
+     * correct values. This is the definitive proof that the migration chain
+     * does NOT wipe user data.
+     *
+     * v4→v5 change: adds `kind TEXT NOT NULL DEFAULT 'physical'` to asset_gold.
+     * All other seeded rows must be byte-for-byte identical after migration.
+     *
+     * Synthetic data only — no real user records.
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate_v4_to_v5_preservesData() {
+        helper.createDatabase(testDb, 4).use { db ->
+            // Seed a synthetic account
+            db.execSQL(
+                """INSERT INTO accounts
+                   (id, name, type, initialBalance, iconName, colorHex, archived, createdAt)
+                   VALUES ('acc-001', 'Dompet Test', 'cash', 500000, 'cash', NULL, 0, 1700000000000)"""
+            )
+            // Seed a synthetic gold asset (v4 schema: no 'kind' column)
+            db.execSQL(
+                """INSERT INTO asset_gold
+                   (id, purchaseEpochDay, weightMilliGram, serial, buyPrice,
+                    note, photoBlob, status, soldEpochDay, soldPrice)
+                   VALUES ('gold-001', 19000, 1000, 'SN-TEST', 950000,
+                    'Synthetic', NULL, 'held', NULL, NULL)"""
+            )
+            // Seed a synthetic transaction
+            db.execSQL(
+                """INSERT INTO transactions
+                   (id, dateEpochDay, amount, type, planItemId, sourceAccountId,
+                    destAccountId, transferFee, debtId, photoBlob, incomeCategoryId, note, createdAt)
+                   VALUES ('txn-001', 19000, 250000, 'expense', NULL, 'acc-001',
+                    NULL, NULL, NULL, NULL, NULL, 'Test expense', 1700000000001)"""
+            )
+        }
+
+        // Run the full migration chain and validate schema at v5
+        val db = helper.runMigrationsAndValidate(testDb, 5, true, *SakuwiseMigrations.ALL)
+
+        // Verify the account row survived unchanged
+        db.query("SELECT name, initialBalance FROM accounts WHERE id = 'acc-001'").use { c ->
+            assertTrue("account row must survive migration", c.moveToFirst())
+            assertEquals("Dompet Test", c.getString(0))
+            assertEquals(500000L, c.getLong(1))
+        }
+
+        // Verify the gold row survived AND gained the default 'kind' value
+        db.query("SELECT weightMilliGram, kind FROM asset_gold WHERE id = 'gold-001'").use { c ->
+            assertTrue("gold row must survive migration", c.moveToFirst())
+            assertEquals(1000L, c.getLong(0))
+            assertEquals("physical", c.getString(1)) // default added by MIGRATION_4_5
+        }
+
+        // Verify the transaction row survived unchanged
+        db.query("SELECT amount, type FROM transactions WHERE id = 'txn-001'").use { c ->
+            assertTrue("transaction row must survive migration", c.moveToFirst())
+            assertEquals(250000L, c.getLong(0))
+            assertEquals("expense", c.getString(1))
+        }
     }
 
     /**

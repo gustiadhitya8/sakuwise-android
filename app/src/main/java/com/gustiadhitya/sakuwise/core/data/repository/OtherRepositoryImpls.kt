@@ -35,6 +35,8 @@ class TransactionRepositoryImpl @Inject constructor(
         dao.observeForPlanItem(planItemId).map { l -> l.map { it.toDomain() } }
     override suspend fun getById(id: String): Transaction? = dao.getById(id)?.toDomain()
     override suspend fun upsert(transaction: Transaction) = dao.upsert(transaction.toEntity())
+    override suspend fun upsertTransferWithFee(transfer: Transaction, fee: Transaction?) =
+        dao.upsertTransferWithFee(transfer.toEntity(), fee?.toEntity())
     override suspend fun delete(id: String) = dao.delete(id)
     override suspend fun deleteAll() = dao.deleteAll()
     override fun observeIncomeBetween(start: LocalDate, end: LocalDate) =

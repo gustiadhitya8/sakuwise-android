@@ -249,26 +249,26 @@ class AddTransferUseCase @Inject constructor(private val repo: TransactionReposi
             note = note,
             createdAt = System.currentTimeMillis(),
         )
-        repo.upsert(txn)
-        if (bookFeeAsExpense) {
-            repo.upsert(
-                Transaction(
-                    id = UUID.randomUUID().toString(),
-                    date = date,
-                    amount = feeAmount,
-                    type = TxnType.Expense,
-                    planItemId = feePlanItemId,
-                    sourceAccountId = fromAccountId,
-                    destAccountId = null,
-                    transferFee = null,
-                    debtId = null,
-                    photoBlob = null,
-                    incomeCategoryId = null,
-                    note = "Biaya transfer",
-                    createdAt = System.currentTimeMillis(),
-                ),
+        val feeRow = if (bookFeeAsExpense) {
+            Transaction(
+                id = UUID.randomUUID().toString(),
+                date = date,
+                amount = feeAmount,
+                type = TxnType.Expense,
+                planItemId = feePlanItemId,
+                sourceAccountId = fromAccountId,
+                destAccountId = null,
+                transferFee = null,
+                debtId = null,
+                photoBlob = null,
+                incomeCategoryId = null,
+                note = "Biaya transfer",
+                createdAt = System.currentTimeMillis(),
             )
+        } else {
+            null
         }
+        repo.upsertTransferWithFee(txn, feeRow)
         txn
     }
 }

@@ -509,6 +509,7 @@
     <string name="deposit_section_label">DEPOSIT / PENSION ASSETS</string>
     <string name="reminder_notif_title">Sakuwise bill due</string>
     <string name="reminder_notif_body_format">Don\'t forget to pay: %1$s</string>
+    <string name="reminder_notif_public_text">You have a payment reminder</string>
     <string name="plan_action_regen_incomes">Sync Recurring Incomes</string>
     <string name="plan_action_regen_incomes_sub">Scan income txns tagged [BERULANG] and write this month\'s</string>
     <string name="plan_recurring_result_format">%1$d recurring incomes added</string>

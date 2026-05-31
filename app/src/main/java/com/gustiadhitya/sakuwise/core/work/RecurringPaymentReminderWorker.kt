@@ -11,6 +11,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.gustiadhitya.sakuwise.R
 import java.util.concurrent.TimeUnit
 
 /**
@@ -27,12 +28,19 @@ class RecurringPaymentReminderWorker(
         val title = inputData.getString(KEY_TITLE) ?: return Result.failure()
         val body = inputData.getString(KEY_BODY) ?: return Result.failure()
         ensureChannel(applicationContext)
+        val publicVersion = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setContentText(applicationContext.getString(R.string.reminder_notif_public_text))
+            .build()
         val notif = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(publicVersion)
             .build()
         // Notification permission is checked at scheduling time, not here.
         NotificationManagerCompat.from(applicationContext).notify(System.currentTimeMillis().toInt(), notif)

@@ -1,19 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Data extraction rules for Android 12+ (API 31+).
+    On API 31+, this file takes precedence over android:allowBackup.
+    We disable cloud backup of all sensitive files; device-to-device transfer
+    is also disabled for the same reason.
+
+    What is excluded and why:
+      database/sakuwise.db  — SQLCipher-encrypted DB; the DEK is Keystore-bound
+                              (not transferable), so the DB is useless on another
+                              device, but we still don't want it sent to Google.
+      file/dek.bin          — EncryptedFile-wrapped DEK; Keystore-bound, but
+                              excluded as belt-and-suspenders hygiene.
+      file/pin.bin          — EncryptedFile-wrapped Argon2id PIN hash; same.
+      sharedpref/sakuwise_autobackup_pin — IV + ciphertext of the auto-backup PIN;
+                              the Keystore key that wraps it is device-bound, but
+                              excluded to avoid sending any credential material to
+                              Google's servers.
+
+    The app's OWN backup mechanism (.sakuwise files to local + Drive) is
+    completely unaffected — it is not Android Auto Backup; it is explicit
+    user-initiated / worker-initiated file I/O.
 -->
 <data-extraction-rules>
-    <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
+        <exclude domain="database" path="sakuwise.db" />
+        <exclude domain="database" path="sakuwise.db-wal" />
+        <exclude domain="database" path="sakuwise.db-shm" />
+        <exclude domain="file" path="dek.bin" />
+        <exclude domain="file" path="pin.bin" />
+        <exclude domain="sharedpref" path="sakuwise_autobackup_pin.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <exclude domain="database" path="sakuwise.db" />
+        <exclude domain="database" path="sakuwise.db-wal" />
+        <exclude domain="database" path="sakuwise.db-shm" />
+        <exclude domain="file" path="dek.bin" />
+        <exclude domain="file" path="pin.bin" />
+        <exclude domain="sharedpref" path="sakuwise_autobackup_pin.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

@@ -509,6 +509,7 @@
     <string name="deposit_section_label">ASET DEPOSITO / PENSIUN</string>
     <string name="reminder_notif_title">Tagihan Sakuwise jatuh tempo</string>
     <string name="reminder_notif_body_format">Jangan lupa bayar: %1$s</string>
+    <string name="reminder_notif_public_text">Ada pengingat pembayaran</string>
     <string name="plan_action_regen_incomes">Sinkron Pemasukan Berulang</string>
     <string name="plan_action_regen_incomes_sub">Cek transaksi income bertanda [BERULANG] dan tulis untuk bulan ini</string>
     <string name="plan_recurring_result_format">%1$d pemasukan berulang ditambahkan</string>

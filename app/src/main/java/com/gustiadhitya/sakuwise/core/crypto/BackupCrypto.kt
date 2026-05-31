@@ -129,3 +129,6 @@ class BadPinException(message: String) : Exception(message)
 
 /** Thrown when a backup file's schema version is newer than this app supports. */
 class BackupVersionTooNewException(message: String) : Exception(message)
+
+/** Thrown when the file-swap step of restore fails after the original DB was deleted. */
+class BackupRestoreException(message: String, cause: Exception? = null) : Exception(message, cause)

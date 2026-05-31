@@ -83,6 +83,7 @@ fun SakuwiseApp(mainViewModel: MainViewModel = hiltViewModel()) {
     val prefs by mainViewModel.prefs.collectAsState()
     val lockController = rememberAppLockController()
     val showLock by lockController.shouldShowLock.collectAsState()
+    val backgrounded by lockController.backgrounded.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().background(sw.bg)) {
         if (!prefs.onboardingCompleted) {
@@ -100,6 +101,17 @@ fun SakuwiseApp(mainViewModel: MainViewModel = hiltViewModel()) {
             ) {
                 LockScreen(onUnlock = { lockController.unlock() })
             }
+        }
+        // Privacy overlay shown whenever the app is backgrounded, regardless of
+        // the auto-lock timer. This ensures the Recents/task-switcher thumbnail
+        // never captures live financial content. The overlay is a solid background;
+        // no PIN is required to dismiss it — the auto-lock timer governs that.
+        if (backgrounded && prefs.onboardingCompleted && !showLock) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(sw.bg),
+            )
         }
     }
 }

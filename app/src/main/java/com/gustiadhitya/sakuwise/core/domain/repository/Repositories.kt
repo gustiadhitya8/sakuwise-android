@@ -60,6 +60,9 @@ interface TransactionRepository {
     fun observeForPlanItem(planItemId: String): Flow<List<Transaction>>
     suspend fun getById(id: String): Transaction?
     suspend fun upsert(transaction: Transaction)
+
+    /** Atomically write a transfer row and an optional sibling fee-expense row. */
+    suspend fun upsertTransferWithFee(transfer: Transaction, fee: Transaction?)
     suspend fun delete(id: String)
     suspend fun deleteAll()
     fun observeIncomeBetween(start: LocalDate, end: LocalDate): Flow<Long>
