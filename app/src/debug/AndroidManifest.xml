@@ -9,5 +9,13 @@
                 <action android:name="com.gustiadhitya.sakuwise.debug.SKIP_ONBOARDING" />
             </intent-filter>
         </receiver>
+        <!-- Debug-only: sets Drive backup prefs + creates fake local backup file for worker test. -->
+        <receiver
+            android:name=".debugtools.DebugDriveTestReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.gustiadhitya.sakuwise.debug.SETUP_DRIVE_TEST" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

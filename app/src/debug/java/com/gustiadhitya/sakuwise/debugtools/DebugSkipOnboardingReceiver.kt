@@ -35,6 +35,7 @@ class DebugSkipOnboardingReceiver : BroadcastReceiver() {
     interface Deps {
         fun prefsRepo(): UserPreferencesRepository
         fun pinStore(): PinStore
+        fun appLockController(): com.gustiadhitya.sakuwise.feature.lock.AppLockController
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -46,6 +47,9 @@ class DebugSkipOnboardingReceiver : BroadcastReceiver() {
         val nick = intent.getStringExtra("nick") ?: "TestUser"
         val pin = intent.getStringExtra("pin") ?: "123456"
         val language = intent.getStringExtra("lang") ?: "id"
+
+        // Unlock immediately so caller can navigate the app right after the broadcast
+        deps.appLockController().unlock()
 
         scope.launch {
             deps.prefsRepo().completeOnboarding(
