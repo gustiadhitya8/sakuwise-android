@@ -2,6 +2,8 @@
 
 > A local-first personal finance Android app built for Indonesian users — replaces the laptop-and-spreadsheet routine with a phone-native budgeting, expense, and net-worth tracker.
 
+[![Release](https://img.shields.io/badge/release-v1.0.4-1F8A4C)](https://github.com/gustiadhitya8/sakuwise-android/releases/tag/v1.0.4)
+[![CI](https://github.com/gustiadhitya8/sakuwise-android/actions/workflows/ci.yml/badge.svg)](https://github.com/gustiadhitya8/sakuwise-android/actions/workflows/ci.yml)
 [![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84)](https://developer.android.com/about/versions/oreo)
 [![Language](https://img.shields.io/badge/language-Kotlin-7F52FF)](https://kotlinlang.org/)
 [![UI](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4)](https://developer.android.com/jetpack/compose)
@@ -86,7 +88,8 @@ Screenshots captured in Bahasa Indonesia locale.
 - **Background work:** WorkManager for the daily net-worth snapshot and reminder notifications.
 - **Crypto:** AES-256 (SQLCipher + GCM for backup), Argon2id for PIN/passphrase-to-key derivation.
 - **Localization:** `values/` (id) + `values-en/` (English). Per-app locale via `AppCompatDelegate.setApplicationLocales` (API 33+); a startup reconciler keeps `prefs.language` in sync with whichever side was changed last (in-app picker or system Settings → App info → Language).
-- **No analytics, no crash reporting, no internet permission.**
+- **Static analysis:** detekt + ktlint run on every CI push (GitHub Actions); a baseline file freezes pre-existing legacy findings so only new issues block the build.
+- **No analytics, no crash reporting SDK, no internet permission.** Crash/ANR data is read from Android Vitals in Play Console — zero code change required.
 
 ## Default Out-of-the-Box
 
@@ -113,23 +116,32 @@ Debug APK lands in `app/build/outputs/apk/debug/`. The debug build's `applicatio
 
 ## Project Status
 
-**Current release: v1.0.3 (versionCode 4) — live on Google Play Store.**
+**Current release: v1.0.4 (versionCode 5) — live on Google Play Store.**
 
 V1 is in active use by the author as the primary personal finance tool. All major modules are implemented, exercised on emulator and physical device, and live in production.
+
+### What's in v1.0.4 — Hardening & External-User Readiness
+- **Safe database migrations** — `fallbackToDestructiveMigration` removed; a tested migration chain now covers schema versions 1–5. An unmigrated schema fails loudly at open time rather than silently wiping user data. Schema JSON is exported and committed as a baseline.
+- **Backup format versioning** — `.sakuwise` files now carry an explicit version marker. Older backups still restore on newer app versions; a version-too-new error is surfaced clearly if the file is newer than the app.
+- **CSV/XLSX round-trip** — Export column order and names now match the import format exactly. A round-trip unit test covers both id-ID and en-US header variants.
+- **Complete English localisation** — All previously hardcoded Indonesian strings (PDF export, backup error messages, transaction history, OCR screen, pickers, dashboard) are now in `strings.xml` and `strings-en.xml`. Zero leaks verified by manual walkthrough across all four tabs.
+- **Faster cold start** — Baseline Profile bundled; startup method hints generated on emulator and compiled into the APK.
+- **Static analysis & CI** — detekt + ktlint wired in with a legacy baseline; GitHub Actions runs build + unit tests + detekt on every push and pull request.
+- **Crash monitoring** — No SDK added. Crash and ANR data is read from Android Vitals in Play Console, keeping the no-telemetry promise intact.
 
 ### What's in v1.0.3
 - **Auto-backup Drive mandiri** — Google Drive auto-backup now creates a fresh encrypted backup daily without requiring a prior manual backup. The encryption PIN is stored securely in Android Keystore (AES-256-GCM) and retrieved by the WorkManager background job.
 - **Live account balance in pickers** — Account picker and transaction form subtitles now show the live computed balance (income + transfers − expenses − fees + reconciliation), not the stale seed balance.
 - **Dashboard reactivity fix** — Changing a transaction date in history now immediately updates the dashboard. Root cause: `Transaction.equals()` was id-only, causing StateFlow deduplication to swallow field-only edits.
-- **Reconciliation display** — Positive reconciliation (user has more cash than computed) now displays with a green up-arrow, not a red expense icon. Both DashboardScreen and TransactionHistoryScreen are sign-aware.
+- **Reconciliation display** — Positive reconciliation (user has more cash than computed) now displays with a green up-arrow, not a red expense icon.
 - **Backup status colour fix** — The backup row on the Me screen now shows warning yellow only when no backup exists or the last backup is older than 30 days; green/neutral when recent.
 
-### V1.2 backlog
+### V1.1 backlog
 - Auto-fire recurring-income worker (UseCase already implemented, not yet scheduled)
-- Proper Room Migration 1→2 (currently `fallbackToDestructiveMigration`, safe pre-scale)
+- Account detail — bank account number, branch, notes fields
 - Full dark-mode visual walkthrough (onboarding verified; detail screens not eye-checked)
 - Inline logo in exported PDF
-- V2: cloud sync, foreign currencies, iOS, family sharing, telemetry-free crash reporting
+- V2: cloud sync, foreign currencies, iOS, family sharing
 
 ## Repository Layout
 
