@@ -32,3 +32,8 @@ restore-dumps/
 
 # Claude Code local state — agent transcripts/settings, not source
 .claude/
+
+# Dev-process docs (handoff/plan/audit) — keep local, never push to public repo
+HANDOFF*.md
+PLAN_*.md
+SECURITY_AUDIT_*.md
