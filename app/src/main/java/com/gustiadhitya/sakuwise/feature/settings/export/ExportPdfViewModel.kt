@@ -1,8 +1,10 @@
 package com.gustiadhitya.sakuwise.feature.settings.export
 
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import com.gustiadhitya.sakuwise.core.domain.usecase.ComputeCurrentPlanPeriodUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,10 +28,11 @@ sealed interface ExportState {
 
 @HiltViewModel
 class ExportPdfViewModel @Inject constructor(
+    app: Application,
     private val exportPdf: ExportPdfUseCase,
     private val computePlanPeriod: ComputeCurrentPlanPeriodUseCase,
     private val prefsRepo: UserPreferencesRepository,
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     private val _state = MutableStateFlow<ExportState>(ExportState.Idle)
     val state: StateFlow<ExportState> = _state.asStateFlow()
@@ -43,7 +46,7 @@ class ExportPdfViewModel @Inject constructor(
             result.fold(
                 onSuccess = { uri -> _state.value = ExportState.Ready(uri) },
                 onFailure = { t ->
-                    _state.value = ExportState.Failure(t.message ?: context.getString(R.string.export_err_unknown))
+                    _state.value = ExportState.Failure(t.message ?: getApplication<Application>().getString(R.string.export_err_unknown))
                 },
             )
         }
