@@ -148,7 +148,11 @@ private fun FilterPill(label: String, active: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String = stringResource(R.string.picker_search_hint)) {
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    placeholder: String = stringResource(R.string.picker_search_hint),
+) {
     val sw = SwTheme.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -511,7 +511,8 @@ private fun DashboardHero(
                 ) {
                     Icon(
                         if (hide) Icons.Outlined.VisibilityOff else Icons.Outlined.RemoveRedEye,
-                        contentDescription = if (hide) stringResource(R.string.dashboard_show_balance) else stringResource(R.string.dashboard_hide_balance),
+                        contentDescription = if (hide) stringResource(R.string.dashboard_show_balance)
+                        else stringResource(R.string.dashboard_hide_balance),
                         tint = sw.onPrimaryHero, modifier = Modifier.size(18.dp),
                     )
                 }

@@ -385,7 +385,8 @@ fun TransactionHistoryScreen(
                                     .padding(horizontal = 12.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                listOf(stringResource(R.string.txnhist_tab_daily), stringResource(R.string.txnhist_tab_category)).forEachIndexed { idx, label ->
+                                val tabs = listOf(stringResource(R.string.txnhist_tab_daily), stringResource(R.string.txnhist_tab_category))
+                                tabs.forEachIndexed { idx, label ->
                                     val active = spendingTab == idx
                                     Box(
                                         contentAlignment = Alignment.Center,

@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwTheme
 import com.gustiadhitya.sakuwise.core.designsystem.theme.SwType
