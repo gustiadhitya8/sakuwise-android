@@ -3,6 +3,29 @@
 All notable changes to Sakuwise are documented here. Dates are local (WIB).
 Versioning is `versionName (versionCode)`.
 
+## 1.0.5 (6) — 2026-05-31
+
+**Theme: security & verification pass.** No new user-facing features.
+
+### Security & correctness
+- **Android OS backup exclusion hardened.** Sensitive app files (encrypted
+  database, key material) are now explicitly excluded from Android Auto Backup
+  on all API levels. The previous configuration left a gap on Android 12+.
+- **Transfer fee writes are now atomic.** Recording a transfer with a fee
+  now uses a single database transaction, preventing a partial write if the
+  fee row failed.
+- **Recents/task-switcher privacy.** App content is masked whenever the
+  app is in the background, so the task switcher thumbnail never shows
+  financial data regardless of the auto-lock setting.
+- **Notification lock-screen privacy.** Payment reminders no longer show
+  their content on the lock screen — only a neutral placeholder is shown.
+- **Backup tamper detection tests.** Added instrumented tests proving that
+  a modified or corrupted backup file is rejected with a clear error.
+- **Migration data-preservation test.** Added instrumented test verifying
+  that financial records survive the database migration from schema v4 → v5.
+- **Restore error handling improved.** A failed file swap during restore
+  now surfaces a clear, actionable error message.
+
 ## 1.0.4 (5) — 2026-05-30
 
 **Theme: hardening & readiness for external users.** No new user-facing

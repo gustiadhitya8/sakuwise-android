@@ -1,7 +1,7 @@
-Rilis penguatan fondasi — fokus keamanan data & kualitas, tanpa ubah fitur:
+Rilis keamanan & verifikasi — tanpa fitur baru:
 
-• Migrasi database kini aman & teruji — data tidak terhapus saat update berikutnya
-• Backup lama tetap bisa dipulihkan di versi baru (format backup diberi versi & diuji)
-• Export ↔ Import CSV/XLSX konsisten — bisa bolak-balik tanpa kehilangan data
-• Mode English tidak lagi bocor teks Indonesia
-• Startup lebih cepat + pemantauan crash via Android Vitals tanpa pelacakan
+• Perlindungan privasi di app switcher: konten app tidak terlihat di Recents saat di-background
+• Notifikasi pengingat tidak menampilkan detail di lock screen
+• Penguatan konfigurasi backup sistem Android (peningkatan internal)
+• Transaksi transfer dengan biaya kini disimpan secara atomik
+• Peningkatan ketahanan pemulihan backup; pesan error lebih jelas jika terjadi masalah
