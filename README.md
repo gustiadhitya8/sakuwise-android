@@ -2,7 +2,7 @@
 
 > A local-first personal finance Android app built for Indonesian users — replaces the laptop-and-spreadsheet routine with a phone-native budgeting, expense, and net-worth tracker.
 
-[![Release](https://img.shields.io/badge/release-v1.0.4-1F8A4C)](https://github.com/gustiadhitya8/sakuwise-android/releases/tag/v1.0.4)
+[![Release](https://img.shields.io/badge/release-v1.0.5-1F8A4C)](https://github.com/gustiadhitya8/sakuwise-android/releases/tag/v1.0.5)
 [![CI](https://github.com/gustiadhitya8/sakuwise-android/actions/workflows/ci.yml/badge.svg)](https://github.com/gustiadhitya8/sakuwise-android/actions/workflows/ci.yml)
 [![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84)](https://developer.android.com/about/versions/oreo)
 [![Language](https://img.shields.io/badge/language-Kotlin-7F52FF)](https://kotlinlang.org/)
@@ -34,11 +34,12 @@ Cloud sync, dead-man's-switch / emergency contact, foreign currencies, income-sl
 
 Sakuwise is **local-first** by design:
 
-- The Android manifest does **not** request `INTERNET` permission. No data ever leaves the device automatically.
+- **INTERNET permission** is requested solely for the optional Google Drive auto-backup feature (AppData scope, private to this app). Every other feature — budgeting, tracking, investments, exports — works fully offline with zero network access.
 - The SQLite database is encrypted at rest via **SQLCipher** with a 256-bit AES key wrapped by Android Keystore (hardware-backed where available).
-- Backups produce a single `.sakuwise` file: AES-256-GCM ciphertext keyed off a user-set PIN/passphrase via **Argon2id** (~64 MB memory, ~1s on a mid-range Android). The user picks where it goes (local storage, USB, manual upload to a drive of their choice).
+- Backups produce a single `.sakuwise` file: AES-256-GCM ciphertext keyed off a user-set PIN/passphrase via **Argon2id** (~64 MB memory, ~1 s on a mid-range Android). The user picks where it goes (local storage, USB, or Google Drive).
+- Android OS Auto Backup is explicitly disabled for all sensitive files (`sakuwise.db`, `dek.bin`, `pin.bin`) — no financial data is ever silently uploaded to Google's backup servers.
 - The app collects **zero** personal identifiers — no email, no phone, no NIK. Just a nickname the user picks at onboarding.
-- No analytics SDK, no crash reporting SDK, no third-party telemetry.
+- No analytics SDK, no crash reporting SDK, no third-party telemetry. Crash/ANR data is read from Android Vitals in Play Console — zero code change required.
 
 ## Feature Overview
 
@@ -49,34 +50,32 @@ Sakuwise is **local-first** by design:
 | **Plan & Allocations** | Three-tier tree (Allocation → Category → Plan Item), configurable 50/30/20 split, recurring items auto-roll into the next period |
 | **Transactions** | Income / Expense / Transfer with backdating, optional receipt photo (encrypted JPEG BLOB), debt linkage |
 | **Dashboard** | Greeting + period · allocation progress · income vs expense · daily-remaining budget · top categories · account balances · net worth · recent transactions · backup banner |
-| **Gold** | Per-batch buy date, weight, serial, purchase price; global sell-price input drives live valuation + profit/loss |
+| **Gold** | Per-batch buy date, weight (physical or digital), serial, purchase price; global sell-price input drives live valuation + profit/loss |
 | **Property / Land** | Name, location, SHM ID, size, buy date + price, optional current value, PBB tax payment sub-records |
 | **Deposits / Pension** | DPLK, BPJSTK JHT, time deposits — monthly balance snapshots with line chart |
 | **Debt** | Two-way (I-owe / owed-to-me) with payment history; optional account linkage that creates real cash-flow transactions |
 | **OCR Receipts** | On-device ML Kit Text Recognition (no upload) — camera, gallery, or Android share intent → pre-filled expense draft |
 | **Backup & Restore** | One encrypted file, restore on a new device with PIN/passphrase; automatic daily Google Drive backup (PIN stored in Keystore); rolling 3-copy local backup; 30-day yellow banner, 60-day blocking modal |
 | **Reminders** | WorkManager-scheduled recurring expense reminders (opt-in, requires POST_NOTIFICATIONS) |
-| **Settings** | Language, biometric, auto-lock (1/5/15/30 min), period start day (1–28), default allocations, global gold sell price, backup management |
-
-A full feature spec lives in [`design/uploads/Sakuwise PRD v1.3 (ID).md`](design/uploads/Sakuwise%20PRD%20v1.3%20(ID).md).
+| **Lock Screen** | PIN or biometric (fingerprint/face) unlock; configurable auto-lock timer; content masked in Recents/task-switcher |
+| **Settings** | Language (ID/EN), biometric, auto-lock (instant/1/5/15/30 min), period start day (1–28), default allocations, global gold sell price, dark/light/system theme, backup management |
 
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/01-home.png" alt="Beranda / Dashboard" width="22%">
-  <img src="docs/screenshots/02-plan.png" alt="Plan" width="22%">
-  <img src="docs/screenshots/03-assets.png" alt="Aset & Kekayaan" width="22%">
-  <img src="docs/screenshots/05-me.png" alt="Saya / Settings" width="22%">
+  <img src="screenshots/v104_dashboard.png" alt="Dashboard" width="22%">
+  <img src="screenshots/v104_plan2.png" alt="Plan" width="22%">
+  <img src="screenshots/v104_assets.png" alt="Assets & Wealth" width="22%">
+  <img src="screenshots/v104_me.png" alt="Settings" width="22%">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/04-history.png" alt="Riwayat Transaksi" width="22%">
-  <img src="docs/screenshots/06-backup.png" alt="Backup & Pemulihan" width="22%">
+  <img src="screenshots/v105_lock.png" alt="Lock Screen" width="22%">
 </p>
 
-From left to right: **Beranda** (SISA ANGGARAN hero · anggaran harian · Semua Riwayat Transaksi card · transaksi terbaru · backup banner) · **Plan** (period chip · expected-income row · allocation filter chips · empty state with template shortcut) · **Aset** (TOTAL KEKAYAAN hero + trend chart + four asset-class cards: Akun, Emas, Properti, Deposito) · **Saya** (profile card · Plan / Keamanan / Backup & Data settings sections). Below: **Riwayat Transaksi** (month picker · Pemasukan/Pengeluaran/Saldo summary · transaction filter chips · search) · **Backup & Pemulihan** (Cloud Backup/Google Drive section + local backup flow + how-it-works explainer).
+From left to right: **Dashboard** (SISA ANGGARAN hero · daily budget · income vs expense · recent transactions · backup banner) · **Plan** (period chip · allocation filter · category breakdown) · **Assets & Wealth** (TOTAL KEKAYAAN hero + trend chart + four asset-class cards: Akun, Emas, Properti, Deposito) · **Settings** (profile card · Plan / Security / Backup sections). Below: **Lock Screen** (PIN keypad · biometric shortcut — content is also masked in the Recents thumbnail).
 
-Screenshots captured in Bahasa Indonesia locale.
+Screenshots captured in English locale on Android emulator (API 36).
 
 ## Technical Architecture
 
@@ -85,63 +84,61 @@ Screenshots captured in Bahasa Indonesia locale.
 - **Storage:** Room over SQLCipher 4.x — full DB encryption with a Keystore-wrapped DEK. Photos stored as compressed JPEG BLOBs inside the encrypted DB (~200 KB target).
 - **DI:** Hilt.
 - **OCR:** Android ML Kit Text Recognition v2 (on-device).
-- **Background work:** WorkManager for the daily net-worth snapshot and reminder notifications.
-- **Crypto:** AES-256 (SQLCipher + GCM for backup), Argon2id for PIN/passphrase-to-key derivation.
-- **Localization:** `values/` (id) + `values-en/` (English). Per-app locale via `AppCompatDelegate.setApplicationLocales` (API 33+); a startup reconciler keeps `prefs.language` in sync with whichever side was changed last (in-app picker or system Settings → App info → Language).
+- **Background work:** WorkManager for the daily net-worth snapshot, Drive auto-backup, and reminder notifications.
+- **Crypto:** AES-256 (SQLCipher + GCM for backup), Argon2id for PIN/passphrase-to-key derivation, Android Keystore for DEK and auto-backup PIN storage.
+- **Localization:** `values/` (id) + `values-en/` (English). Per-app locale via `AppCompatDelegate.setApplicationLocales`.
 - **Static analysis:** detekt + ktlint run on every CI push (GitHub Actions); a baseline file freezes pre-existing legacy findings so only new issues block the build.
-- **No analytics, no crash reporting SDK, no internet permission.** Crash/ANR data is read from Android Vitals in Play Console — zero code change required.
-
-## Default Out-of-the-Box
-
-A fresh install lands the user on a working app with: Bahasa Indonesia, biometric unlock enabled, one "Tunai" account with Rp 0 balance, no plan yet (empty state with a one-tap "Apply Starter Template" banner), no investments, no debts. Greeted by chosen nickname, then the dashboard.
 
 ## Building
 
-Requirements:
-
-- Android Studio Hedgehog or newer
-- JDK 17
-- Android SDK with platform-tools
-
-Then:
+Requirements: Android Studio Hedgehog+, JDK 17, Android SDK.
 
 ```bash
 git clone https://github.com/gustiadhitya8/sakuwise-android.git
 cd sakuwise-android
 ./gradlew :app:assembleDebug
-./gradlew :app:installDebug   # to install on a connected device/emulator
+./gradlew :app:installDebug   # install on a connected device/emulator
 ```
 
-Debug APK lands in `app/build/outputs/apk/debug/`. The debug build's `applicationIdSuffix` is `.debug`, so the package on device is `com.gustiadhitya.sakuwise.debug` and the release build can coexist.
+Debug APK lands in `app/build/outputs/apk/debug/`. The debug build uses `applicationIdSuffix = ".debug"` so it coexists with the release build on device.
 
 ## Project Status
 
-**Current release: v1.0.4 (versionCode 5) — live on Google Play Store.**
+**Current release: v1.0.5 (versionCode 6) — in closed testing on Google Play.**
 
 V1 is in active use by the author as the primary personal finance tool. All major modules are implemented, exercised on emulator and physical device, and live in production.
 
+### What's in v1.0.5 — Security & Verification Pass
+
+- **Recents/task-switcher privacy** — App content is masked whenever Sakuwise is in the background, so the system thumbnail never shows financial data regardless of auto-lock setting.
+- **Android OS backup hardened** — Sensitive files (`sakuwise.db`, `dek.bin`, `pin.bin`, auto-backup PIN) are now explicitly excluded from Android Auto Backup on all API levels. The previous empty `dataExtractionRules` was silently enabling full cloud backup on API 31+.
+- **Atomic transfer writes** — A transfer + fee-expense pair is now written in a single Room `@Transaction`, preventing a partial write if the second insert failed.
+- **Notification lock-screen privacy** — Payment reminders no longer expose content on the lock screen (explicit `VISIBILITY_PRIVATE` + neutral public version).
+- **Backup tamper-detection tests** — Instrumented tests prove that a modified or corrupted `.sakuwise` file is rejected before any data is touched.
+- **Migration data-preservation test** — Instrumented test seeds records at schema v4, migrates to v5, and asserts every row survived with correct values.
+- **Room schema JSONs committed** — Schemas 1–5 are now tracked in the repo so `MigrationTestHelper` can read them in CI.
+
 ### What's in v1.0.4 — Hardening & External-User Readiness
-- **Safe database migrations** — `fallbackToDestructiveMigration` removed; a tested migration chain now covers schema versions 1–5. An unmigrated schema fails loudly at open time rather than silently wiping user data. Schema JSON is exported and committed as a baseline.
-- **Backup format versioning** — `.sakuwise` files now carry an explicit version marker. Older backups still restore on newer app versions; a version-too-new error is surfaced clearly if the file is newer than the app.
-- **CSV/XLSX round-trip** — Export column order and names now match the import format exactly. A round-trip unit test covers both id-ID and en-US header variants.
-- **Complete English localisation** — All previously hardcoded Indonesian strings (PDF export, backup error messages, transaction history, OCR screen, pickers, dashboard) are now in `strings.xml` and `strings-en.xml`. Zero leaks verified by manual walkthrough across all four tabs.
-- **Faster cold start** — Baseline Profile bundled; startup method hints generated on emulator and compiled into the APK.
-- **Static analysis & CI** — detekt + ktlint wired in with a legacy baseline; GitHub Actions runs build + unit tests + detekt on every push and pull request.
-- **Crash monitoring** — No SDK added. Crash and ANR data is read from Android Vitals in Play Console, keeping the no-telemetry promise intact.
+
+- **Safe database migrations** — `fallbackToDestructiveMigration` removed; a tested migration chain covers schema versions 1–5.
+- **Backup format versioning** — `.sakuwise` files carry an explicit version marker; older backups still restore on newer app versions.
+- **CSV/XLSX round-trip** — Export column names match the importer exactly; a unit test covers both locale header variants.
+- **Complete English localisation** — All previously hardcoded Indonesian strings now live in `strings.xml` / `strings-en.xml`.
+- **Static analysis & CI** — detekt + ktlint + GitHub Actions on every push.
+- **Faster cold start** — Baseline Profile bundled.
 
 ### What's in v1.0.3
-- **Auto-backup Drive mandiri** — Google Drive auto-backup now creates a fresh encrypted backup daily without requiring a prior manual backup. The encryption PIN is stored securely in Android Keystore (AES-256-GCM) and retrieved by the WorkManager background job.
-- **Live account balance in pickers** — Account picker and transaction form subtitles now show the live computed balance (income + transfers − expenses − fees + reconciliation), not the stale seed balance.
-- **Dashboard reactivity fix** — Changing a transaction date in history now immediately updates the dashboard. Root cause: `Transaction.equals()` was id-only, causing StateFlow deduplication to swallow field-only edits.
-- **Reconciliation display** — Positive reconciliation (user has more cash than computed) now displays with a green up-arrow, not a red expense icon.
-- **Backup status colour fix** — The backup row on the Me screen now shows warning yellow only when no backup exists or the last backup is older than 30 days; green/neutral when recent.
+
+- **Mandiri Drive auto-backup** — Daily Google Drive backup without requiring a prior manual backup. The encryption PIN is stored in Android Keystore.
+- **Live account balance in pickers** — Computed balance (not seed balance) shown in transaction forms.
+- **Dashboard reactivity fix** — Changing a transaction date now immediately updates the dashboard.
 
 ### V1.1 backlog
-- Auto-fire recurring-income worker (UseCase already implemented, not yet scheduled)
+
+- Biometric enrollment invalidation — new fingerprint enrollment should require PIN re-confirmation before unlocking (needs UX design)
 - Account detail — bank account number, branch, notes fields
-- Full dark-mode visual walkthrough (onboarding verified; detail screens not eye-checked)
-- Inline logo in exported PDF
-- V2: cloud sync, foreign currencies, iOS, family sharing
+- Restore atomicity — two-phase commit so a failed file-swap during restore doesn't leave the app in an unrecoverable state
+- Auto-fire recurring-income worker (UseCase already implemented, not yet scheduled)
 
 ## Repository Layout
 
@@ -157,7 +154,7 @@ app/
 │   │   ├── datastore/      # UserPreferencesRepository (DataStore)
 │   │   ├── designsystem/   # SwTheme, SwType, SwButton, SwField, SwCard, …
 │   │   ├── domain/         # models + repository interfaces + UseCases
-│   │   └── work/           # NetWorthSnapshotWorker, DriveAutoBackupWorker
+│   │   └── work/           # NetWorthSnapshotWorker, DriveAutoBackupWorker, ReminderWorker
 │   └── feature/
 │       ├── onboarding/     # 4-step flow + locale picker
 │       ├── dashboard/      # main screen
@@ -165,11 +162,13 @@ app/
 │       ├── transaction/    # Expense/Income/Transfer forms + OCR
 │       ├── asset/          # accounts, gold, land, deposit, debt
 │       ├── settings/       # hub + sub-screens (backup, PIN, export, …)
-│       └── lock/           # PIN/biometric unlock
+│       └── lock/           # PIN/biometric unlock + Recents masking
+├── schemas/                # Room schema JSON exports (v1–v5) for MigrationTestHelper
 └── src/main/res/
     ├── values/             # Bahasa Indonesia strings (default)
     └── values-en/          # English strings
 design/                     # PRD, design concept, handoff spec, prototype screens
+screenshots/                # Representative UI screenshots
 ```
 
 ## License & Attribution
