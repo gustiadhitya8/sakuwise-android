@@ -1030,4 +1030,57 @@
 
     <!-- i18n audit — Expense form -->
     <string name="expense_field_debt">Debt</string>
+
+    <!-- i18n audit pass 2 — Import/Export remaining literals -->
+    <string name="action_retry">Try Again</string>
+
+    <!-- Export Transactions (pass 2) -->
+    <string name="export_intro">Export all transactions to a CSV or XLSX file to open in Excel / Google Sheets.</string>
+    <string name="export_action_format">Export %1$s</string>
+    <string name="export_period_current_month">This Month</string>
+    <string name="export_period_last_30">Last 30 Days</string>
+    <string name="export_period_this_year">This Year</string>
+    <string name="export_period_all">All Time</string>
+    <string name="export_share_file">Share File</string>
+    <string name="export_open_file">Open File</string>
+    <string name="export_open_with">Open with</string>
+    <string name="export_again">Export Again</string>
+    <string name="export_err_unknown">Unknown</string>
+
+    <!-- Import Transactions (pass 2) -->
+    <string name="import_intro">Import transactions from a CSV file (semicolon-delimited). Format: Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan.</string>
+    <string name="import_pick_file">Choose CSV File</string>
+    <string name="import_download_template">Download CSV Template</string>
+    <string name="import_save_template">Save Template</string>
+    <string name="import_hint_date_label">Date</string>
+    <string name="import_hint_date_value">YYYYMMDD (e.g. 20260503)</string>
+    <string name="import_hint_type_label">Type</string>
+    <string name="import_hint_type_value">Expense / Income / Transfer</string>
+    <string name="import_hint_category_label">Category</string>
+    <string name="import_hint_category_value">Plan category name (optional)</string>
+    <string name="import_hint_item_label">Item</string>
+    <string name="import_hint_item_value">Item name under Category (optional)</string>
+    <string name="import_hint_account_label">Account</string>
+    <string name="import_hint_account_value">Account/wallet name (optional)</string>
+    <string name="import_hint_amount_label">Amount</string>
+    <string name="import_hint_amount_value">Numbers only, no Rp or separators</string>
+    <string name="import_hint_note_label">Note</string>
+    <string name="import_hint_note_value">Additional description (optional)</string>
+    <string name="import_header_bilingual">Headers can be Indonesian or English (Date/Tanggal, etc.).</string>
+    <string name="import_unresolved_accounts_format">%1$d account names not found</string>
+    <string name="import_unresolved_accounts_hint">Those rows will use the Fallback Account below. Make sure account names match exactly what\'s in the app.</string>
+    <string name="import_fallback_account_label">FALLBACK ACCOUNT</string>
+    <string name="import_pick_target_account">CHOOSE TARGET ACCOUNT</string>
+    <string name="import_fallback_account_hint">Used for rows without an Account column or that don\'t match</string>
+    <string name="import_all_to_account_hint">All transactions will go to this account</string>
+    <string name="import_update_n_format">Update %1$d Transactions</string>
+    <string name="import_import_n_format">Import %1$d Transactions</string>
+    <string name="import_pick_other_file">Choose Another File</string>
+    <string name="import_import_other_file">Import Another File</string>
+    <string name="import_err_empty_file">File is empty</string>
+    <string name="import_err_invalid_header">Invalid header. Required columns: Tanggal, Tipe, Jumlah (or Date, Type, Amount)</string>
+    <string name="import_err_bad_date_format">Row %1$d: unrecognized date format: \"%2$s\"</string>
+    <string name="import_err_no_valid_rows">No valid rows found in this file</string>
+    <string name="import_err_read_failed">Failed to read file</string>
+    <string name="import_err_cannot_open">Cannot open file</string>
 </resources>

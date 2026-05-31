@@ -64,7 +64,7 @@ fun ExportTransactionScreen(
     SimpleSettingsScreen(title = stringResource(R.string.export_title), onBack = onBack) {
 
         Text(
-            "Export semua transaksi ke file CSV atau XLSX untuk dibuka di Excel / Google Sheets.",
+            stringResource(R.string.export_intro),
             color = sw.inkMuted,
             style = SwType.LabelSmall.copy(fontSize = 13.sp),
         )
@@ -101,10 +101,10 @@ fun ExportTransactionScreen(
 
         SwCard(padding = PaddingValues(0.dp)) {
             Column {
-                ExportPeriodRow("Bulan Ini", period == ExportPeriod.CurrentMonth) { period = ExportPeriod.CurrentMonth }
-                ExportPeriodRow("30 Hari Terakhir", period == ExportPeriod.Last30Days) { period = ExportPeriod.Last30Days }
-                ExportPeriodRow("Tahun Ini", period == ExportPeriod.ThisYear) { period = ExportPeriod.ThisYear }
-                ExportPeriodRow("Semua Waktu", period == ExportPeriod.AllTime) { period = ExportPeriod.AllTime }
+                ExportPeriodRow(stringResource(R.string.export_period_current_month), period == ExportPeriod.CurrentMonth) { period = ExportPeriod.CurrentMonth }
+                ExportPeriodRow(stringResource(R.string.export_period_last_30), period == ExportPeriod.Last30Days) { period = ExportPeriod.Last30Days }
+                ExportPeriodRow(stringResource(R.string.export_period_this_year), period == ExportPeriod.ThisYear) { period = ExportPeriod.ThisYear }
+                ExportPeriodRow(stringResource(R.string.export_period_all), period == ExportPeriod.AllTime) { period = ExportPeriod.AllTime }
             }
         }
 
@@ -114,7 +114,7 @@ fun ExportTransactionScreen(
         when (val s = state) {
             is ExportTxnState.Idle -> {
                 SwButton(
-                    text = "Export ${format.name}",
+                    text = stringResource(R.string.export_action_format, format.name),
                     onClick = { viewModel.export(period, format) },
                     leading = {
                         Icon(Icons.Outlined.TableChart, null,
@@ -161,7 +161,7 @@ fun ExportTransactionScreen(
                 }
                 Spacer(Modifier.height(12.dp))
                 SwButton(
-                    text = "Bagikan File",
+                    text = stringResource(R.string.export_share_file),
                     onClick = {
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = mime
@@ -171,7 +171,7 @@ fun ExportTransactionScreen(
                         }
                         runCatching {
                             context.startActivity(
-                                Intent.createChooser(intent, "Bagikan File").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                Intent.createChooser(intent, context.getString(R.string.export_share_file)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                         }
                     },
@@ -181,7 +181,7 @@ fun ExportTransactionScreen(
                     },
                 )
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Buka File",
+                SwButton(text = stringResource(R.string.export_open_file),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(s.uri, mime)
@@ -190,14 +190,14 @@ fun ExportTransactionScreen(
                         }
                         runCatching {
                             context.startActivity(
-                                Intent.createChooser(intent, "Buka dengan").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                Intent.createChooser(intent, context.getString(R.string.export_open_with)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                         }
                     },
                     variant = SwButtonVariant.Outline,
                 )
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Export Ulang", onClick = { viewModel.clear() }, variant = SwButtonVariant.Ghost)
+                SwButton(text = stringResource(R.string.export_again), onClick = { viewModel.clear() }, variant = SwButtonVariant.Ghost)
             }
 
             is ExportTxnState.Failure -> {
@@ -218,7 +218,7 @@ fun ExportTransactionScreen(
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                SwButton(text = "Coba Lagi", onClick = { viewModel.export(period, format) })
+                SwButton(text = stringResource(R.string.action_retry), onClick = { viewModel.export(period, format) })
                 Spacer(Modifier.height(8.dp))
                 SwButton(text = stringResource(R.string.action_cancel), onClick = { viewModel.clear() }, variant = SwButtonVariant.Ghost)
             }

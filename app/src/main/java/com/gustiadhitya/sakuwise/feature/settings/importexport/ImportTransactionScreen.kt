@@ -76,7 +76,7 @@ fun ImportTransactionScreen(
     SimpleSettingsScreen(title = stringResource(R.string.import_title), onBack = onBack) {
 
         Text(
-            "Import transaksi dari file CSV (delimiter titik koma). Format: Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan.",
+            stringResource(R.string.import_intro),
             color = sw.inkMuted,
             style = SwType.LabelSmall.copy(fontSize = 13.sp),
         )
@@ -86,13 +86,13 @@ fun ImportTransactionScreen(
             // ── Idle ──────────────────────────────────────────────────
             is ImportUiState.Idle -> {
                 SwButton(
-                    text = "Pilih File CSV",
+                    text = stringResource(R.string.import_pick_file),
                     onClick = { launcher.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain", "*/*")) },
                     leading = { Icon(Icons.Outlined.FileOpen, null, tint = sw.onPrimary, modifier = Modifier.size(18.dp)) },
                 )
                 Spacer(Modifier.height(10.dp))
                 SwButton(
-                    text = "Unduh Template CSV",
+                    text = stringResource(R.string.import_download_template),
                     onClick = {
                         runCatching {
                             val uri = viewModel.shareTemplate()
@@ -103,7 +103,7 @@ fun ImportTransactionScreen(
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             }
                             context.startActivity(
-                                Intent.createChooser(intent, "Simpan Template").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                Intent.createChooser(intent, context.getString(R.string.import_save_template)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                         }
                     },
@@ -116,16 +116,16 @@ fun ImportTransactionScreen(
                         Text(stringResource(R.string.import_format_required), color = sw.ink,
                             style = SwType.LabelStrong.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold))
                         Spacer(Modifier.height(4.dp))
-                        FormatHintRow("Tanggal", "YYYYMMDD  (mis. 20260503)")
-                        FormatHintRow("Tipe", "Expense / Income / Transfer")
-                        FormatHintRow("Kategori", "Nama kategori di Plan (opsional)")
-                        FormatHintRow("Item", "Nama item di bawah Kategori (opsional)")
-                        FormatHintRow("Akun", "Nama akun/dompet (opsional)")
-                        FormatHintRow("Jumlah", "Angka saja, tanpa Rp atau titik")
-                        FormatHintRow("Catatan", "Deskripsi tambahan (opsional)")
+                        FormatHintRow(stringResource(R.string.import_hint_date_label), stringResource(R.string.import_hint_date_value))
+                        FormatHintRow(stringResource(R.string.import_hint_type_label), stringResource(R.string.import_hint_type_value))
+                        FormatHintRow(stringResource(R.string.import_hint_category_label), stringResource(R.string.import_hint_category_value))
+                        FormatHintRow(stringResource(R.string.import_hint_item_label), stringResource(R.string.import_hint_item_value))
+                        FormatHintRow(stringResource(R.string.import_hint_account_label), stringResource(R.string.import_hint_account_value))
+                        FormatHintRow(stringResource(R.string.import_hint_amount_label), stringResource(R.string.import_hint_amount_value))
+                        FormatHintRow(stringResource(R.string.import_hint_note_label), stringResource(R.string.import_hint_note_value))
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Header bisa bahasa Indonesia atau English (Date/Tanggal, dll.).",
+                            stringResource(R.string.import_header_bilingual),
                             color = sw.inkSubtle,
                             style = SwType.LabelSmall.copy(fontSize = 11.sp),
                         )
@@ -201,8 +201,8 @@ fun ImportTransactionScreen(
                 // Unresolved account names warning
                 if (s.unresolvedAccounts > 0) {
                     Spacer(Modifier.height(8.dp))
-                    WarningChip("${s.unresolvedAccounts} nama akun tidak ditemukan",
-                        "Baris tersebut akan menggunakan Akun Cadangan di bawah. Pastikan nama akun sama persis dengan yang ada di aplikasi.")
+                    WarningChip(stringResource(R.string.import_unresolved_accounts_format, s.unresolvedAccounts),
+                        stringResource(R.string.import_unresolved_accounts_hint))
                 }
 
                 if (s.errors.isNotEmpty()) {
@@ -226,10 +226,11 @@ fun ImportTransactionScreen(
 
                 // Fallback account picker — shown when some rows have no resolved account
                 if (s.needsFallbackAccount) {
-                    val label = if (s.unresolvedAccounts > 0) "AKUN CADANGAN" else "PILIH AKUN TUJUAN"
+                    val label = if (s.unresolvedAccounts > 0) stringResource(R.string.import_fallback_account_label)
+                        else stringResource(R.string.import_pick_target_account)
                     val sub   = if (s.unresolvedAccounts > 0)
-                        "Digunakan untuk baris tanpa kolom Akun atau yang tidak cocok"
-                    else "Semua transaksi akan masuk ke akun ini"
+                        stringResource(R.string.import_fallback_account_hint)
+                    else stringResource(R.string.import_all_to_account_hint)
                     Text(label, color = sw.inkSubtle,
                         style = SwType.SectionLabel.copy(fontSize = 11.sp),
                         modifier = Modifier.padding(start = 4.dp, bottom = 2.dp))
@@ -318,7 +319,7 @@ fun ImportTransactionScreen(
                 Spacer(Modifier.height(10.dp))
 
                 val canImport = !s.needsFallbackAccount || selectedAccountId != null
-                val importLabel = if (updateMode) "Perbarui ${s.rows.size} Transaksi" else "Import ${s.rows.size} Transaksi"
+                val importLabel = if (updateMode) stringResource(R.string.import_update_n_format, s.rows.size) else stringResource(R.string.import_import_n_format, s.rows.size)
                 SwButton(
                     text = importLabel,
                     onClick = { viewModel.importRows(s.rows, selectedAccountId, updateMode) },
@@ -326,7 +327,7 @@ fun ImportTransactionScreen(
                     leading = { Icon(Icons.Outlined.UploadFile, null, tint = sw.onPrimary, modifier = Modifier.size(18.dp)) },
                 )
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Pilih File Lain", onClick = { viewModel.reset() }, variant = SwButtonVariant.Ghost)
+                SwButton(text = stringResource(R.string.import_pick_other_file), onClick = { viewModel.reset() }, variant = SwButtonVariant.Ghost)
             }
 
             // ── Importing ─────────────────────────────────────────────
@@ -373,7 +374,7 @@ fun ImportTransactionScreen(
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                SwButton(text = "Import File Lain", onClick = { viewModel.reset() }, variant = SwButtonVariant.Outline)
+                SwButton(text = stringResource(R.string.import_import_other_file), onClick = { viewModel.reset() }, variant = SwButtonVariant.Outline)
                 Spacer(Modifier.height(8.dp))
                 SwButton(text = stringResource(R.string.action_done), onClick = onBack, variant = SwButtonVariant.Ghost)
             }
@@ -396,12 +397,12 @@ fun ImportTransactionScreen(
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                SwButton(text = "Coba Lagi", onClick = {
+                SwButton(text = stringResource(R.string.action_retry), onClick = {
                     viewModel.reset()
                     launcher.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain", "*/*"))
                 })
                 Spacer(Modifier.height(8.dp))
-                SwButton(text = "Batal", onClick = { viewModel.reset() }, variant = SwButtonVariant.Ghost)
+                SwButton(text = stringResource(R.string.action_cancel), onClick = { viewModel.reset() }, variant = SwButtonVariant.Ghost)
             }
         }
     }

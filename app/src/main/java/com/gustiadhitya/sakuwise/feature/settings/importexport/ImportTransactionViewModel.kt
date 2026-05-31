@@ -3,6 +3,7 @@ package com.gustiadhitya.sakuwise.feature.settings.importexport
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.gustiadhitya.sakuwise.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gustiadhitya.sakuwise.core.domain.model.Account
@@ -74,9 +75,14 @@ class ImportTransactionViewModel @Inject constructor(
                     context.contentResolver.openInputStream(uri)
                         ?.bufferedReader(Charsets.UTF_8)
                         ?.readText()
-                        ?: error("Tidak bisa membuka file")
+                        ?: error(context.getString(R.string.import_err_cannot_open))
                 }
-                val parsed = withContext(Dispatchers.Default) { TransactionCsvParser.parse(text) }
+                val parserStrings = TransactionCsvParser.ParserStrings(
+                    emptyFile = context.getString(R.string.import_err_empty_file),
+                    invalidHeader = context.getString(R.string.import_err_invalid_header),
+                    badDateTemplate = context.getString(R.string.import_err_bad_date_format),
+                )
+                val parsed = withContext(Dispatchers.Default) { TransactionCsvParser.parse(text, parserStrings) }
 
                 // Resolve (date, kategori, item) → planItemId for rows that have kategori + item
                 val lookup = withContext(Dispatchers.IO) { buildPlanItemLookup() }
@@ -118,7 +124,7 @@ class ImportTransactionViewModel @Inject constructor(
                         result.rows.isEmpty() && result.errors.isNotEmpty() ->
                             ImportUiState.Err(result.errors.first())
                         result.rows.isEmpty() ->
-                            ImportUiState.Err("Tidak ada baris valid ditemukan di file ini")
+                            ImportUiState.Err(context.getString(R.string.import_err_no_valid_rows))
                         else ->
                             ImportUiState.Preview(
                                 result.rows, result.skipped, result.errors,
@@ -128,7 +134,7 @@ class ImportTransactionViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
-                    _state.value = ImportUiState.Err(e.message ?: "Gagal membaca file")
+                    _state.value = ImportUiState.Err(e.message ?: context.getString(R.string.import_err_read_failed))
                 },
             )
         }

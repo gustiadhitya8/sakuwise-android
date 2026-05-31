@@ -1,12 +1,15 @@
 package com.gustiadhitya.sakuwise.feature.settings.importexport
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gustiadhitya.sakuwise.R
 import com.gustiadhitya.sakuwise.core.datastore.UserPreferencesRepository
 import com.gustiadhitya.sakuwise.core.domain.usecase.ComputeCurrentPlanPeriodUseCase
 import com.gustiadhitya.sakuwise.feature.settings.export.ExportPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +27,7 @@ sealed interface ExportTxnState {
 
 @HiltViewModel
 class ExportTransactionViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val exportUseCase: ExportTransactionsUseCase,
     private val computePlanPeriod: ComputeCurrentPlanPeriodUseCase,
     private val prefsRepo: UserPreferencesRepository,
@@ -39,7 +43,7 @@ class ExportTransactionViewModel @Inject constructor(
             val (start, end) = resolveRange(period)
             exportUseCase(start, end, format).fold(
                 onSuccess = { (uri, count) -> _state.value = ExportTxnState.Ready(uri, count, format) },
-                onFailure = { t -> _state.value = ExportTxnState.Failure(t.message ?: "Tidak diketahui") },
+                onFailure = { t -> _state.value = ExportTxnState.Failure(t.message ?: context.getString(R.string.export_err_unknown)) },
             )
         }
     }

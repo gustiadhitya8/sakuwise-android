@@ -24,6 +24,13 @@ data class ParseResult(
 
 object TransactionCsvParser {
 
+    /** Localized error strings supplied by the UI layer (parser stays Android-free). */
+    data class ParserStrings(
+        val emptyFile: String,
+        val invalidHeader: String,
+        val badDateTemplate: String,
+    )
+
     /**
      * Canonical column schema, in order. Export writes exactly these columns
      * in this order, and the import template uses them, so export → import is
@@ -43,10 +50,10 @@ object TransactionCsvParser {
         DateTimeFormatter.ofPattern("dd/M/yyyy"),
     )
 
-    fun parse(csvText: String): ParseResult {
+    fun parse(csvText: String, strings: ParserStrings): ParseResult {
         val text = csvText.trimStart('﻿')
         val lines = text.lines().filter { it.isNotBlank() }
-        if (lines.isEmpty()) return ParseResult(emptyList(), 0, listOf("File kosong"))
+        if (lines.isEmpty()) return ParseResult(emptyList(), 0, listOf(strings.emptyFile))
 
         // Strip parenthetical suffixes so "Catatan (Opsional)" matches as "catatan"
         val headerRow = parseCsvLine(lines.first()).map { it.trim().lowercase().substringBefore("(").trim() }
@@ -65,7 +72,7 @@ object TransactionCsvParser {
         if (dateIdx < 0 || typeIdx < 0 || amountIdx < 0) {
             return ParseResult(
                 emptyList(), 0,
-                listOf("Header tidak valid. Kolom wajib: Tanggal, Tipe, Jumlah (atau Date, Type, Amount)"),
+                listOf(strings.invalidHeader),
             )
         }
 
@@ -85,7 +92,7 @@ object TransactionCsvParser {
             val dateRaw = cols.getOrNull(dateIdx)?.trim() ?: ""
             val date = parseDate(dateRaw)
             if (date == null) {
-                errors.add("Baris $lineNo: format tanggal tidak dikenali: \"$dateRaw\"")
+                errors.add(strings.badDateTemplate.format(lineNo, dateRaw))
                 skipped++; continue
             }
 

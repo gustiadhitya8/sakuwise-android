@@ -18,6 +18,12 @@ import java.time.LocalDate
  */
 class ExportImportRoundTripTest {
 
+    private val testStrings = TransactionCsvParser.ParserStrings(
+        emptyFile = "File kosong",
+        invalidHeader = "Header tidak valid",
+        badDateTemplate = "Baris %1\$d: format tanggal tidak dikenali: \"%2\$s\"",
+    )
+
     // Column order = Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan
     private fun row(vararg cols: String) = cols.joinToString(";")
 
@@ -31,7 +37,7 @@ class ExportImportRoundTripTest {
             row("20260503", "Expense", "Makan", "ShopeeFood", "BCA", "45000", "Egg Roll, Basgor"),
         )
 
-        val result = TransactionCsvParser.parse(text)
+        val result = TransactionCsvParser.parse(text, testStrings)
 
         assertEquals(0, result.errors.size)
         assertEquals(1, result.rows.size)
@@ -57,8 +63,8 @@ class ExportImportRoundTripTest {
             row("20260501", "Income", "Gaji", "", "BCA", "5000000", "Gaji Mei"),
         )
 
-        val id = TransactionCsvParser.parse(idText).rows.single()
-        val en = TransactionCsvParser.parse(enText).rows.single()
+        val id = TransactionCsvParser.parse(idText, testStrings).rows.single()
+        val en = TransactionCsvParser.parse(enText, testStrings).rows.single()
 
         assertEquals(id.date, en.date)
         assertEquals(id.type, en.type)
@@ -79,7 +85,7 @@ class ExportImportRoundTripTest {
             row("20260510", "Transfer", "", "", "Tunai", "200000", "ke BCA"),
         )
 
-        val r = TransactionCsvParser.parse(text).rows.single()
+        val r = TransactionCsvParser.parse(text, testStrings).rows.single()
 
         assertEquals(TxnType.Transfer, r.type)
         assertEquals(200_000L, r.amount)

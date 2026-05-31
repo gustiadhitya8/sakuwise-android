@@ -64,7 +64,7 @@ class ExportTransactionsUseCase @Inject constructor(
             val exportsDir = File(context.cacheDir, "exports").apply { mkdirs() }
             val stamp      = DateTimeFormatter.ofPattern("yyyyMMdd").format(LocalDate.now())
             val ext        = if (format == ExportFormat.Csv) "csv" else "xlsx"
-            val file       = File(exportsDir, "sakuwise_transaksi_$stamp.$ext")
+            val file       = File(exportsDir, "sakuwise_transactions_$stamp.$ext")
 
             when (format) {
                 ExportFormat.Csv  -> writeCsv(file, headers, rows)
@@ -100,13 +100,23 @@ class ExportTransactionsUseCase @Inject constructor(
         return listOf(
             t.date.format(dateFmt),
             tipe,
-            kategori,
-            item,
-            nameById[t.sourceAccountId] ?: "",
+            neutralizeFormula(kategori),
+            neutralizeFormula(item),
+            neutralizeFormula(nameById[t.sourceAccountId] ?: ""),
             t.amount.toString(),
-            t.note ?: "",
+            neutralizeFormula(t.note ?: ""),
         )
     }
+
+    /**
+     * CSV formula-injection guard: a spreadsheet (Excel/Sheets) executes a cell
+     * that begins with = + - @ (or tab/CR) as a formula. User-entered text
+     * (category/item/account/note) could otherwise be run as a formula when the
+     * exported file is opened. Prefix such cells with an apostrophe so they are
+     * treated as literal text. Applied to user-controlled fields only.
+     */
+    private fun neutralizeFormula(s: String): String =
+        if (s.isNotEmpty() && s.first() in charArrayOf('=', '+', '-', '@', '\t', '\r')) "'$s" else s
 
     /**
      * Builds planItemId → (categoryName, itemName) by traversing all plans.

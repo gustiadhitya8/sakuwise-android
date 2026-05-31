@@ -1030,4 +1030,57 @@
 
     <!-- i18n audit — Expense form -->
     <string name="expense_field_debt">Hutang</string>
+
+    <!-- i18n audit pass 2 — Import/Export remaining literals -->
+    <string name="action_retry">Coba Lagi</string>
+
+    <!-- Export Transaksi (pass 2) -->
+    <string name="export_intro">Export semua transaksi ke file CSV atau XLSX untuk dibuka di Excel / Google Sheets.</string>
+    <string name="export_action_format">Export %1$s</string>
+    <string name="export_period_current_month">Bulan Ini</string>
+    <string name="export_period_last_30">30 Hari Terakhir</string>
+    <string name="export_period_this_year">Tahun Ini</string>
+    <string name="export_period_all">Semua Waktu</string>
+    <string name="export_share_file">Bagikan File</string>
+    <string name="export_open_file">Buka File</string>
+    <string name="export_open_with">Buka dengan</string>
+    <string name="export_again">Export Ulang</string>
+    <string name="export_err_unknown">Tidak diketahui</string>
+
+    <!-- Import Transaksi (pass 2) -->
+    <string name="import_intro">Import transaksi dari file CSV (delimiter titik koma). Format: Tanggal;Tipe;Kategori;Item;Akun;Jumlah;Catatan.</string>
+    <string name="import_pick_file">Pilih File CSV</string>
+    <string name="import_download_template">Unduh Template CSV</string>
+    <string name="import_save_template">Simpan Template</string>
+    <string name="import_hint_date_label">Tanggal</string>
+    <string name="import_hint_date_value">YYYYMMDD  (mis. 20260503)</string>
+    <string name="import_hint_type_label">Tipe</string>
+    <string name="import_hint_type_value">Expense / Income / Transfer</string>
+    <string name="import_hint_category_label">Kategori</string>
+    <string name="import_hint_category_value">Nama kategori di Plan (opsional)</string>
+    <string name="import_hint_item_label">Item</string>
+    <string name="import_hint_item_value">Nama item di bawah Kategori (opsional)</string>
+    <string name="import_hint_account_label">Akun</string>
+    <string name="import_hint_account_value">Nama akun/dompet (opsional)</string>
+    <string name="import_hint_amount_label">Jumlah</string>
+    <string name="import_hint_amount_value">Angka saja, tanpa Rp atau titik</string>
+    <string name="import_hint_note_label">Catatan</string>
+    <string name="import_hint_note_value">Deskripsi tambahan (opsional)</string>
+    <string name="import_header_bilingual">Header bisa bahasa Indonesia atau English (Date/Tanggal, dll.).</string>
+    <string name="import_unresolved_accounts_format">%1$d nama akun tidak ditemukan</string>
+    <string name="import_unresolved_accounts_hint">Baris tersebut akan menggunakan Akun Cadangan di bawah. Pastikan nama akun sama persis dengan yang ada di aplikasi.</string>
+    <string name="import_fallback_account_label">AKUN CADANGAN</string>
+    <string name="import_pick_target_account">PILIH AKUN TUJUAN</string>
+    <string name="import_fallback_account_hint">Digunakan untuk baris tanpa kolom Akun atau yang tidak cocok</string>
+    <string name="import_all_to_account_hint">Semua transaksi akan masuk ke akun ini</string>
+    <string name="import_update_n_format">Perbarui %1$d Transaksi</string>
+    <string name="import_import_n_format">Import %1$d Transaksi</string>
+    <string name="import_pick_other_file">Pilih File Lain</string>
+    <string name="import_import_other_file">Import File Lain</string>
+    <string name="import_err_empty_file">File kosong</string>
+    <string name="import_err_invalid_header">Header tidak valid. Kolom wajib: Tanggal, Tipe, Jumlah (atau Date, Type, Amount)</string>
+    <string name="import_err_bad_date_format">Baris %1$d: format tanggal tidak dikenali: \"%2$s\"</string>
+    <string name="import_err_no_valid_rows">Tidak ada baris valid ditemukan di file ini</string>
+    <string name="import_err_read_failed">Gagal membaca file</string>
+    <string name="import_err_cannot_open">Tidak bisa membuka file</string>
 </resources>
