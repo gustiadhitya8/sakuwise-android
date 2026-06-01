@@ -764,15 +764,17 @@ class ComputeNetWorthTrendUseCase @Inject constructor(
         // net worth regardless of whether the daily worker has run yet.
         snapshotToday(today)
 
-        // Non-account assets (gold, land, deposits) have no per-month snapshot
-        // history — only account balances are tracked transactionally. When a
-        // user enters their gold/land/deposits for the first time, historical
-        // monthly snapshots have goldTotal=0 etc., making the chart appear to
-        // show only account data. Fix: use the CURRENT non-account component
-        // for every historical month, so the chart shows account evolution
-        // (which does change month-to-month) against a stable non-account
-        // baseline. The latest data point equals the Aset card total exactly.
-        val nonAccountOffset = currentNw?.let {
+        // Chart value strategy — two cases:
+        //
+        // A) Snapshot already has non-account data (goldTotal|landTotal|depositTotal > 0):
+        //    Use snapshot.total directly. This correctly captures every month-over-month
+        //    change: deposit balance updates, gold price changes, new debts, etc.
+        //
+        // B) Snapshot has zero for all non-account categories but the user NOW has
+        //    those assets (snapshot was taken before they were entered into the app):
+        //    Use accountsTotal + current non-account total so the chart doesn't look
+        //    like it shows account-only data for those early months.
+        val nonAccountFallback = currentNw?.let {
             it.goldTotal + it.landTotal + it.depositTotal - it.debtsTotal
         }
 
@@ -781,8 +783,13 @@ class ComputeNetWorthTrendUseCase @Inject constructor(
             .groupBy { YearMonth.from(LocalDate.ofEpochDay(it.epochDay)) }
             .mapValues { (_, rows) ->
                 val snap = rows.maxByOrNull { it.epochDay }!!
-                if (nonAccountOffset != null) snap.accountsTotal + nonAccountOffset
-                else snap.total
+                val snapHasNonAccountData =
+                    snap.goldTotal > 0L || snap.landTotal > 0L || snap.depositTotal > 0L
+                if (snapHasNonAccountData || nonAccountFallback == null || nonAccountFallback <= 0L) {
+                    snap.total   // case A — use the full recorded total
+                } else {
+                    snap.accountsTotal + nonAccountFallback  // case B — inject current non-account
+                }
             }
 
         return (monthsBack downTo 0).mapNotNull { m ->
