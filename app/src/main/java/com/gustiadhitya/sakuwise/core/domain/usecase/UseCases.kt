@@ -758,27 +758,32 @@ class ComputeNetWorthTrendUseCase @Inject constructor(
     suspend operator fun invoke(
         today: LocalDate = LocalDate.now(),
         monthsBack: Int = 11,
+        currentNw: ComputeNetWorthUseCase.NetWorth? = null,
     ): List<Pair<LocalDate, Long>> {
         // Refresh today's snapshot so the chart always ends at the current
         // net worth regardless of whether the daily worker has run yet.
         snapshotToday(today)
 
-        // --- Aggregate daily snapshots → one value per calendar month ------
-        // Use ONLY real snapshot data. Never backfill synthetic values for
-        // months where the user had no app data — that creates a misleading
-        // flat baseline followed by a false "drop" when real data begins.
-        //
-        // Strategy: take the LAST daily snapshot of each calendar month as
-        // the monthly close value, then return all months that have real data
-        // within the (monthsBack+1)-month window.
-        //
-        // Consequence: fresh users see fewer data points (honest). The chart
-        // empty-state in the UI explains this to the user. Filters naturally
-        // start differentiating once multiple real months accumulate.
+        // Non-account assets (gold, land, deposits) have no per-month snapshot
+        // history — only account balances are tracked transactionally. When a
+        // user enters their gold/land/deposits for the first time, historical
+        // monthly snapshots have goldTotal=0 etc., making the chart appear to
+        // show only account data. Fix: use the CURRENT non-account component
+        // for every historical month, so the chart shows account evolution
+        // (which does change month-to-month) against a stable non-account
+        // baseline. The latest data point equals the Aset card total exactly.
+        val nonAccountOffset = currentNw?.let {
+            it.goldTotal + it.landTotal + it.depositTotal - it.debtsTotal
+        }
+
         val snapshots = snapshotDao.observeAll().first()
         val realByMonth: Map<YearMonth, Long> = snapshots
             .groupBy { YearMonth.from(LocalDate.ofEpochDay(it.epochDay)) }
-            .mapValues { (_, rows) -> rows.maxByOrNull { it.epochDay }!!.total }
+            .mapValues { (_, rows) ->
+                val snap = rows.maxByOrNull { it.epochDay }!!
+                if (nonAccountOffset != null) snap.accountsTotal + nonAccountOffset
+                else snap.total
+            }
 
         return (monthsBack downTo 0).mapNotNull { m ->
             val ym = YearMonth.from(today).minusMonths(m.toLong())

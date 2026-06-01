@@ -55,8 +55,8 @@ class AssetsHubViewModel @Inject constructor(
         // Recompute the trend any time the net-worth value changes (cheap O(N*M)
         // over ≤ 10k txns × 12 months → microseconds in practice).
         viewModelScope.launch {
-            computeNetWorth().collect { _ ->
-                _trend.value = computeNetWorthTrend()
+            computeNetWorth().collect { nw ->
+                _trend.value = computeNetWorthTrend(currentNw = nw)
             }
         }
     }
