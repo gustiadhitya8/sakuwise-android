@@ -62,19 +62,6 @@ Sakuwise is **local-first** by design:
 
 ## Screenshots
 
-<p align="center">
-  <img src="screenshots/sc_dashboard.png"  alt="Beranda / Dashboard" width="22%">
-  <img src="screenshots/sc_plan.png"        alt="Plan & Alokasi"     width="22%">
-  <img src="screenshots/sc_assets.png"      alt="Aset & Kekayaan"   width="22%">
-  <img src="screenshots/sc_settings.png"    alt="Saya / Settings"   width="22%">
-</p>
-
-<p align="center">
-  <img src="screenshots/sc_dashboard2.png"  alt="Transaksi Terbaru" width="22%">
-  <img src="screenshots/sc_history.png"     alt="Riwayat Transaksi" width="22%">
-  <img src="screenshots/v105_lock.png"      alt="Lock Screen"       width="22%">
-</p>
-
 **Beranda** — hero card SISA ANGGARAN dengan anggaran harian, progress alokasi Kebutuhan/Keinginan/Investasi, strip Aset & Kekayaan.  
 **Plan** — periode aktif, expected income, breakdown alokasi 50/30/20, per-kategori planned vs aktual.  
 **Aset & Kekayaan** — total net worth hero, tren kekayaan, empat kelas aset (Akun, Emas, Properti, Deposito).  
@@ -118,6 +105,8 @@ V1 is in active use by the author as the primary personal finance tool. All majo
 
 ### What's in v1.0.5 — Security & Verification Pass
 
+- **Aset Hub chart accuracy** — Net worth trend chart now correctly includes gold, land, and deposit totals (not just account balances). Snapshots with recorded non-account data use the snapshot value directly; older snapshots without it blend the account history with current non-account totals.
+- **Gold icon** — Gold asset entries now display a gold ingot icon instead of a diamond gem.
 - **Recents/task-switcher privacy** — App content is masked whenever Sakuwise is in the background, so the system thumbnail never shows financial data regardless of auto-lock setting.
 - **Android OS backup hardened** — Sensitive files (`sakuwise.db`, `dek.bin`, `pin.bin`, auto-backup PIN) are now explicitly excluded from Android Auto Backup on all API levels. The previous empty `dataExtractionRules` was silently enabling full cloud backup on API 31+.
 - **Atomic transfer writes** — A transfer + fee-expense pair is now written in a single Room `@Transaction`, preventing a partial write if the second insert failed.
@@ -176,7 +165,6 @@ app/
     ├── values/             # Bahasa Indonesia strings (default)
     └── values-en/          # English strings
 design/                     # PRD, design concept, handoff spec, prototype screens
-screenshots/                # Representative UI screenshots
 ```
 
 ## License & Attribution
