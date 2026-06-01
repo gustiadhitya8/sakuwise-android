@@ -37,3 +37,8 @@ restore-dumps/
 HANDOFF*.md
 PLAN_*.md
 SECURITY_AUDIT_*.md
+
+# Release build artifacts — signed APKs/AABs stay local, uploaded directly to Play
+app/release/
+screenshots/
+screenshots.zip

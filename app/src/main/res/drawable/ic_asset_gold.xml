@@ -3,28 +3,25 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+    <!-- Front face of gold ingot -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="1.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M6,6 H18 L20,11 L12,21 L4,11 Z" />
+        android:pathData="M3,14 L3,20 Q3,21 4,21 L20,21 Q21,21 21,20 L21,14 Z" />
+    <!-- Top angled face (isometric perspective) -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="1.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M6,6 L8,11 H16 L18,6" />
+        android:pathData="M3,14 L6,10 L18,10 L21,14" />
+    <!-- Inner stamp rectangle on front face -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="1.8"
+        android:strokeWidth="1.4"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M4,11 H20" />
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M12,11 V21" />
+        android:pathData="M7,16 L7,19 L17,19 L17,16 Z" />
 </vector>
